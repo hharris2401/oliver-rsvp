@@ -107,15 +107,72 @@
 #forceQuote.dark{
   color:#ff9a9a;
 }
+    #confetti{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99998; /* above hyperspace, below message */
+}
+
+/* Hidden birthday overlay */
+.secretMsg{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .25s ease;
+  z-index: 99999; /* top */
+}
+
+.secretMsg.show{
+  opacity: 1;
+}
+
+.secretCard{
+  pointer-events: none;
+  text-align: center;
+  padding: 18px 18px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.72);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,.5);
+  backdrop-filter: blur(6px);
+  max-width: 92vw;
+}
+
+.secretTitle{
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  font-size: clamp(20px, 5vw, 34px);
+}
+
+.secretSub{
+  opacity: .9;
+  margin-top: 8px;
+  font-size: clamp(12px, 3.2vw, 16px);
+}
   </style>
 </head>
 
 <body>
   <canvas id="hyperspace"></canvas>
+  <canvas id="confetti"></canvas>
+
+<div id="secretMsg" class="secretMsg">
+  <div class="secretCard">
+    <div class="secretTitle">🎉 HAPPY BIRTHDAY, OLIVER! 🎉</div>
+    <div class="secretSub">May the Force be with you on Level 8 🚀</div>
+  </div>
+</div>
 <div id="forceQuote"></div>
   <div class="card">
     <div class="top">
-      <div class="title">THE BALANCE OF EIGHT</div>
+      <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
       <div class="subtitle">Tap to ignite. Then continue to RSVP.</div>
 
       <div class="pillrow">
@@ -123,7 +180,104 @@
         <div class="pill red">DARK SIDE</div>
       </div>
     </div>
+// ===== CONFETTI ENGINE (no library) =====
+const confettiCanvas = document.getElementById("confetti");
+const confettiCtx = confettiCanvas.getContext("2d", { alpha: true });
 
+function confettiResize(){
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  confettiCanvas.width = Math.floor(window.innerWidth * dpr);
+  confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+  confettiCanvas.style.width = window.innerWidth + "px";
+  confettiCanvas.style.height = window.innerHeight + "px";
+  confettiCtx.setTransform(dpr,0,0,dpr,0,0);
+}
+confettiResize();
+window.addEventListener("resize", confettiResize);
+
+function fireConfetti(durationMs = 2200){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const start = performance.now();
+
+  const pieces = Array.from({ length: 140 }, () => ({
+    x: Math.random() * w,
+    y: -20 - Math.random() * h * 0.2,
+    vx: -1.2 + Math.random() * 2.4,
+    vy: 3.2 + Math.random() * 5.6,
+    r: 4 + Math.random() * 6,
+    rot: Math.random() * Math.PI,
+    vr: (-0.2 + Math.random() * 0.4),
+    // Star Wars-ish palette: gold/blue/red/white
+    c: (["#ffd36b", "#00aaff", "#ff3c3c", "#ffffff"][(Math.random()*4)|0]),
+    life: 0.85 + Math.random() * 0.6
+  }));
+
+  function frame(t){
+    const p = Math.min(1, (t - start) / durationMs);
+
+    confettiCtx.clearRect(0,0,w,h);
+
+    for (const q of pieces){
+      q.x += q.vx;
+      q.y += q.vy;
+      q.vy += 0.03;          // gravity
+      q.rot += q.vr;
+
+      // wrap sideways
+      if (q.x < -30) q.x = w + 30;
+      if (q.x > w + 30) q.x = -30;
+
+      // fade out near end
+      const fade = p < 0.75 ? 1 : (1 - (p - 0.75) / 0.25);
+      confettiCtx.globalAlpha = fade * q.life;
+
+      confettiCtx.save();
+      confettiCtx.translate(q.x, q.y);
+      confettiCtx.rotate(q.rot);
+      confettiCtx.fillStyle = q.c;
+      confettiCtx.fillRect(-q.r, -q.r*0.6, q.r*2, q.r*1.2);
+      confettiCtx.restore();
+    }
+
+    if (p < 1) requestAnimationFrame(frame);
+    else confettiCtx.clearRect(0,0,w,h);
+  }
+
+  requestAnimationFrame(frame);
+}
+
+// ===== SECRET BDAY EASTER EGG: 5 taps on title =====
+(function birthdayEgg(){
+  const title = document.getElementById("secretTitle"); // <-- you add this id in step 4
+  const msg = document.getElementById("secretMsg");
+  if (!title || !msg) return;
+
+  let taps = 0;
+  let timer = null;
+
+  function showBirthday(){
+    msg.classList.add("show");
+    fireConfetti(2600);
+
+    // optional light haptic
+    if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+
+    // hide after 2.5s
+    setTimeout(() => msg.classList.remove("show"), 2500);
+  }
+
+  title.addEventListener("click", () => {
+    taps++;
+    clearTimeout(timer);
+    timer = setTimeout(() => (taps = 0), 900);
+
+    if (taps >= 5){
+      taps = 0;
+      showBirthday();
+    }
+  });
+})();
     <div class="mid">
       <button class="btn gold" id="igniteBtn">TAP TO IGNITE LIGHTSABER ⚔️</button>
 
