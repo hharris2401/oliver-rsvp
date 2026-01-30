@@ -106,6 +106,26 @@
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       window.location.href = RSVP_FORM;
     });
+    // ===== TEMP CANVAS TEST (remove after test) =====
+(() => {
+  const c = document.getElementById("hyperspace");
+  if (!c) return;
+  const ctx = c.getContext("2d", { alpha: true });
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+  c.width = Math.floor(window.innerWidth * dpr);
+  c.height = Math.floor(window.innerHeight * dpr);
+  c.style.width = window.innerWidth + "px";
+  c.style.height = window.innerHeight + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  ctx.fillStyle = "rgba(0,170,255,0.18)";
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+  setTimeout(() => ctx.clearRect(0, 0, window.innerWidth, window.innerHeight), 1200);
+})();
+// ===== END TEMP CANVAS TEST =====
   </script>
 </body>
 </html>
