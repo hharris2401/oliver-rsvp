@@ -172,14 +172,16 @@
       position:relative;
       z-index:2;
 
-      /* Entrance animation */
+      /* Starts hidden until crawl ends */
       opacity:0;
       transform: translateY(14px) scale(0.99);
       transition: opacity 600ms ease, transform 650ms ease;
+      pointer-events:none;
     }
     .card.enter{
       opacity:1;
       transform: translateY(0) scale(1);
+      pointer-events:auto;
     }
     @media (prefers-reduced-motion: reduce){
       .card{ transition:none; transform:none; }
@@ -232,13 +234,16 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl (SLOWER so it's readable) ===== */
+    /* ===== Opening Crawl (NOW MUCH SLOWER + shows starfield behind) ===== */
     #crawl{
       position: fixed;
       inset: 0;
       z-index: 100002;
       pointer-events: none;
-      background: radial-gradient(circle at 50% 30%, rgba(0,0,0,.25), rgba(0,0,0,.85) 65%, rgba(0,0,0,.95));
+
+      /* Transparent enough to SEE the starfield "starting background" */
+      background:
+        radial-gradient(circle at 50% 30%, rgba(0,0,0,.10), rgba(0,0,0,.55) 65%, rgba(0,0,0,.70));
       display:flex;
       align-items:flex-end;
       justify-content:center;
@@ -249,7 +254,7 @@
 
     .crawlInner{
       width:min(780px, 92vw);
-      height: 120vh;
+      height: 125vh;
       perspective: 420px;
       transform-origin: bottom center;
       overflow:hidden;
@@ -266,11 +271,11 @@
       letter-spacing: 1.2px;
       text-align: justify;
       font-size: clamp(14px, 3.4vw, 22px);
-      line-height: 1.6;
+      line-height: 1.65;
       text-shadow: 0 0 18px rgba(255,211,107,.22);
 
-      /* SLOWED DOWN */
-      animation: crawlMove 20s linear forwards;
+      /* WAY slower (movie readable) */
+      animation: crawlMove 34s linear forwards;
     }
 
     .crawlTitle{
@@ -288,7 +293,7 @@
 
     @keyframes crawlMove{
       from { top: 100%; }
-      to   { top: -140%; }
+      to   { top: -160%; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -298,6 +303,11 @@
 </head>
 
 <body>
+  <!-- FX layers (starfield/hyperspace starts immediately behind crawl) -->
+  <canvas id="hyperspace"></canvas>
+  <div id="warpOverlay"></div>
+  <canvas id="confetti"></canvas>
+
   <!-- Opening Crawl -->
   <div id="crawl">
     <div class="crawlInner">
@@ -321,11 +331,6 @@
     </div>
   </div>
 
-  <!-- FX layers -->
-  <canvas id="hyperspace"></canvas>
-  <div id="warpOverlay"></div>
-  <canvas id="confetti"></canvas>
-
   <!-- Overlays -->
   <div id="forceQuote"></div>
   <div id="warpCountdown"></div>
@@ -339,7 +344,7 @@
     </div>
   </div>
 
-  <!-- UI -->
+  <!-- Interactive Menu (appears AFTER crawl ends) -->
   <div class="card">
     <div class="top">
       <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
@@ -376,9 +381,11 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Top 5: Ambient Space Hum (add file to repo)
-    // Upload an mp3 named EXACTLY: Space Hum.mp3 (or rename below)
+    // Ambient space loop (upload this file to repo)
     const AMBIENT_URL = "./Space Hum.mp3";
+
+    // Crawl duration must match CSS (34s) in milliseconds:
+    const CRAWL_MS = 34000;
 
     // ================= AUDIO =================
     const saber = new Audio(SABER_URL);
@@ -392,14 +399,12 @@
 
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // Start ambient audio ONLY after first user interaction (mobile-safe)
+    // Start ambient only after first user interaction (mobile safe)
     let ambientStarted = false;
     function startAmbientOnce(){
       if (ambientStarted) return;
       ambientStarted = true;
-      ambient.play().catch(() => {/* ignore */});
-      window.removeEventListener("pointerdown", startAmbientOnce);
-      window.removeEventListener("touchstart", startAmbientOnce);
+      ambient.play().catch(() => {});
     }
     window.addEventListener("pointerdown", startAmbientOnce, { once:true });
     window.addEventListener("touchstart", startAmbientOnce, { once:true });
@@ -409,18 +414,29 @@
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // ================= ENTRANCE ANIMATION =================
-    window.addEventListener("load", () => {
-      const card = document.querySelector(".card");
-      if (card) card.classList.add("enter");
-    });
-
-    // ================= OPENING CRAWL (SLOWED) =================
+    // ================= SHOW MENU AFTER CRAWL =================
     const crawl = document.getElementById("crawl");
-    setTimeout(() => {
-      crawl.classList.add("hide");
-      setTimeout(() => crawl.remove(), 650);
-    }, 20000); // MATCHES 20s crawl
+    const card = document.querySelector(".card");
+
+    function endCrawlAndShowMenu(){
+      if (crawl){
+        crawl.classList.add("hide");
+        setTimeout(() => crawl.remove(), 650);
+      }
+      if (card) card.classList.add("enter");
+    }
+
+    // Wait for crawl to finish, THEN reveal menu
+    setTimeout(endCrawlAndShowMenu, CRAWL_MS);
+
+    // (Optional quality-of-life): if the crawl gets removed (e.g., cached weirdness), always show menu
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        if (card && !card.classList.contains("enter") && !document.getElementById("crawl")){
+          card.classList.add("enter");
+        }
+      }, 900);
+    });
 
     // ================= QUOTES =================
     const lightQuotes = [
@@ -456,7 +472,7 @@
       setTimeout(() => { quoteEl.style.opacity = 0; }, 3200);
     }
 
-    // ================= HYPERSPACE CANVAS =================
+    // ================= HYPERSPACE CANVAS + STARFIELD =================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha: true });
 
@@ -470,19 +486,18 @@
     }
     fxResize();
 
-    // ---- Subtle Background Starfield (idle) ----
     let isBursting = false;
     let bgStars = [];
 
     function initStarfield(){
-      const count = Math.min(180, Math.floor((window.innerWidth * window.innerHeight) / 7000));
+      const count = Math.min(220, Math.floor((window.innerWidth * window.innerHeight) / 6500));
       bgStars = Array.from({ length: count }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        r: 0.6 + Math.random() * 1.4,
-        a: 0.25 + Math.random() * 0.55,
+        r: 0.6 + Math.random() * 1.6,
+        a: 0.18 + Math.random() * 0.60,
         tw: 0.003 + Math.random() * 0.012,
-        sp: 0.08 + Math.random() * 0.28,
+        sp: 0.06 + Math.random() * 0.22,
       }));
     }
     initStarfield();
@@ -523,7 +538,7 @@
           }
           s.a += s.tw * (dt / 16);
           if (s.a > 0.85) s.tw *= -1;
-          if (s.a < 0.18) s.tw *= -1;
+          if (s.a < 0.12) s.tw *= -1;
 
           fxCtx.globalAlpha = s.a;
           fxCtx.fillStyle = "#fff";
@@ -586,14 +601,11 @@
       requestAnimationFrame(frame);
     }
 
-    // ================= LEGENDARY "GOLD FORCE" EVENT =================
-    function maybeGoldForce(){
-      return (Math.random() < 0.10);
-    }
+    // ================= GOLD FORCE EVENT =================
+    function maybeGoldForce(){ return (Math.random() < 0.10); }
 
-    function hyperspaceBurst(side){ // "light" or "dark" or "gold"
+    function hyperspaceBurst(side){
       const isGold = (side === "gold");
-
       showQuote(side);
 
       const w = window.innerWidth;
@@ -648,20 +660,13 @@
           fxCtx.stroke();
         }
 
-        if (p < 1){
-          requestAnimationFrame(frame);
-        } else {
-          fxCtx.clearRect(0, 0, w, h);
-          isBursting = false;
-        }
+        if (p < 1) requestAnimationFrame(frame);
+        else { fxCtx.clearRect(0, 0, w, h); isBursting = false; }
       }
 
       requestAnimationFrame(frame);
 
-      if (isGold){
-        fireConfetti(2800);
-        vibe([35, 35, 35, 60, 35]);
-      }
+      if (isGold){ fireConfetti(2800); vibe([35,35,35,60,35]); }
     }
 
     // ================= SECRET EASTER EGG (5 taps title) =================
@@ -684,11 +689,7 @@
         taps++;
         clearTimeout(timer);
         timer = setTimeout(() => (taps = 0), 900);
-
-        if (taps >= 5){
-          taps = 0;
-          showBirthday();
-        }
+        if (taps >= 5){ taps = 0; showBirthday(); }
       });
     })();
 
@@ -735,24 +736,14 @@
 
     // ================= BUTTONS =================
     document.getElementById("igniteBtn").addEventListener("click", () => {
-      if (maybeGoldForce()){
-        hyperspaceBurst("gold");
-      } else {
-        hyperspaceBurst("dark");
-      }
-
+      hyperspaceBurst(maybeGoldForce() ? "gold" : "dark");
       vibe([40, 20, 40]);
       saber.currentTime = 0;
       saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
     });
 
     document.getElementById("musicBtn").addEventListener("click", () => {
-      if (maybeGoldForce()){
-        hyperspaceBurst("gold");
-      } else {
-        hyperspaceBurst("light");
-      }
-
+      hyperspaceBurst(maybeGoldForce() ? "gold" : "light");
       vibe(25);
       music.currentTime = 0;
       music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
@@ -768,11 +759,7 @@
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       vibe([20, 40, 20]);
 
-      if (maybeGoldForce()){
-        hyperspaceBurst("gold");
-      } else {
-        hyperspaceBurst("light");
-      }
+      hyperspaceBurst(maybeGoldForce() ? "gold" : "light");
 
       const overlay = document.getElementById("warpOverlay");
       if (overlay) overlay.classList.add("show");
