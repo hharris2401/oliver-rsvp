@@ -152,6 +152,11 @@
     // ===== Audio =====
     const saber = new Audio(SABER_URL);
     const music = new Audio(MUSIC_URL);
+    // ---------- HAPTICS (phone vibration) ----------
+function vibe(pattern) {
+  // Only vibrate if the browser supports it
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
     music.loop = true;
     music.volume = 0.65;
 
@@ -321,24 +326,28 @@ function showQuote(side){
 }
     // ===== Buttons =====
     document.getElementById("igniteBtn").addEventListener("click", () => {
+      vibe([40, 20, 40]);
       hyperspaceBurst("dark");
       saber.currentTime = 0;
       saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
     });
 
     document.getElementById("musicBtn").addEventListener("click", () => {
+      vibe(25);
       hyperspaceBurst("light");
       music.currentTime = 0;
       music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
     });
 
     document.getElementById("stopBtn").addEventListener("click", () => {
+      vibe(15);
       music.pause();
       music.currentTime = 0;
     });
 
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       window.location.href = RSVP_FORM;
+      vibe([20, 30, 20, 30, 40]);
     });
   </script>
 </body>
