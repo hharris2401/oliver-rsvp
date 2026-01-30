@@ -155,26 +155,31 @@ function hyperspaceBurst(side){
   }
   requestAnimationFrame(frame);
 }
-// =====================================================
-    document.getElementById("igniteBtn").addEventListener("click", () => {
+// // LIGHT SIDE = Music + Blue Hyperspace
+document.getElementById("musicBtn").addEventListener("click", () => {
+  hyperspaceBurst("light");
+  music.currentTime = 0;
+  music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
+});
+
+// DARK SIDE = Saber + Red Hyperspace
+document.getElementById("igniteBtn").addEventListener("click", () => {
   hyperspaceBurst("dark");
   saber.currentTime = 0;
   saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
 });
 
-document.getElementById("musicBtn").addEventListener("click", () => {
-  hyperspaceBurst("light");
-  music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
-});
-
+// Stop music
 document.getElementById("stopBtn").addEventListener("click", () => {
   music.pause();
   music.currentTime = 0;
 });
 
+// RSVP
 document.getElementById("rsvpBtn").addEventListener("click", () => {
   window.location.href = RSVP_FORM;
 });
+    
     // ---- Hyperspace FX (Light/Dark) ----
 const fxCanvas = document.getElementById("hyperspace");
 const fxCtx = fxCanvas.getContext("2d", { alpha: true });
