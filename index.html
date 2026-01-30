@@ -148,7 +148,68 @@
     }
     fxResize();
     window.addEventListener("resize", fxResize);
+// ===== Subtle Background Starfield (idle animation) =====
+let isBursting = false; // when true, starfield pauses so the burst can take over
+let stars = [];
 
+function initStarfield(){
+  const count = Math.min(180, Math.floor((window.innerWidth * window.innerHeight) / 7000));
+  stars = Array.from({ length: count }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: 0.6 + Math.random() * 1.4,        // radius
+    a: 0.25 + Math.random() * 0.55,      // alpha
+    tw: 0.003 + Math.random() * 0.012,   // twinkle speed
+    sp: 0.08 + Math.random() * 0.28,     // drift speed
+  }));
+}
+initStarfield();
+
+// Re-init star distribution on resize (keeps it proportional and full-screen)
+const _oldFxResize = fxResize;
+function fxResizeWrapped(){
+  _oldFxResize();
+  initStarfield();
+}
+window.removeEventListener("resize", fxResize);
+window.addEventListener("resize", fxResizeWrapped);
+
+let lastT = performance.now();
+function starfieldLoop(t){
+  const dt = Math.min(32, t - lastT); // cap delta for stability
+  lastT = t;
+
+  if (!isBursting){
+    // Clear for fresh starfield frame
+    fxCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Draw stars
+    for (const s of stars){
+      // Slow drift downward (feels like floating in space)
+      s.y += s.sp * (dt / 16);
+      if (s.y > window.innerHeight + 2) {
+        s.y = -2;
+        s.x = Math.random() * window.innerWidth;
+      }
+
+      // Gentle twinkle
+      s.a += s.tw * (dt / 16);
+      if (s.a > 0.85) s.tw *= -1;
+      if (s.a < 0.18) s.tw *= -1;
+
+      fxCtx.globalAlpha = s.a;
+      fxCtx.fillStyle = "#fff";
+      fxCtx.beginPath();
+      fxCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      fxCtx.fill();
+    }
+    fxCtx.globalAlpha = 1;
+  }
+
+  requestAnimationFrame(starfieldLoop);
+}
+requestAnimationFrame(starfieldLoop);
+// ===== End Starfield =====
     function hyperspaceBurst(side){
       const w = window.innerWidth;
       const h = window.innerHeight;
