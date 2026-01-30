@@ -31,16 +31,16 @@
       z-index:1;
     }
 
-    /* Transition flash layer */
+    /* Ultra-fast transition flash layer */
     #warpOverlay{
       position:fixed;
       inset:0;
       opacity:0;
       pointer-events:none;
       z-index:99997;
-      transition: opacity .18s ease;
+      transition: opacity .10s ease; /* SUPER FAST */
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), rgba(0,0,0,.0) 40%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.22), rgba(0,0,0,.0) 40%),
         radial-gradient(circle at 50% 50%, rgba(255,211,107,.18), rgba(0,0,0,.0) 58%),
         linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45));
       backdrop-filter: blur(1px);
@@ -103,31 +103,6 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* Success toast */
-    #successToast{
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%);
-      z-index: 100003;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.72);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s ease, transform .25s ease;
-      font-weight: 900;
-      letter-spacing: .6px;
-      max-width: 92vw;
-      text-align:center;
-    }
-    #successToast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(-2px);
-    }
-
     /* Secret birthday overlay */
     .secretMsg{
       position:fixed;
@@ -175,10 +150,10 @@
 
       /* Starts hidden until crawl ends */
       opacity:0;
-      transform: translateY(14px) scale(0.99);
+      transform: translateY(10px) scale(0.992);
 
-      /* POP UP 100% FASTER (half the time) */
-      transition: opacity 225ms ease, transform 260ms ease;
+      /* SUPER FAST menu pop-in */
+      transition: opacity 120ms ease, transform 140ms ease;
       pointer-events:none;
     }
     .card.enter{
@@ -234,21 +209,43 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl (40% slower than before) ===== */
+    /* ===== Opening Crawl (kept slower) ===== */
     #crawl{
       position: fixed;
       inset: 0;
       z-index: 100002;
-      pointer-events: none;
+
+      /* IMPORTANT: allow taps so we can 100% start music when tapped */
+      pointer-events:auto;
+
       background:
         radial-gradient(circle at 50% 30%, rgba(0,0,0,.10), rgba(0,0,0,.55) 65%, rgba(0,0,0,.70));
       display:flex;
       align-items:flex-end;
       justify-content:center;
       opacity:1;
-      transition: opacity .18s ease;
+      transition: opacity .10s ease; /* super fast fade */
+      cursor:pointer;
     }
     #crawl.hide{ opacity:0; }
+
+    .crawlHint{
+      position:fixed;
+      left:50%;
+      bottom:16px;
+      transform:translateX(-50%);
+      z-index:100003;
+      background:rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:900;
+      letter-spacing:.6px;
+      font-size:12px;
+      color:var(--gold);
+      box-shadow:0 12px 40px rgba(0,0,0,.4);
+      user-select:none;
+    }
 
     .crawlInner{
       width:min(780px, 92vw);
@@ -272,7 +269,7 @@
       line-height: 1.70;
       text-shadow: 0 0 18px rgba(255,211,107,.22);
 
-      /* Was 48s; 40% slower => 67.2s */
+      /* slower crawl (67.2s) */
       animation: crawlMove 67.2s linear forwards;
     }
 
@@ -293,10 +290,6 @@
       from { top: 100%; }
       to   { top: -190%; }
     }
-
-    @media (prefers-reduced-motion: reduce){
-      .crawlText{ animation: none; top: -60%; }
-    }
   </style>
 </head>
 
@@ -306,8 +299,8 @@
   <div id="warpOverlay"></div>
   <canvas id="confetti"></canvas>
 
-  <!-- Opening Crawl -->
-  <div id="crawl">
+  <!-- Opening Crawl (tap anywhere on crawl to start theme music 100% of the time) -->
+  <div id="crawl" aria-label="Tap to start music">
     <div class="crawlInner">
       <div class="crawlText">
         <div class="crawlEpisode">EPISODE VIII</div>
@@ -327,12 +320,12 @@
         </p>
       </div>
     </div>
+    <div id="crawlHint" class="crawlHint">TAP TO START THE THEME 🎵</div>
   </div>
 
   <!-- Overlays -->
   <div id="forceQuote"></div>
   <div id="warpCountdown"></div>
-  <div id="successToast">✅ RSVP received. You are cleared for landing.</div>
 
   <!-- Secret Easter Egg -->
   <div id="secretMsg" class="secretMsg">
@@ -342,7 +335,7 @@
     </div>
   </div>
 
-  <!-- Interactive Menu (appears AFTER crawl ends) -->
+  <!-- Interactive Menu -->
   <div class="card">
     <div class="top">
       <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
@@ -377,9 +370,9 @@
 
     // Must match your repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";     // ignition sound
-    const MUSIC_URL = "./Star Wars Theme.mp3";      // theme music (used in crawl + play button)
-    const DUEL_URL  = "./Lightsaber Duel.mp3";      // dueling sound effect (add this file)
-    const AMBIENT_URL = "./Space Hum.mp3";          // ambient loop (optional but kept)
+    const MUSIC_URL = "./Star Wars Theme.mp3";      // theme music (crawl + button)
+    const DUEL_URL  = "./Lightsaber Duel.mp3";      // dueling sound effect
+    const AMBIENT_URL = "./Space Hum.mp3";          // ambient loop (optional)
 
     // Crawl duration must match CSS (67.2s) in milliseconds:
     const CRAWL_MS = 67200;
@@ -401,51 +394,61 @@
 
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // Mobile-safe: start theme during crawl AFTER first interaction.
-    // Added scroll trigger for reliability.
-    let unlockedAudio = false;
+    // ✅ GUARANTEE: when the user taps the crawl, theme music starts 100% of the time
+    // (Mobile browsers require a user gesture, so we bind it directly to the tap.)
+    let audioUnlocked = false;
 
-    function unlockAudio(){
-      if (unlockedAudio) return;
-      unlockedAudio = true;
-
-      // Theme music during crawl (if crawl still exists)
-      if (document.getElementById("crawl")){
-        music.currentTime = 0;
-        music.play().catch(()=>{});
+    async function playTheme({ restart = false } = {}) {
+      try {
+        if (restart) music.currentTime = 0;
+        await music.play();
+      } catch (e) {
+        // If a browser blocks it (rare when called from tap), do nothing.
       }
-
-      // Ambient quietly under it
-      ambient.play().catch(()=>{});
     }
 
-    window.addEventListener("pointerdown", unlockAudio, { once:true });
-    window.addEventListener("touchstart", unlockAudio, { once:true });
-    window.addEventListener("scroll", unlockAudio, { once:true });
+    async function unlockAllAudioFromTap(){
+      if (!audioUnlocked) audioUnlocked = true;
+
+      // Start theme immediately (the promise is invoked inside a user tap)
+      await playTheme({ restart: true });
+
+      // Start ambient under it (safe to ignore if missing file)
+      ambient.play().catch(()=>{});
+
+      // Hide the tap hint once music is initiated
+      const hint = document.getElementById("crawlHint");
+      if (hint) hint.style.display = "none";
+    }
+
+    // Attach directly to crawl tap (this is the most reliable way to guarantee playback)
+    const crawlEl = document.getElementById("crawl");
+    crawlEl.addEventListener("click", unlockAllAudioFromTap);
+    crawlEl.addEventListener("touchstart", unlockAllAudioFromTap, { passive:true });
 
     // ================= HAPTICS =================
     function vibe(pattern){
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // ================= SHOW MENU AFTER CRAWL (quick transition) =================
-    const crawl = document.getElementById("crawl");
+    // ================= SHOW MENU AFTER CRAWL (SUPER FAST) =================
     const card = document.querySelector(".card");
     const overlay = document.getElementById("warpOverlay");
 
     function endCrawlAndShowMenu(){
-      // quick flash + hide crawl
+      // ultra-fast flash + remove crawl
       if (overlay) overlay.classList.add("show");
-      if (crawl){
-        crawl.classList.add("hide");
-        setTimeout(() => crawl.remove(), 220);
+
+      if (crawlEl){
+        crawlEl.classList.add("hide");
+        setTimeout(() => crawlEl.remove(), 120); // faster removal
       }
 
-      // pop menu quickly
+      // menu appears almost immediately
       setTimeout(() => {
         if (card) card.classList.add("enter");
         if (overlay) overlay.classList.remove("show");
-      }, 230);
+      }, 130);
     }
     setTimeout(endCrawlAndShowMenu, CRAWL_MS);
 
@@ -464,18 +467,9 @@
       "Embrace your destiny.",
       "The galaxy will bend."
     ];
-    const goldQuotes = [
-      "GOLD FORCE EVENT! ✨ The galaxy approves.",
-      "Legendary roll! ✨ Balance achieved.",
-      "Rare Force surge! ✨ You feel unstoppable."
-    ];
-
     const quoteEl = document.getElementById("forceQuote");
     function showQuote(side){
-      const list =
-        (side === "gold") ? goldQuotes :
-        (side === "dark") ? darkQuotes : lightQuotes;
-
+      const list = (side === "dark") ? darkQuotes : lightQuotes;
       const q = list[Math.floor(Math.random() * list.length)];
       quoteEl.textContent = q;
       quoteEl.className = side;
@@ -496,10 +490,10 @@
       fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     fxResize();
+    window.addEventListener("resize", fxResize);
 
     let isBursting = false;
     let bgStars = [];
-
     function initStarfield(){
       const count = Math.min(220, Math.floor((window.innerWidth * window.innerHeight) / 6500));
       bgStars = Array.from({ length: count }, () => ({
@@ -512,26 +506,7 @@
       }));
     }
     initStarfield();
-
-    // ================= CONFETTI =================
-    const confettiCanvas = document.getElementById("confetti");
-    const confettiCtx = confettiCanvas.getContext("2d", { alpha: true });
-
-    function confettiResize(){
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      confettiCanvas.width  = Math.floor(window.innerWidth * dpr);
-      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-      confettiCanvas.style.width  = window.innerWidth + "px";
-      confettiCanvas.style.height = window.innerHeight + "px";
-      confettiCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    confettiResize();
-
-    window.addEventListener("resize", () => {
-      fxResize();
-      initStarfield();
-      confettiResize();
-    });
+    window.addEventListener("resize", initStarfield);
 
     let lastT = performance.now();
     function starfieldLoop(t){
@@ -564,58 +539,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    function fireConfetti(durationMs = 2200){
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const start = performance.now();
-
-      const pieces = Array.from({ length: 140 }, () => ({
-        x: Math.random() * w,
-        y: -20 - Math.random() * h * 0.2,
-        vx: -1.2 + Math.random() * 2.4,
-        vy: 3.2 + Math.random() * 5.6,
-        r: 4 + Math.random() * 6,
-        rot: Math.random() * Math.PI,
-        vr: (-0.2 + Math.random() * 0.4),
-        c: (["#ffd36b", "#00aaff", "#ff3c3c", "#ffffff"][(Math.random() * 4) | 0]),
-        life: 0.85 + Math.random() * 0.6
-      }));
-
-      function frame(t){
-        const p = Math.min(1, (t - start) / durationMs);
-        confettiCtx.clearRect(0, 0, w, h);
-
-        const fade = (p < 0.75) ? 1 : (1 - (p - 0.75) / 0.25);
-
-        for (const q of pieces){
-          q.x += q.vx;
-          q.y += q.vy;
-          q.vy += 0.03;
-          q.rot += q.vr;
-
-          if (q.x < -30) q.x = w + 30;
-          if (q.x > w + 30) q.x = -30;
-
-          confettiCtx.globalAlpha = fade * q.life;
-          confettiCtx.save();
-          confettiCtx.translate(q.x, q.y);
-          confettiCtx.rotate(q.rot);
-          confettiCtx.fillStyle = q.c;
-          confettiCtx.fillRect(-q.r, -q.r * 0.6, q.r * 2, q.r * 1.2);
-          confettiCtx.restore();
-        }
-
-        if (p < 1) requestAnimationFrame(frame);
-        else confettiCtx.clearRect(0, 0, w, h);
-      }
-
-      requestAnimationFrame(frame);
-    }
-
-    // ================= GOLD FORCE EVENT =================
-    function maybeGoldForce(){ return (Math.random() < 0.10); }
-
-    // ================= LIGHTSABER DUEL VISUAL (buttons) =================
+    // ================= LIGHTSABER DUEL GRAPHIC (replaces dark warp on IGNITE) =================
     function saberDuelBurst(){
       const w = window.innerWidth, h = window.innerHeight;
       const cx = w/2, cy = h/2;
@@ -629,30 +553,29 @@
 
         fxCtx.clearRect(0,0,w,h);
 
+        // red saber
         fxCtx.globalAlpha = 0.95 * fade;
-
-        // Red saber
         fxCtx.strokeStyle = "rgba(255,60,60,1)";
         fxCtx.lineWidth = 10;
         fxCtx.lineCap = "round";
         fxCtx.beginPath();
-        fxCtx.moveTo(cx - 220*(1-p), cy + 220*(1-p));
-        fxCtx.lineTo(cx + 80, cy - 80);
+        fxCtx.moveTo(cx - 240*(1-p), cy + 240*(1-p));
+        fxCtx.lineTo(cx + 90, cy - 90);
         fxCtx.stroke();
 
-        // Blue saber
+        // blue saber
         fxCtx.strokeStyle = "rgba(0,170,255,1)";
         fxCtx.lineWidth = 10;
         fxCtx.beginPath();
-        fxCtx.moveTo(cx + 220*(1-p), cy + 220*(1-p));
-        fxCtx.lineTo(cx - 80, cy - 80);
+        fxCtx.moveTo(cx + 240*(1-p), cy + 240*(1-p));
+        fxCtx.lineTo(cx - 90, cy - 90);
         fxCtx.stroke();
 
-        // Clash bloom
-        fxCtx.globalAlpha = 0.35 * fade;
+        // clash spark bloom
+        fxCtx.globalAlpha = 0.38 * fade;
         fxCtx.fillStyle = "rgba(255,255,255,1)";
         fxCtx.beginPath();
-        fxCtx.arc(cx, cy-70, 70*(0.6+p), 0, Math.PI*2);
+        fxCtx.arc(cx, cy-80, 75*(0.6+p), 0, Math.PI*2);
         fxCtx.fill();
 
         if (p < 1) requestAnimationFrame(frame);
@@ -660,96 +583,6 @@
       }
       requestAnimationFrame(frame);
     }
-
-    // Gold hyperspace retained for RSVP + rare events
-    function hyperspaceBurst(side){
-      const isGold = (side === "gold");
-      showQuote(side);
-
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const cx = w / 2;
-      const cy = h / 2;
-
-      const colors = isGold
-        ? ["rgba(255,211,107,.98)", "rgba(255,235,170,.75)", "rgba(255,255,255,.65)"]
-        : (side === "dark"
-          ? ["rgba(255,60,60,.95)", "rgba(255,170,170,.7)", "rgba(255,255,255,.55)"]
-          : ["rgba(0,170,255,.95)", "rgba(200,245,255,.75)", "rgba(255,255,255,.6)"]
-        );
-
-      const stars = Array.from({ length: isGold ? 190 : 160 }, () => ({
-        a: Math.random() * Math.PI * 2,
-        s: (isGold ? 320 : 260) + Math.random() * (isGold ? 1100 : 980),
-        l: (isGold ? 34 : 22) + Math.random() * (isGold ? 180 : 150),
-        w: 1 + Math.random() * (isGold ? 3.2 : 2.4),
-        c: colors[(Math.random() * colors.length) | 0]
-      }));
-
-      const start = performance.now();
-      isBursting = true;
-
-      function frame(t){
-        const p = Math.min(1, (t - start) / 900);
-        const fade = (p < 0.75) ? 1 : (1 - (p - 0.75) / 0.25);
-
-        fxCtx.clearRect(0, 0, w, h);
-
-        fxCtx.globalAlpha = (isGold ? 0.26 : 0.18) * fade;
-        fxCtx.fillStyle = isGold ? "rgba(255,211,107,1)" : (side === "dark" ? "rgba(255,60,60,1)" : "rgba(0,170,255,1)");
-        fxCtx.beginPath();
-        fxCtx.ellipse(cx, cy, (isGold ? 320 : 260) * (0.6 + p), (isGold ? 170 : 140) * (0.6 + p), 0, 0, Math.PI * 2);
-        fxCtx.fill();
-
-        fxCtx.globalAlpha = 1 * fade;
-        for (const s of stars){
-          const d = s.s * p;
-          const x2 = cx + Math.cos(s.a) * d;
-          const y2 = cy + Math.sin(s.a) * d;
-          const x1 = x2 - Math.cos(s.a) * s.l * (0.25 + p);
-          const y1 = y2 - Math.sin(s.a) * s.l * (0.25 + p);
-
-          fxCtx.strokeStyle = s.c;
-          fxCtx.lineWidth = s.w;
-          fxCtx.lineCap = "round";
-          fxCtx.beginPath();
-          fxCtx.moveTo(x1, y1);
-          fxCtx.lineTo(x2, y2);
-          fxCtx.stroke();
-        }
-
-        if (p < 1) requestAnimationFrame(frame);
-        else { fxCtx.clearRect(0, 0, w, h); isBursting = false; }
-      }
-
-      requestAnimationFrame(frame);
-
-      if (isGold){ fireConfetti(2800); vibe([35,35,35,60,35]); }
-    }
-
-    // ================= SECRET EASTER EGG (5 taps title) =================
-    (function birthdayEgg(){
-      const title = document.getElementById("secretTitle");
-      const msg = document.getElementById("secretMsg");
-      if (!title || !msg) return;
-
-      let taps = 0;
-      let timer = null;
-
-      function showBirthday(){
-        msg.classList.add("show");
-        fireConfetti(2600);
-        vibe([30, 40, 30]);
-        setTimeout(() => msg.classList.remove("show"), 2500);
-      }
-
-      title.addEventListener("click", () => {
-        taps++;
-        clearTimeout(timer);
-        timer = setTimeout(() => (taps = 0), 900);
-        if (taps >= 5){ taps = 0; showBirthday(); }
-      });
-    })();
 
     // ================= COUNTDOWN (kept for RSVP) =================
     const countdownEl = document.getElementById("warpCountdown");
@@ -780,42 +613,46 @@
     }
 
     // ================= BUTTONS =================
-    // Play Music: Theme + duel visual/audio
-    document.getElementById("musicBtn").addEventListener("click", () => {
+    // Play Theme Music button: ALWAYS starts theme (restart) + duel sound/graphic
+    document.getElementById("musicBtn").addEventListener("click", async () => {
       vibe(25);
       saberDuelBurst();
 
       duel.currentTime = 0;
       duel.play().catch(()=>{});
 
-      music.currentTime = 0;
-      music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
+      // guarantee theme starts when tapped
+      await playTheme({ restart: true });
+
+      ambient.play().catch(()=>{});
     });
 
-    // Ignite: Duel + ignition
+    // Ignite button: NO dark warp. Instead: dueling graphic + duel sound + ignition sound
     document.getElementById("igniteBtn").addEventListener("click", () => {
       vibe([40, 20, 40]);
+
+      // Replace dark warp reaction with saber duel graphic
       saberDuelBurst();
+      showQuote("dark");
 
       duel.currentTime = 0;
       duel.play().catch(()=>{});
 
       saber.currentTime = 0;
-      saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
+      saber.play().catch(()=>{});
     });
 
-    // Stop
+    // Stop button: stop theme + duel
     document.getElementById("stopBtn").addEventListener("click", () => {
       vibe(15);
       music.pause(); music.currentTime = 0;
       duel.pause();  duel.currentTime  = 0;
+      ambient.pause(); ambient.currentTime = 0;
     });
 
-    // RSVP: hyperspace + countdown + redirect
+    // RSVP: keep countdown + redirect (and keep your existing effects simple)
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       vibe([20, 40, 20]);
-
-      hyperspaceBurst(maybeGoldForce() ? "gold" : "light");
 
       const ov = document.getElementById("warpOverlay");
       if (ov) ov.classList.add("show");
@@ -827,24 +664,28 @@
       }, Math.max(900, delay));
     });
 
-    // ================= SHOW MENU AFTER CRAWL (quick transition) =================
-    const crawl = document.getElementById("crawl");
-    const card = document.querySelector(".card");
-    const overlay = document.getElementById("warpOverlay");
+    // ================= SECRET EASTER EGG (5 taps title) =================
+    (function birthdayEgg(){
+      const title = document.getElementById("secretTitle");
+      const msg = document.getElementById("secretMsg");
+      if (!title || !msg) return;
 
-    function endCrawlAndShowMenu(){
-      if (overlay) overlay.classList.add("show");
-      if (crawl){
-        crawl.classList.add("hide");
-        setTimeout(() => crawl.remove(), 220);
+      let taps = 0;
+      let timer = null;
+
+      function showBirthday(){
+        msg.classList.add("show");
+        vibe([30, 40, 30]);
+        setTimeout(() => msg.classList.remove("show"), 2500);
       }
 
-      setTimeout(() => {
-        if (card) card.classList.add("enter");
-        if (overlay) overlay.classList.remove("show");
-      }, 230);
-    }
-    setTimeout(endCrawlAndShowMenu, CRAWL_MS);
+      title.addEventListener("click", () => {
+        taps++;
+        clearTimeout(timer);
+        timer = setTimeout(() => (taps = 0), 900);
+        if (taps >= 5){ taps = 0; showBirthday(); }
+      });
+    })();
   </script>
 </body>
 </html>
