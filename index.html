@@ -156,26 +156,25 @@ function hyperspaceBurst(side){
   requestAnimationFrame(frame);
 }
 // =====================================================
-    document.getElementById("formLink").href = RSVP_FORM;
-
     document.getElementById("igniteBtn").addEventListener("click", () => {
-      saber.currentTime = 0;
-      saber.play().catch(() => { window.open(SABER_URL, "_blank", "noopener"); });
-    });
+  hyperspaceBurst("dark");
+  saber.currentTime = 0;
+  saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
+});
 
-    document.getElementById("musicBtn").addEventListener("click", () => {
-      music.play().catch(() => { window.open(MUSIC_URL, "_blank", "noopener"); });
-    });
+document.getElementById("musicBtn").addEventListener("click", () => {
+  hyperspaceBurst("light");
+  music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
+});
 
-    document.getElementById("stopBtn").addEventListener("click", () => {
-      music.pause();
-      music.currentTime = 0;
-    });
+document.getElementById("stopBtn").addEventListener("click", () => {
+  music.pause();
+  music.currentTime = 0;
+});
 
-    document.getElementById("rsvpBtn").addEventListener("click", () => {
-      window.location.href = RSVP_FORM;
-    });
-    </script>
+document.getElementById("rsvpBtn").addEventListener("click", () => {
+  window.location.href = RSVP_FORM;
+});
     // ---- Hyperspace FX (Light/Dark) ----
 const fxCanvas = document.getElementById("hyperspace");
 const fxCtx = fxCanvas.getContext("2d", { alpha: true });
