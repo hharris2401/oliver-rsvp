@@ -84,12 +84,35 @@
       padding:0 22px 22px;
     }
     a{ color:var(--gold); }
+    #forceQuote{
+  position:fixed;
+  left:50%;
+  top:22%;
+  transform:translateX(-50%);
+  text-align:center;
+  font-weight:800;
+  letter-spacing:1.5px;
+  font-size:clamp(16px,4vw,26px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .6s ease;
+  z-index:3;
+  text-shadow:0 0 18px rgba(255,255,255,.35);
+}
+
+#forceQuote.light{
+  color:#9fe7ff;
+}
+
+#forceQuote.dark{
+  color:#ff9a9a;
+}
   </style>
 </head>
 
 <body>
   <canvas id="hyperspace"></canvas>
-
+<div id="forceQuote"></div>
   <div class="card">
     <div class="top">
       <div class="title">THE BALANCE OF EIGHT</div>
@@ -211,6 +234,7 @@ function starfieldLoop(t){
 requestAnimationFrame(starfieldLoop);
 // ===== End Starfield =====
     function hyperspaceBurst(side){
+      showQuote(side);
       const w = window.innerWidth;
       const h = window.innerHeight;
       const cx = w/2;
@@ -264,7 +288,37 @@ requestAnimationFrame(starfieldLoop);
       }
       requestAnimationFrame(frame);
     }
+// ===== Force Quotes =====
+const lightQuotes = [
+  "The Force is strong with you.",
+  "A Jedi trusts the living Force.",
+  "Hope is never lost among the stars.",
+  "Balance begins with belief.",
+  "Your destiny shines bright."
+];
 
+const darkQuotes = [
+  "Power flows through the shadows.",
+  "The Dark Side is awakening.",
+  "Fear is the path to strength.",
+  "Embrace your destiny.",
+  "The galaxy will bend."
+];
+
+const quoteEl = document.getElementById("forceQuote");
+
+function showQuote(side){
+  const list = side === "dark" ? darkQuotes : lightQuotes;
+  const q = list[Math.floor(Math.random() * list.length)];
+
+  quoteEl.textContent = q;
+  quoteEl.className = side;   // adds "light" or "dark" class for color
+  quoteEl.style.opacity = 1;
+
+  setTimeout(() => {
+    quoteEl.style.opacity = 0;
+  }, 3200);
+}
     // ===== Buttons =====
     document.getElementById("igniteBtn").addEventListener("click", () => {
       hyperspaceBurst("dark");
