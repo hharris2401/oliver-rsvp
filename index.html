@@ -31,17 +31,18 @@
       z-index:1;
     }
 
+    /* Reused as "transition flash" layer */
     #warpOverlay{
       position:fixed;
       inset:0;
       opacity:0;
       pointer-events:none;
       z-index:99997;
-      transition: opacity .25s ease;
+      transition: opacity .18s ease; /* quicker transition */
       background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.10), rgba(0,0,0,.0) 40%),
-        radial-gradient(circle at 50% 50%, rgba(0,170,255,.18), rgba(0,0,0,.0) 55%),
-        linear-gradient(180deg, rgba(0,0,0,.15), rgba(0,0,0,.55));
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), rgba(0,0,0,.0) 40%),
+        radial-gradient(circle at 50% 50%, rgba(255,211,107,.18), rgba(0,0,0,.0) 58%),
+        linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.45));
       backdrop-filter: blur(1px);
     }
     #warpOverlay.show{ opacity:1; }
@@ -84,7 +85,7 @@
       box-shadow: 0 0 28px rgba(255,211,107,.18);
     }
 
-    /* Warp countdown */
+    /* Warp countdown (still used for RSVP) */
     #warpCountdown{
       position:fixed;
       left:50%;
@@ -175,16 +176,13 @@
       /* Starts hidden until crawl ends */
       opacity:0;
       transform: translateY(14px) scale(0.99);
-      transition: opacity 600ms ease, transform 650ms ease;
+      transition: opacity 450ms ease, transform 520ms ease; /* quicker reveal */
       pointer-events:none;
     }
     .card.enter{
       opacity:1;
       transform: translateY(0) scale(1);
       pointer-events:auto;
-    }
-    @media (prefers-reduced-motion: reduce){
-      .card{ transition:none; transform:none; }
     }
 
     .top{ padding:26px 22px 18px; text-align:center; }
@@ -234,27 +232,25 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl (NOW MUCH SLOWER + shows starfield behind) ===== */
+    /* ===== Opening Crawl (slower + theme music during crawl) ===== */
     #crawl{
       position: fixed;
       inset: 0;
       z-index: 100002;
       pointer-events: none;
-
-      /* Transparent enough to SEE the starfield "starting background" */
       background:
         radial-gradient(circle at 50% 30%, rgba(0,0,0,.10), rgba(0,0,0,.55) 65%, rgba(0,0,0,.70));
       display:flex;
       align-items:flex-end;
       justify-content:center;
       opacity:1;
-      transition: opacity .6s ease;
+      transition: opacity .18s ease; /* quicker hide */
     }
     #crawl.hide{ opacity:0; }
 
     .crawlInner{
       width:min(780px, 92vw);
-      height: 125vh;
+      height: 128vh;
       perspective: 420px;
       transform-origin: bottom center;
       overflow:hidden;
@@ -271,11 +267,11 @@
       letter-spacing: 1.2px;
       text-align: justify;
       font-size: clamp(14px, 3.4vw, 22px);
-      line-height: 1.65;
+      line-height: 1.70;
       text-shadow: 0 0 18px rgba(255,211,107,.22);
 
-      /* WAY slower (movie readable) */
-      animation: crawlMove 34s linear forwards;
+      /* EVEN SLOWER */
+      animation: crawlMove 48s linear forwards;
     }
 
     .crawlTitle{
@@ -293,7 +289,7 @@
 
     @keyframes crawlMove{
       from { top: 100%; }
-      to   { top: -160%; }
+      to   { top: -190%; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -303,7 +299,7 @@
 </head>
 
 <body>
-  <!-- FX layers (starfield/hyperspace starts immediately behind crawl) -->
+  <!-- FX layers (starfield behind crawl immediately) -->
   <canvas id="hyperspace"></canvas>
   <div id="warpOverlay"></div>
   <canvas id="confetti"></canvas>
@@ -378,58 +374,78 @@
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
 
     // Must match your repo filenames EXACTLY:
-    const SABER_URL = "./Lightsaber Fight.mp3";
-    const MUSIC_URL = "./Star Wars Theme.mp3";
+    const SABER_URL = "./Lightsaber Fight.mp3";     // used for IGNITE
+    const MUSIC_URL = "./Star Wars Theme.mp3";      // used for CRAWL + PLAY MUSIC
+    const DUEL_URL  = "./Lightsaber Duel.mp3";      // NEW: add this file for dueling (or rename here)
+    const AMBIENT_URL = "./Space Hum.mp3";          // ambient loop (optional but kept)
 
-    // Ambient space loop (upload this file to repo)
-    const AMBIENT_URL = "./Space Hum.mp3";
-
-    // Crawl duration must match CSS (34s) in milliseconds:
-    const CRAWL_MS = 34000;
+    // Crawl duration must match CSS (48s) in milliseconds:
+    const CRAWL_MS = 48000;
 
     // ================= AUDIO =================
     const saber = new Audio(SABER_URL);
+    const duel  = new Audio(DUEL_URL);
     const music = new Audio(MUSIC_URL);
+    const ambient = new Audio(AMBIENT_URL);
+
     music.loop = true;
     music.volume = 0.65;
 
-    const ambient = new Audio(AMBIENT_URL);
     ambient.loop = true;
     ambient.volume = 0.15;
 
+    duel.loop = false;
+    duel.volume = 0.85;
+
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // Start ambient only after first user interaction (mobile safe)
-    let ambientStarted = false;
-    function startAmbientOnce(){
-      if (ambientStarted) return;
-      ambientStarted = true;
-      ambient.play().catch(() => {});
+    // Mobile-safe: start audio on first interaction.
+    // We want: Theme music during crawl. But browsers require a tap.
+    // So: first tap starts theme (if crawl still showing) and ambient.
+    let unlockedAudio = false;
+    function unlockAudio(){
+      if (unlockedAudio) return;
+      unlockedAudio = true;
+
+      // If crawl is still showing, start theme music
+      if (document.getElementById("crawl")){
+        music.currentTime = 0;
+        music.play().catch(()=>{});
+      }
+
+      // Start ambient quietly in background
+      ambient.play().catch(()=>{});
     }
-    window.addEventListener("pointerdown", startAmbientOnce, { once:true });
-    window.addEventListener("touchstart", startAmbientOnce, { once:true });
+    window.addEventListener("pointerdown", unlockAudio, { once:true });
+    window.addEventListener("touchstart", unlockAudio, { once:true });
 
     // ================= HAPTICS =================
     function vibe(pattern){
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // ================= SHOW MENU AFTER CRAWL =================
+    // ================= SHOW MENU AFTER CRAWL (quicker transition) =================
     const crawl = document.getElementById("crawl");
     const card = document.querySelector(".card");
+    const overlay = document.getElementById("warpOverlay");
 
     function endCrawlAndShowMenu(){
+      // quick flash + hide crawl
+      if (overlay) overlay.classList.add("show");
       if (crawl){
         crawl.classList.add("hide");
-        setTimeout(() => crawl.remove(), 650);
+        setTimeout(() => crawl.remove(), 220); // quicker removal
       }
-      if (card) card.classList.add("enter");
-    }
 
-    // Wait for crawl to finish, THEN reveal menu
+      // reveal menu quickly
+      setTimeout(() => {
+        if (card) card.classList.add("enter");
+        if (overlay) overlay.classList.remove("show");
+      }, 240);
+    }
     setTimeout(endCrawlAndShowMenu, CRAWL_MS);
 
-    // (Optional quality-of-life): if the crawl gets removed (e.g., cached weirdness), always show menu
+    // safety: if crawl removed, show menu
     window.addEventListener("load", () => {
       setTimeout(() => {
         if (card && !card.classList.contains("enter") && !document.getElementById("crawl")){
@@ -472,7 +488,7 @@
       setTimeout(() => { quoteEl.style.opacity = 0; }, 3200);
     }
 
-    // ================= HYPERSPACE CANVAS + STARFIELD =================
+    // ================= CANVAS: STARFIELD + EFFECTS =================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha: true });
 
@@ -604,6 +620,54 @@
     // ================= GOLD FORCE EVENT =================
     function maybeGoldForce(){ return (Math.random() < 0.10); }
 
+    // ================= LIGHTSABER DUEL VISUAL (replaces warp for buttons) =================
+    function saberDuelBurst(){
+      showQuote("dark");
+
+      const w = window.innerWidth, h = window.innerHeight;
+      const cx = w/2, cy = h/2;
+
+      const start = performance.now();
+      isBursting = true;
+
+      function frame(t){
+        const p = Math.min(1, (t - start) / 520);
+        const fade = p < 0.7 ? 1 : (1 - (p - 0.7) / 0.3);
+
+        fxCtx.clearRect(0,0,w,h);
+
+        // red saber line
+        fxCtx.globalAlpha = 0.95 * fade;
+        fxCtx.strokeStyle = "rgba(255,60,60,1)";
+        fxCtx.lineWidth = 10;
+        fxCtx.lineCap = "round";
+        fxCtx.beginPath();
+        fxCtx.moveTo(cx - 220*(1-p), cy + 220*(1-p));
+        fxCtx.lineTo(cx + 80, cy - 80);
+        fxCtx.stroke();
+
+        // blue saber line
+        fxCtx.strokeStyle = "rgba(0,170,255,1)";
+        fxCtx.lineWidth = 10;
+        fxCtx.beginPath();
+        fxCtx.moveTo(cx + 220*(1-p), cy + 220*(1-p));
+        fxCtx.lineTo(cx - 80, cy - 80);
+        fxCtx.stroke();
+
+        // clash bloom
+        fxCtx.globalAlpha = 0.35 * fade;
+        fxCtx.fillStyle = "rgba(255,255,255,1)";
+        fxCtx.beginPath();
+        fxCtx.arc(cx, cy-70, 70*(0.6+p), 0, Math.PI*2);
+        fxCtx.fill();
+
+        if (p < 1) requestAnimationFrame(frame);
+        else { fxCtx.clearRect(0,0,w,h); isBursting = false; }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // Gold hyperspace retained for "rare events" and RSVP
     function hyperspaceBurst(side){
       const isGold = (side === "gold");
       showQuote(side);
@@ -693,7 +757,7 @@
       });
     })();
 
-    // ================= WARP COUNTDOWN =================
+    // ================= COUNTDOWN (kept for RSVP) =================
     const countdownEl = document.getElementById("warpCountdown");
     function runCountdown(seconds = 3){
       if (!countdownEl) return 0;
@@ -721,7 +785,7 @@
       return (seconds * 550) + 500;
     }
 
-    // ================= RSVP SUCCESS CELEBRATION =================
+    // ================= SUCCESS CELEBRATION =================
     const toast = document.getElementById("successToast");
     function showSuccess(){
       if (!toast) return;
@@ -735,34 +799,45 @@
     }
 
     // ================= BUTTONS =================
-    document.getElementById("igniteBtn").addEventListener("click", () => {
-      hyperspaceBurst(maybeGoldForce() ? "gold" : "dark");
-      vibe([40, 20, 40]);
-      saber.currentTime = 0;
-      saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
-    });
-
+    // PLAY MUSIC: use saber duel burst (visual) + duel audio (sound), not hyperspace
     document.getElementById("musicBtn").addEventListener("click", () => {
-      hyperspaceBurst(maybeGoldForce() ? "gold" : "light");
       vibe(25);
+      saberDuelBurst();
+
+      duel.currentTime = 0;
+      duel.play().catch(()=>{});
+
       music.currentTime = 0;
       music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
     });
 
-    document.getElementById("stopBtn").addEventListener("click", () => {
-      vibe(15);
-      music.pause();
-      music.currentTime = 0;
+    // IGNITE: use saber duel burst + duel audio (sound) + saber ignition sound
+    document.getElementById("igniteBtn").addEventListener("click", () => {
+      vibe([40, 20, 40]);
+      saberDuelBurst();
+
+      duel.currentTime = 0;
+      duel.play().catch(()=>{});
+
+      saber.currentTime = 0;
+      saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
     });
 
-    // RSVP with warp overlay + countdown + delayed redirect
+    // STOP MUSIC
+    document.getElementById("stopBtn").addEventListener("click", () => {
+      vibe(15);
+      music.pause(); music.currentTime = 0;
+      duel.pause();  duel.currentTime  = 0;
+    });
+
+    // RSVP: keep hyperspace + countdown + redirect (as before)
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       vibe([20, 40, 20]);
 
       hyperspaceBurst(maybeGoldForce() ? "gold" : "light");
 
-      const overlay = document.getElementById("warpOverlay");
-      if (overlay) overlay.classList.add("show");
+      const ov = document.getElementById("warpOverlay");
+      if (ov) ov.classList.add("show");
 
       const delay = runCountdown(3);
 
