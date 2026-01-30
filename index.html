@@ -165,7 +165,7 @@
 
 <div id="secretMsg" class="secretMsg">
   <div class="secretCard">
-    <div class="secretTitleMsg">🎉 HAPPY BIRTHDAY, OLIVER!</div>
+    <div class="secretTitle">🎉 HAPPY BIRTHDAY, OLIVER!</div>
     <div class="secretSub">May the Force be with you on Level 8 🚀</div>
   </div>
 </div>
@@ -180,104 +180,7 @@
         <div class="pill red">DARK SIDE</div>
       </div>
     </div>
-// ===== CONFETTI ENGINE (no library) =====
-const confettiCanvas = document.getElementById("confetti");
-const confettiCtx = confettiCanvas.getContext("2d", { alpha: true });
 
-function confettiResize(){
-  const dpr = Math.max(1, window.devicePixelRatio || 1);
-  confettiCanvas.width = Math.floor(window.innerWidth * dpr);
-  confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-  confettiCanvas.style.width = window.innerWidth + "px";
-  confettiCanvas.style.height = window.innerHeight + "px";
-  confettiCtx.setTransform(dpr,0,0,dpr,0,0);
-}
-confettiResize();
-window.addEventListener("resize", confettiResize);
-
-function fireConfetti(durationMs = 2200){
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const start = performance.now();
-
-  const pieces = Array.from({ length: 140 }, () => ({
-    x: Math.random() * w,
-    y: -20 - Math.random() * h * 0.2,
-    vx: -1.2 + Math.random() * 2.4,
-    vy: 3.2 + Math.random() * 5.6,
-    r: 4 + Math.random() * 6,
-    rot: Math.random() * Math.PI,
-    vr: (-0.2 + Math.random() * 0.4),
-    // Star Wars-ish palette: gold/blue/red/white
-    c: (["#ffd36b", "#00aaff", "#ff3c3c", "#ffffff"][(Math.random()*4)|0]),
-    life: 0.85 + Math.random() * 0.6
-  }));
-
-  function frame(t){
-    const p = Math.min(1, (t - start) / durationMs);
-
-    confettiCtx.clearRect(0,0,w,h);
-
-    for (const q of pieces){
-      q.x += q.vx;
-      q.y += q.vy;
-      q.vy += 0.03;          // gravity
-      q.rot += q.vr;
-
-      // wrap sideways
-      if (q.x < -30) q.x = w + 30;
-      if (q.x > w + 30) q.x = -30;
-
-      // fade out near end
-      const fade = p < 0.75 ? 1 : (1 - (p - 0.75) / 0.25);
-      confettiCtx.globalAlpha = fade * q.life;
-
-      confettiCtx.save();
-      confettiCtx.translate(q.x, q.y);
-      confettiCtx.rotate(q.rot);
-      confettiCtx.fillStyle = q.c;
-      confettiCtx.fillRect(-q.r, -q.r*0.6, q.r*2, q.r*1.2);
-      confettiCtx.restore();
-    }
-
-    if (p < 1) requestAnimationFrame(frame);
-    else confettiCtx.clearRect(0,0,w,h);
-  }
-
-  requestAnimationFrame(frame);
-}
-
-// ===== SECRET BDAY EASTER EGG: 5 taps on title =====
-(function birthdayEgg(){
-  const title = document.getElementById("secretTitle"); // <-- you add this id in step 4
-  const msg = document.getElementById("secretMsg");
-  if (!title || !msg) return;
-
-  let taps = 0;
-  let timer = null;
-
-  function showBirthday(){
-    msg.classList.add("show");
-    fireConfetti(2600);
-
-    // optional light haptic
-    if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
-
-    // hide after 2.5s
-    setTimeout(() => msg.classList.remove("show"), 2500);
-  }
-
-  title.addEventListener("click", () => {
-    taps++;
-    clearTimeout(timer);
-    timer = setTimeout(() => (taps = 0), 900);
-
-    if (taps >= 5){
-      taps = 0;
-      showBirthday();
-    }
-  });
-})();
     <div class="mid">
       <button class="btn gold" id="igniteBtn">TAP TO IGNITE LIGHTSABER ⚔️</button>
 
@@ -506,3 +409,4 @@ function showQuote(side){
   </script>
 </body>
 </html>
+ 
