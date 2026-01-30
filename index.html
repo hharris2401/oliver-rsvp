@@ -31,14 +31,14 @@
       z-index:1;
     }
 
-    /* Reused as "transition flash" layer */
+    /* Transition flash layer */
     #warpOverlay{
       position:fixed;
       inset:0;
       opacity:0;
       pointer-events:none;
       z-index:99997;
-      transition: opacity .18s ease; /* quicker transition */
+      transition: opacity .18s ease;
       background:
         radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), rgba(0,0,0,.0) 40%),
         radial-gradient(circle at 50% 50%, rgba(255,211,107,.18), rgba(0,0,0,.0) 58%),
@@ -85,7 +85,7 @@
       box-shadow: 0 0 28px rgba(255,211,107,.18);
     }
 
-    /* Warp countdown (still used for RSVP) */
+    /* Countdown (used for RSVP jump) */
     #warpCountdown{
       position:fixed;
       left:50%;
@@ -176,7 +176,9 @@
       /* Starts hidden until crawl ends */
       opacity:0;
       transform: translateY(14px) scale(0.99);
-      transition: opacity 450ms ease, transform 520ms ease; /* quicker reveal */
+
+      /* POP UP 100% FASTER (half the time) */
+      transition: opacity 225ms ease, transform 260ms ease;
       pointer-events:none;
     }
     .card.enter{
@@ -232,7 +234,7 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl (slower + theme music during crawl) ===== */
+    /* ===== Opening Crawl (40% slower than before) ===== */
     #crawl{
       position: fixed;
       inset: 0;
@@ -244,7 +246,7 @@
       align-items:flex-end;
       justify-content:center;
       opacity:1;
-      transition: opacity .18s ease; /* quicker hide */
+      transition: opacity .18s ease;
     }
     #crawl.hide{ opacity:0; }
 
@@ -270,8 +272,8 @@
       line-height: 1.70;
       text-shadow: 0 0 18px rgba(255,211,107,.22);
 
-      /* EVEN SLOWER */
-      animation: crawlMove 48s linear forwards;
+      /* Was 48s; 40% slower => 67.2s */
+      animation: crawlMove 67.2s linear forwards;
     }
 
     .crawlTitle{
@@ -374,13 +376,13 @@
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
 
     // Must match your repo filenames EXACTLY:
-    const SABER_URL = "./Lightsaber Fight.mp3";     // used for IGNITE
-    const MUSIC_URL = "./Star Wars Theme.mp3";      // used for CRAWL + PLAY MUSIC
-    const DUEL_URL  = "./Lightsaber Duel.mp3";      // NEW: add this file for dueling (or rename here)
+    const SABER_URL = "./Lightsaber Fight.mp3";     // ignition sound
+    const MUSIC_URL = "./Star Wars Theme.mp3";      // theme music (used in crawl + play button)
+    const DUEL_URL  = "./Lightsaber Duel.mp3";      // dueling sound effect (add this file)
     const AMBIENT_URL = "./Space Hum.mp3";          // ambient loop (optional but kept)
 
-    // Crawl duration must match CSS (48s) in milliseconds:
-    const CRAWL_MS = 48000;
+    // Crawl duration must match CSS (67.2s) in milliseconds:
+    const CRAWL_MS = 67200;
 
     // ================= AUDIO =================
     const saber = new Audio(SABER_URL);
@@ -399,32 +401,34 @@
 
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // Mobile-safe: start audio on first interaction.
-    // We want: Theme music during crawl. But browsers require a tap.
-    // So: first tap starts theme (if crawl still showing) and ambient.
+    // Mobile-safe: start theme during crawl AFTER first interaction.
+    // Added scroll trigger for reliability.
     let unlockedAudio = false;
+
     function unlockAudio(){
       if (unlockedAudio) return;
       unlockedAudio = true;
 
-      // If crawl is still showing, start theme music
+      // Theme music during crawl (if crawl still exists)
       if (document.getElementById("crawl")){
         music.currentTime = 0;
         music.play().catch(()=>{});
       }
 
-      // Start ambient quietly in background
+      // Ambient quietly under it
       ambient.play().catch(()=>{});
     }
+
     window.addEventListener("pointerdown", unlockAudio, { once:true });
     window.addEventListener("touchstart", unlockAudio, { once:true });
+    window.addEventListener("scroll", unlockAudio, { once:true });
 
     // ================= HAPTICS =================
     function vibe(pattern){
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // ================= SHOW MENU AFTER CRAWL (quicker transition) =================
+    // ================= SHOW MENU AFTER CRAWL (quick transition) =================
     const crawl = document.getElementById("crawl");
     const card = document.querySelector(".card");
     const overlay = document.getElementById("warpOverlay");
@@ -434,25 +438,16 @@
       if (overlay) overlay.classList.add("show");
       if (crawl){
         crawl.classList.add("hide");
-        setTimeout(() => crawl.remove(), 220); // quicker removal
+        setTimeout(() => crawl.remove(), 220);
       }
 
-      // reveal menu quickly
+      // pop menu quickly
       setTimeout(() => {
         if (card) card.classList.add("enter");
         if (overlay) overlay.classList.remove("show");
-      }, 240);
+      }, 230);
     }
     setTimeout(endCrawlAndShowMenu, CRAWL_MS);
-
-    // safety: if crawl removed, show menu
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        if (card && !card.classList.contains("enter") && !document.getElementById("crawl")){
-          card.classList.add("enter");
-        }
-      }, 900);
-    });
 
     // ================= QUOTES =================
     const lightQuotes = [
@@ -620,10 +615,8 @@
     // ================= GOLD FORCE EVENT =================
     function maybeGoldForce(){ return (Math.random() < 0.10); }
 
-    // ================= LIGHTSABER DUEL VISUAL (replaces warp for buttons) =================
+    // ================= LIGHTSABER DUEL VISUAL (buttons) =================
     function saberDuelBurst(){
-      showQuote("dark");
-
       const w = window.innerWidth, h = window.innerHeight;
       const cx = w/2, cy = h/2;
 
@@ -636,8 +629,9 @@
 
         fxCtx.clearRect(0,0,w,h);
 
-        // red saber line
         fxCtx.globalAlpha = 0.95 * fade;
+
+        // Red saber
         fxCtx.strokeStyle = "rgba(255,60,60,1)";
         fxCtx.lineWidth = 10;
         fxCtx.lineCap = "round";
@@ -646,7 +640,7 @@
         fxCtx.lineTo(cx + 80, cy - 80);
         fxCtx.stroke();
 
-        // blue saber line
+        // Blue saber
         fxCtx.strokeStyle = "rgba(0,170,255,1)";
         fxCtx.lineWidth = 10;
         fxCtx.beginPath();
@@ -654,7 +648,7 @@
         fxCtx.lineTo(cx - 80, cy - 80);
         fxCtx.stroke();
 
-        // clash bloom
+        // Clash bloom
         fxCtx.globalAlpha = 0.35 * fade;
         fxCtx.fillStyle = "rgba(255,255,255,1)";
         fxCtx.beginPath();
@@ -667,7 +661,7 @@
       requestAnimationFrame(frame);
     }
 
-    // Gold hyperspace retained for "rare events" and RSVP
+    // Gold hyperspace retained for RSVP + rare events
     function hyperspaceBurst(side){
       const isGold = (side === "gold");
       showQuote(side);
@@ -785,21 +779,8 @@
       return (seconds * 550) + 500;
     }
 
-    // ================= SUCCESS CELEBRATION =================
-    const toast = document.getElementById("successToast");
-    function showSuccess(){
-      if (!toast) return;
-      toast.classList.add("show");
-      fireConfetti(2200);
-      vibe([20, 40, 20, 40, 20]);
-      setTimeout(() => toast.classList.remove("show"), 2600);
-    }
-    if (new URLSearchParams(window.location.search).get("done") === "true"){
-      setTimeout(showSuccess, 400);
-    }
-
     // ================= BUTTONS =================
-    // PLAY MUSIC: use saber duel burst (visual) + duel audio (sound), not hyperspace
+    // Play Music: Theme + duel visual/audio
     document.getElementById("musicBtn").addEventListener("click", () => {
       vibe(25);
       saberDuelBurst();
@@ -811,7 +792,7 @@
       music.play().catch(() => window.open(MUSIC_URL, "_blank", "noopener"));
     });
 
-    // IGNITE: use saber duel burst + duel audio (sound) + saber ignition sound
+    // Ignite: Duel + ignition
     document.getElementById("igniteBtn").addEventListener("click", () => {
       vibe([40, 20, 40]);
       saberDuelBurst();
@@ -823,14 +804,14 @@
       saber.play().catch(() => window.open(SABER_URL, "_blank", "noopener"));
     });
 
-    // STOP MUSIC
+    // Stop
     document.getElementById("stopBtn").addEventListener("click", () => {
       vibe(15);
       music.pause(); music.currentTime = 0;
       duel.pause();  duel.currentTime  = 0;
     });
 
-    // RSVP: keep hyperspace + countdown + redirect (as before)
+    // RSVP: hyperspace + countdown + redirect
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       vibe([20, 40, 20]);
 
@@ -845,6 +826,25 @@
         window.location.href = RSVP_FORM;
       }, Math.max(900, delay));
     });
+
+    // ================= SHOW MENU AFTER CRAWL (quick transition) =================
+    const crawl = document.getElementById("crawl");
+    const card = document.querySelector(".card");
+    const overlay = document.getElementById("warpOverlay");
+
+    function endCrawlAndShowMenu(){
+      if (overlay) overlay.classList.add("show");
+      if (crawl){
+        crawl.classList.add("hide");
+        setTimeout(() => crawl.remove(), 220);
+      }
+
+      setTimeout(() => {
+        if (card) card.classList.add("enter");
+        if (overlay) overlay.classList.remove("show");
+      }, 230);
+    }
+    setTimeout(endCrawlAndShowMenu, CRAWL_MS);
   </script>
 </body>
 </html>
