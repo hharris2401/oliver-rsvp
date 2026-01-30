@@ -102,6 +102,31 @@
     }
     #warpCountdown.show{ opacity:1; }
 
+    /* Success toast */
+    #successToast{
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      z-index: 100003;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.72);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      font-weight: 900;
+      letter-spacing: .6px;
+      max-width: 92vw;
+      text-align:center;
+    }
+    #successToast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
     /* Secret birthday overlay */
     .secretMsg{
       position:fixed;
@@ -147,7 +172,7 @@
       position:relative;
       z-index:2;
 
-      /* #2 Entrance animation: start hidden */
+      /* Entrance animation */
       opacity:0;
       transform: translateY(14px) scale(0.99);
       transition: opacity 600ms ease, transform 650ms ease;
@@ -207,7 +232,7 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl (Top 5) ===== */
+    /* ===== Opening Crawl (SLOWER so it's readable) ===== */
     #crawl{
       position: fixed;
       inset: 0;
@@ -243,7 +268,9 @@
       font-size: clamp(14px, 3.4vw, 22px);
       line-height: 1.6;
       text-shadow: 0 0 18px rgba(255,211,107,.22);
-      animation: crawlMove 7.2s linear forwards;
+
+      /* SLOWED DOWN */
+      animation: crawlMove 20s linear forwards;
     }
 
     .crawlTitle{
@@ -264,32 +291,6 @@
       to   { top: -140%; }
     }
 
-    /* ===== RSVP Success Celebration (Top 5) ===== */
-    #successToast{
-      position: fixed;
-      left: 50%;
-      bottom: 22px;
-      transform: translateX(-50%);
-      z-index: 100003;
-      padding: 10px 14px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.72);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s ease, transform .25s ease;
-      font-weight: 900;
-      letter-spacing: .6px;
-      max-width: 92vw;
-      text-align:center;
-    }
-    #successToast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(-2px);
-    }
-
-    /* Reduced motion: skip crawl animation quickly */
     @media (prefers-reduced-motion: reduce){
       .crawlText{ animation: none; top: -60%; }
     }
@@ -375,8 +376,8 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Top 5: Ambient Space Hum (add this file to repo)
-    // Add an mp3 named EXACTLY: Space Hum.mp3  (or change the filename below)
+    // Top 5: Ambient Space Hum (add file to repo)
+    // Upload an mp3 named EXACTLY: Space Hum.mp3 (or rename below)
     const AMBIENT_URL = "./Space Hum.mp3";
 
     // ================= AUDIO =================
@@ -408,19 +409,18 @@
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    // ================= ENTRANCE ANIMATION (#2) =================
+    // ================= ENTRANCE ANIMATION =================
     window.addEventListener("load", () => {
       const card = document.querySelector(".card");
       if (card) card.classList.add("enter");
     });
 
-    // ================= OPENING CRAWL (Top 5) =================
-    // Ends crawl after animation duration, then enables interactions normally.
+    // ================= OPENING CRAWL (SLOWED) =================
     const crawl = document.getElementById("crawl");
     setTimeout(() => {
       crawl.classList.add("hide");
       setTimeout(() => crawl.remove(), 650);
-    }, 7200);
+    }, 20000); // MATCHES 20s crawl
 
     // ================= QUOTES =================
     const lightQuotes = [
@@ -586,13 +586,11 @@
       requestAnimationFrame(frame);
     }
 
-    // ================= LEGENDARY "GOLD FORCE" EVENT (Top 5) =================
-    // 1 in 10 chance on any major interaction
+    // ================= LEGENDARY "GOLD FORCE" EVENT =================
     function maybeGoldForce(){
       return (Math.random() < 0.10);
     }
 
-    // Gold hyperspace burst uses gold palette + extra confetti + stronger haptic
     function hyperspaceBurst(side){ // "light" or "dark" or "gold"
       const isGold = (side === "gold");
 
@@ -694,7 +692,7 @@
       });
     })();
 
-    // ================= WARP COUNTDOWN (Top 5) =================
+    // ================= WARP COUNTDOWN =================
     const countdownEl = document.getElementById("warpCountdown");
     function runCountdown(seconds = 3){
       if (!countdownEl) return 0;
@@ -722,9 +720,7 @@
       return (seconds * 550) + 500;
     }
 
-    // ================= RSVP SUCCESS CELEBRATION (Top 5) =================
-    // If you later link back to this page with ?done=true, it will celebrate.
-    // Example return URL: https://YOUR_GITHUB_PAGES_URL/?done=true
+    // ================= RSVP SUCCESS CELEBRATION =================
     const toast = document.getElementById("successToast");
     function showSuccess(){
       if (!toast) return;
@@ -739,7 +735,6 @@
 
     // ================= BUTTONS =================
     document.getElementById("igniteBtn").addEventListener("click", () => {
-      // Gold chance
       if (maybeGoldForce()){
         hyperspaceBurst("gold");
       } else {
@@ -752,7 +747,6 @@
     });
 
     document.getElementById("musicBtn").addEventListener("click", () => {
-      // Gold chance
       if (maybeGoldForce()){
         hyperspaceBurst("gold");
       } else {
@@ -768,14 +762,12 @@
       vibe(15);
       music.pause();
       music.currentTime = 0;
-      // keep ambient running softly
     });
 
     // RSVP with warp overlay + countdown + delayed redirect
     document.getElementById("rsvpBtn").addEventListener("click", () => {
       vibe([20, 40, 20]);
 
-      // Gold chance on RSVP jump too
       if (maybeGoldForce()){
         hyperspaceBurst("gold");
       } else {
