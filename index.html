@@ -16,31 +16,6 @@
     }
     *{ box-sizing:border-box; }
 
-    /* =========================
-       THEME SYSTEM (RESTORED)
-       ========================= */
-    body{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --panelEdge: rgba(255,255,255,.18);
-      --panelBg: rgba(0,0,0,.55);
-      --vignette: rgba(0,0,0,.10);
-      --starOpacity: .78;
-      --holoOpacity: .22; /* subtle baseline */
-    }
-    body[data-theme="light"]{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --vignette: rgba(0,0,0,.08);
-      --starOpacity: .78;
-    }
-    body[data-theme="dark"]{
-      --accent: var(--red);
-      --accentGlow: rgba(255,60,60,.45);
-      --vignette: rgba(0,0,0,.22);
-      --starOpacity: .62;
-    }
-
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -48,16 +23,6 @@
       background: radial-gradient(circle at 30% 10%, var(--bg1), var(--bg2) 60%, #000);
       min-height:100vh;
       overflow:hidden;
-    }
-
-    /* Theme-aware cinematic vignette */
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      background: radial-gradient(circle at 50% 30%, rgba(0,0,0,0), var(--vignette) 70%);
     }
 
     /* FX layers */
@@ -68,7 +33,7 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity: var(--starOpacity); transition: opacity .25s ease; }
+    #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
@@ -139,10 +104,7 @@
           rgba(0,0,0,0) 60%
         );
     }
-    /* baseline holo ON (subtle) */
-    body.holo-on #holoFX{ opacity: var(--holoOpacity); }
-    /* stronger holo during crawl */
-    body.holo-strong #holoFX{ opacity: .55; }
+    body.holo-on #holoFX{ opacity:.55; }
 
     body.holo-on{
       animation: holoFlicker 2.6s infinite;
@@ -152,8 +114,8 @@
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
 
-    body.holo-strong .stage,
-    body.holo-strong #crawlScreen{
+    body.holo-on .stage,
+    body.holo-on #crawlScreen{
       animation: holoJitter 1.4s infinite;
     }
     @keyframes holoJitter{
@@ -161,6 +123,66 @@
       97% { transform: translate(1px,0); }
       98% { transform: translate(-1px,0); }
       99% { transform: translate(0,1px); }
+    }
+
+    /* ===== VHS INTRO GLITCH (NEW: #4 parent nostalgia) ===== */
+    #vhsIntro{
+      position: fixed;
+      inset: 0;
+      z-index: 99996; /* above crawl */
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .08s linear;
+      mix-blend-mode: screen;
+    }
+    #vhsIntro::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(255,255,255,.10), rgba(0,0,0,0) 55%),
+        radial-gradient(circle at 50% 50%, rgba(0,170,255,.08), rgba(0,0,0,0) 60%);
+      opacity:.9;
+    }
+    #vhsIntro::after{
+      content:"";
+      position:absolute;
+      inset:-12px;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.10) 0px,
+          rgba(255,255,255,.10) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 6px
+        ),
+        linear-gradient(
+          180deg,
+          rgba(255,255,255,.10),
+          rgba(0,0,0,0) 40%,
+          rgba(255,255,255,.08)
+        );
+      opacity:.55;
+      transform: translateX(0);
+      animation: vhsJitter .22s steps(2,end) infinite;
+    }
+    @keyframes vhsJitter{
+      0% { transform: translateX(-1px) translateY(0); }
+      50% { transform: translateX(1px) translateY(-1px); }
+      100% { transform: translateX(0) translateY(1px); }
+    }
+    .vhsTag{
+      position:absolute;
+      left:50%;
+      top:18%;
+      transform:translateX(-50%);
+      font-weight: 950;
+      letter-spacing: 2.4px;
+      font-size: clamp(16px, 4.8vw, 32px);
+      color: rgba(255,255,255,.92);
+      text-shadow: 0 0 22px rgba(255,255,255,.20);
+      opacity:.95;
+      user-select:none;
     }
 
     /* Chewie bubble */
@@ -294,8 +316,8 @@
 
     .card{
       width:min(720px,100%);
-      border:1px solid var(--panelEdge);
-      background:var(--panelBg);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.55);
       box-shadow:0 20px 60px rgba(0,0,0,.45);
       border-radius:18px;
       overflow:hidden;
@@ -334,6 +356,7 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
+      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -381,9 +404,6 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
-    .title{
-      animation: titleFlicker 3.8s infinite;
-    }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
       48%     { filter: brightness(1.03) contrast(1.02); }
@@ -411,18 +431,11 @@
       background:rgba(255,255,255,.06);
       user-select:none;
       cursor:pointer;
-      transition: filter .12s ease, transform .08s ease, box-shadow .18s ease;
+      transition: filter .12s ease, transform .08s ease;
     }
     .pill:active{ transform: translateY(1px); filter: brightness(.96); }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
-
-    /* theme active styling */
-    .pill.active{
-      border-color: var(--accentGlow);
-      box-shadow: 0 0 18px var(--accentGlow);
-      background: rgba(255,255,255,.09);
-    }
 
     #retroToggle{ display:none; }
     body.legend-unlocked #retroToggle{ display:inline-flex; }
@@ -451,6 +464,7 @@
       position: relative;
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
+
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
@@ -718,6 +732,11 @@
   <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
 
+  <!-- NEW: VHS intro splash overlay -->
+  <div id="vhsIntro" aria-hidden="true">
+    <div class="vhsTag">LUCASFILM LTD.</div>
+  </div>
+
   <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
 
@@ -864,18 +883,11 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    const CRAWL_MS = 150000;      // crawl animation length (2:30)
-    const MENU_REVEAL_MS = 95000; // menu appears at 1:35 (without killing crawl)
+    const CRAWL_MS = 150000;      // 2:30 crawl
+    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
-
-    // Theme persistence
-    const THEME_KEY = "oliverTheme_v2";
-
-    // Legend & retro persistence
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-    const RETRO_KEY  = "oliverRetroMode_v1";
 
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
@@ -883,7 +895,7 @@
     // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;
+    theme.loop = false;   // full song, no loops
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -908,42 +920,12 @@
     const subtitleEl    = document.getElementById("subtitleEl");
     const retroToggle   = document.getElementById("retroToggle");
 
-    const pillLight     = document.getElementById("pillLight");
-    const pillDark      = document.getElementById("pillDark");
-
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
-    // ================== THEME SWITCHER (RESTORED) ==================
-    function applyTheme(t){
-      document.body.dataset.theme = t; // "light" or "dark"
-      localStorage.setItem(THEME_KEY, t);
-
-      pillLight.classList.toggle("active", t === "light");
-      pillDark.classList.toggle("active", t === "dark");
-    }
-
-    function initTheme(){
-      const saved = localStorage.getItem(THEME_KEY) || "light";
-      applyTheme(saved);
-    }
-    initTheme();
-
     // ================== HOLO FX CONTROLS ==================
-    function holoOnStrong(){
-      document.body.classList.add("holo-on");
-      document.body.classList.add("holo-strong");
-    }
-    function holoOnSubtle(){
-      document.body.classList.add("holo-on");
-      document.body.classList.remove("holo-strong");
-    }
-    function holoOff(){
-      document.body.classList.remove("holo-on");
-      document.body.classList.remove("holo-strong");
-    }
-    // keep subtle holo always (designer vibe)
-    holoOnSubtle();
+    function holoOn(){ document.body.classList.add("holo-on"); }
+    function holoOff(){ document.body.classList.remove("holo-on"); }
 
     // ================== HUD TOAST ==================
     function showHud(message, ms=1400){
@@ -969,7 +951,35 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){
+      inputBuffer = [];
+      konamiStartAt = 0;
+    }
+    function pushKonami(token){
+      const now = Date.now();
+      if (inputBuffer.length === 0) konamiStartAt = now;
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
+
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
     // ================== RETRO MODE (Legend-only) ==================
+    const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -985,7 +995,6 @@
         vibe(15);
       }
     }
-
     function applyRetroOnLoad(){
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
@@ -1319,6 +1328,56 @@
       }catch(e){}
     }
 
+    /* ===== CINEMATIC DEEP NOTE SWELL (NEW: #9) ===== */
+    function deepNoteSwell(){
+      // Must be called after a user gesture (crawl tap) for mobile.
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.55, now + 0.12);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
+      master.connect(ctx.destination);
+
+      const sub = ctx.createOscillator();
+      sub.type = "sine";
+      sub.frequency.setValueAtTime(38, now);
+      sub.frequency.exponentialRampToValueAtTime(22, now + 1.15);
+
+      const harm = ctx.createOscillator();
+      harm.type = "triangle";
+      harm.frequency.setValueAtTime(76, now);
+      harm.frequency.exponentialRampToValueAtTime(44, now + 1.15);
+
+      const dur = 1.25;
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++){
+        data[i] = (Math.random()*2 - 1) * 0.25;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.setValueAtTime(240, now);
+      lp.frequency.exponentialRampToValueAtTime(1200, now + 0.55);
+      lp.frequency.exponentialRampToValueAtTime(360, now + 1.20);
+
+      const gSub = ctx.createGain();  gSub.gain.setValueAtTime(0.95, now);
+      const gHarm = ctx.createGain(); gHarm.gain.setValueAtTime(0.35, now);
+      const gNoise = ctx.createGain();gNoise.gain.setValueAtTime(0.18, now);
+
+      sub.connect(gSub);     gSub.connect(master);
+      harm.connect(gHarm);   gHarm.connect(master);
+      noise.connect(lp);     lp.connect(gNoise); gNoise.connect(master);
+
+      sub.start(now); harm.start(now); noise.start(now);
+      sub.stop(now + dur); harm.stop(now + dur); noise.stop(now + dur);
+    }
+
     function showChewieBubble(text){
       chewieBubble.textContent = text;
       chewieBubble.classList.add("show");
@@ -1389,49 +1448,22 @@
       }, 850);
     }
 
-    // ================== KONAMI (Dark=B, Light=A via LONG PRESS) ==================
-    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    let inputBuffer = [];
-    let konamiStartAt = 0;
-
-    function resetKonami(){
-      inputBuffer = [];
-      konamiStartAt = 0;
-    }
-
-    function pushKonami(token){
-      const now = Date.now();
-
-      if (inputBuffer.length === 0) konamiStartAt = now;
-      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
-        resetKonami();
-        konamiStartAt = now;
-      }
-
-      inputBuffer.push(token);
-      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
-
-      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
-      if (ok){
-        resetKonami();
-        unlockLegendMode();
-      }
-    }
-
+    // ================== KONAMI + LEGEND MODE ==================
     function unlockLegendMode(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
-        document.body.classList.add("legend","legend-unlocked");
+        document.body.classList.add("legend");
+        document.body.classList.add("legend-unlocked");
         applyRetroOnLoad();
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
-
-      document.body.classList.add("legend-unlocked","legend");
+      document.body.classList.add("legend-unlocked");
+      document.body.classList.add("legend");
 
       vibe([30,40,30,60,30]);
       fireConfetti(2400);
@@ -1445,20 +1477,20 @@
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
 
       const title = document.getElementById("secretTitle");
-      if (title){
+      if (title && !title.dataset.legendApplied){
         title.dataset.legendApplied = "1";
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
-
       applyRetroOnLoad();
     }
 
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
-        document.body.classList.add("legend-unlocked","legend");
+        document.body.classList.add("legend-unlocked");
+        document.body.classList.add("legend");
         const title = document.getElementById("secretTitle");
         if (title){
           title.dataset.legendApplied = "1";
@@ -1468,7 +1500,6 @@
       applyRetroOnLoad();
     })();
 
-    // Keyboard Konami
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1479,7 +1510,6 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
-    // Swipe Konami (mobile)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
@@ -1508,35 +1538,8 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // LONG PRESS helper for A/B on pills
-    function addLongPress(el, ms, onLong){
-      let timer = null;
-      let longFired = false;
-
-      function start(){
-        longFired = false;
-        clearTimeout(timer);
-        timer = setTimeout(()=>{
-          longFired = true;
-          onLong();
-        }, ms);
-      }
-      function cancel(){
-        clearTimeout(timer);
-      }
-
-      el.addEventListener("pointerdown", start);
-      el.addEventListener("pointerup", cancel);
-      el.addEventListener("pointercancel", cancel);
-      el.addEventListener("pointerleave", cancel);
-
-      // return whether last press was long (used to suppress tap)
-      return () => longFired;
-    }
-
-    // ================== CRAWL FLOW (menu pops at 95s, crawl ends at 150s) ==================
+    // ================== CRAWL FLOW (Menu pops at 95s) ==================
     let started = false;
-    let menuShown = false;
 
     async function beginCrawl(){
       if (started) return;
@@ -1544,34 +1547,35 @@
 
       getAudioCtx();
 
-      // Strong holo during crawl
-      holoOnStrong();
+      // NEW: VHS splash + cinematic deep note on the FIRST tap
+      const vhs = document.getElementById("vhsIntro");
+      if (vhs){
+        vhs.style.opacity = "1";
+        setTimeout(()=> vhs.style.opacity = "0", 420);
+      }
+      deepNoteSwell();
+
+      // HOLO ON during crawl
+      holoOn();
 
       vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
 
-      // show menu at MENU_REVEAL_MS (without removing crawl)
       setTimeout(() => {
-        if (menuShown) return;
-        menuShown = true;
-
         mainCard.classList.add("show");
         burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // Subtle holo continues during menu
-        holoOnSubtle();
-      }, MENU_REVEAL_MS);
+        // HOLO OFF when menu appears
+        holoOff();
 
-      // finally remove crawl at the actual crawl end
-      setTimeout(() => {
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 160);
-      }, CRAWL_MS);
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
+      }, MENU_REVEAL_MS);
     }
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
@@ -1581,6 +1585,8 @@
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
+    const pillLight = document.getElementById("pillLight");
+    const pillDark  = document.getElementById("pillDark");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
@@ -1627,40 +1633,9 @@
       doRsvpWarp();
     });
 
-    // LIGHT/DARK pills:
-    // - TAP = theme switch (RESTORED)
-    // - LONG PRESS = Konami A/B (PERSISTENT UNLOCK)
-    const wasLongLight = addLongPress(pillLight, 420, () => {
-      vibe([10,20,10]);
-      pushKonami("A");
-      burstAtElement(pillLight, PAL_BLUE, 0.9);
-      showHud(`INPUT: <b>A</b>`, 650);
-    });
-
-    const wasLongDark = addLongPress(pillDark, 420, () => {
-      vibe([10,20,10]);
-      pushKonami("B");
-      burstAtElement(pillDark, PAL_RED, 0.9);
-      showHud(`INPUT: <b>B</b>`, 650);
-    });
-
-    pillLight.addEventListener("click", () => {
-      if (wasLongLight()) return; // long-press already used
-      vibe(12);
-      applyTheme("light");
-      burstAtElement(pillLight, PAL_BLUE, 0.75);
-      showYoda("Light side… chosen, you have.");
-      yodaSubtitle("Light side… active, it is.", 1900);
-    });
-
-    pillDark.addEventListener("click", () => {
-      if (wasLongDark()) return;
-      vibe(12);
-      applyTheme("dark");
-      burstAtElement(pillDark, PAL_RED, 0.75);
-      showYoda("Dark side… tempting, it is.");
-      yodaSubtitle("Dark side… active, it is.", 1900);
-    });
+    // Konami B/A on pills
+    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
+    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
