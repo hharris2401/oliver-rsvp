@@ -1,238 +1,64 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Oliver Turns 8 – RSVP</title>
+<div class="center" style="font-size:1.15em;">EPISODE VIII</div>
+<div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
 
-<style>
-:root{
-  --gold:#ffd36b; --blue:#00aaff; --red:#ff3c3c; --bg1:#173a66; --bg2:#04060a;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; color:#fff; overflow:hidden;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:radial-gradient(circle at 30% 10%,var(--bg1),var(--bg2) 60%,#000);
-}
+<p class="small">
+In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
+</p>
 
-/* layers */
-#starfield,#hyperspace,#confetti{position:fixed;inset:0;pointer-events:none}
-#starfield{z-index:1;opacity:.78}
-#hyperspace{z-index:2}
-#confetti{z-index:9998}
+<p class="small">
+The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+</p>
 
-/* crawl */
-#crawlScreen{
-  position:fixed; inset:0; z-index:50; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  background:radial-gradient(circle at 50% 20%,rgba(25,60,110,.65),rgba(0,0,0,.85) 65%,#000);
-  transition:opacity .06s linear;
-}
-#crawlScreen.hide{opacity:0;pointer-events:none}
-.crawlWrap{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;perspective:520px;overflow:hidden;padding-bottom:10vh}
-.crawl{
-  width:min(720px,92vw); color:#ffd36b; font-weight:900; letter-spacing:1.4px;
-  line-height:1.55; text-align:justify; opacity:0;
-  transform-origin:50% 100%; transform:rotateX(24deg) translateY(120%);
-}
-.crawl .center{text-align:center}
-.crawl .small{opacity:.92}
-#crawlScreen.running .crawl{opacity:1;animation:crawlMove var(--crawlms) linear forwards}
-@keyframes crawlMove{
-  0%{transform:rotateX(24deg) translateY(120%);opacity:1}
-  100%{transform:rotateX(24deg) translateY(-230%);opacity:0}
-}
+<p class="small">
+Today, birthday mode has been activated.
+</p>
 
-/* main card */
-.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:24px;z-index:10}
-.card{
-  width:min(720px,100%); background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18);
-  border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.45);
-  transform:translateY(8px) scale(.992); opacity:0; pointer-events:none;
-  transition:transform .05s ease,opacity .05s ease;
-}
-.card.show{transform:none;opacity:1;pointer-events:auto}
-.top{text-align:center;padding:26px 22px 18px}
-.title{font-weight:900;letter-spacing:3px;font-size:clamp(22px,4.6vw,36px)}
-.subtitle{opacity:.85;margin-top:6px}
-.subchewie{margin-top:10px;font-size:12px;font-weight:900;color:var(--gold)}
-.mid{padding:0 22px 18px;display:grid;gap:12px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:520px){.row{grid-template-columns:1fr}}
-.btn{border:none;border-radius:14px;padding:14px;font-weight:900;font-size:16px}
-.btn.gold{background:linear-gradient(#ffe7a6,var(--gold))}
-.btn.blue{background:linear-gradient(#3ad0ff,var(--blue))}
-.btn.red{background:linear-gradient(#ff7b7b,var(--red))}
-.fine{text-align:center;font-size:12px;opacity:.75;padding-bottom:22px}
-a{color:var(--gold)}
+<p class="small">
+From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
+</p>
 
-.pillrow{display:flex;gap:10px;justify-content:center;margin-top:14px}
-.pill{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-weight:900}
+<p class="small">
+But before the party can begin, the arcade network must be fully powered.
+</p>
 
-/* duel */
-#duelOverlay{position:fixed;inset:0;z-index:9996;opacity:0;pointer-events:none;background:rgba(0,0,0,.18);transition:.12s}
-#duelOverlay.show{opacity:1}
-.duelStage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.sabers{position:relative;width:min(640px,92vw);height:min(420px,58vh)}
-.saber{position:absolute;left:50%;top:50%;width:10px;height:280px;border-radius:999px;transform-origin:50% 92%;opacity:0}
-.saber.blue{background:linear-gradient(#00aaff,transparent);box-shadow:0 0 30px #00aaff}
-.saber.red{background:linear-gradient(#ff3c3c,transparent);box-shadow:0 0 30px #ff3c3c}
-#duelOverlay.show .saber{opacity:1;animation:saber .9s ease forwards}
-@keyframes saber{
-0%{transform:translate(-50%,-50%) rotate(-24deg) scaleY(.05)}
-50%{transform:translate(-50%,-50%) rotate(18deg) scaleY(1)}
-100%{transform:translate(-50%,-50%) rotate(10deg) scaleY(.05);opacity:0}
-}
+<p class="small">
+Training droids have prepared three heroic challenges.
+</p>
 
-/* secret */
-.secretMsg{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;z-index:9999}
-.secretMsg.show{opacity:1}
-.secretCard{background:rgba(0,0,0,.7);padding:20px;border-radius:18px;text-align:center}
+<p class="small">
+CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
+</p>
 
-/* warp */
-#warpOverlay{position:fixed;inset:0;opacity:0;z-index:9997}
-#warpOverlay.show{opacity:1}
-</style>
-</head>
+<p class="small">
+CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
+</p>
 
-<body>
+<p class="small">
+CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
+</p>
 
-<canvas id="starfield"></canvas>
-<canvas id="hyperspace"></canvas>
-<canvas id="confetti"></canvas>
+<p class="small">
+Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
+</p>
 
-<div id="duelOverlay">
-  <div class="duelStage">
-    <div class="sabers">
-      <div class="saber blue"></div>
-      <div class="saber red"></div>
-    </div>
-  </div>
-</div>
+<p class="small">
+Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
+</p>
 
-<div id="secretMsg" class="secretMsg">
-  <div class="secretCard">
-    🎉 HAPPY BIRTHDAY OLIVER!<br><br>May the Force be with you!
-  </div>
-</div>
+<p class="small">
+Choose your path wisely, young player.
+</p>
 
-<!-- Crawl -->
-<div id="crawlScreen">
-<div class="crawlWrap">
-<div class="crawl">
+<p class="small center">
+The joysticks are ready.<br>
+The buttons are glowing.<br>
+The Force is fully charged.
+</p>
 
-<div class="center">EPISODE VIII</div>
-<div class="center" style="font-size:1.5em;margin-top:8px">THE BALANCE OF EIGHT</div>
+<p class="small center" style="margin-top:10px;">
+And the quest for LEVEL 8…
+</p>
 
-<p class="small">In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.</p>
-
-<p class="small">The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.</p>
-
-<p class="small">Today, birthday mode has been activated.</p>
-
-<p class="small">From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.</p>
-
-<p class="small">But before the party can begin, the arcade network must be fully powered.</p>
-
-<p class="small">Training droids have prepared three heroic challenges.</p>
-
-<p class="small">CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.</p>
-
-<p class="small">CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.</p>
-
-<p class="small">CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.</p>
-
-<p class="small">Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.</p>
-
-<p class="small">Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.</p>
-
-<p class="small center">The joysticks are ready.<br>The buttons are glowing.<br>The Force is fully charged.</p>
-
-<p class="small center">And the quest for LEVEL 8…</p>
-<p class="small center">is about to begin.</p>
-
-</div>
-</div>
-</div>
-
-<div class="stage">
-<div class="card" id="mainCard">
-<div class="top">
-<div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
-<div class="subtitle">Tap to ignite. Then RSVP.</div>
-<div class="subchewie">Wookiee translation: Bring snacks.</div>
-<div class="pillrow">
-<div class="pill">LIGHT SIDE</div>
-<div class="pill">DARK SIDE</div>
-</div>
-</div>
-
-<div class="mid">
-<button class="btn gold" id="igniteBtn">IGNITE ⚔️</button>
-<div class="row">
-<button class="btn blue" id="musicBtn">PLAY THEME 🎵</button>
-<button class="btn red" id="stopBtn">STOP ⛔</button>
-</div>
-<button class="btn gold" id="rsvpBtn">RSVP 📋</button>
-</div>
-
-<div class="fine">
-<a id="formLink" target="_blank">Open RSVP Form</a>
-</div>
-</div>
-</div>
-
-<script>
-const RSVP_FORM="https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
-document.getElementById("formLink").href=RSVP_FORM;
-
-const MUSIC_URL="./Star Wars Theme.mp3";
-const SABER_URL="./Lightsaber Fight.mp3";
-
-const theme=new Audio(MUSIC_URL); theme.loop=false;
-const saber=new Audio(SABER_URL);
-
-document.documentElement.style.setProperty("--crawlms","70000ms");
-
-const crawl=document.getElementById("crawlScreen");
-const card=document.getElementById("mainCard");
-let started=false;
-
-crawl.onclick=async()=>{
- if(started)return; started=true;
- try{theme.currentTime=0;await theme.play()}catch{}
- crawl.classList.add("running");
- setTimeout(()=>{crawl.classList.add("hide");card.classList.add("show")},70000);
-};
-
-document.getElementById("igniteBtn").onclick=async()=>{
- document.getElementById("duelOverlay").classList.add("show");
- setTimeout(()=>document.getElementById("duelOverlay").classList.remove("show"),900);
- try{saber.currentTime=0;await saber.play()}catch{}
-};
-
-document.getElementById("musicBtn").onclick=()=>{theme.currentTime=0;theme.play()};
-document.getElementById("stopBtn").onclick=()=>{theme.pause();theme.currentTime=0};
-document.getElementById("rsvpBtn").onclick=()=>location.href=RSVP_FORM;
-
-// 5 tap egg
-let taps=0;
-document.getElementById("secretTitle").onclick=()=>{
- taps++; if(taps>=5){document.getElementById("secretMsg").classList.add("show");setTimeout(()=>document.getElementById("secretMsg").classList.remove("show"),2500);taps=0;}
-};
-
-// starfield
-const c=document.getElementById("starfield"),x=c.getContext("2d");
-function resize(){c.width=innerWidth;c.height=innerHeight}
-resize();addEventListener("resize",resize);
-let stars=Array.from({length:200},()=>({x:Math.random()*c.width,y:Math.random()*c.height,s:.5+Math.random()}));
-(function loop(){
- x.clearRect(0,0,c.width,c.height);
- x.fillStyle="#fff";
- stars.forEach(s=>{s.y+=s.s;if(s.y>c.height){s.y=0;s.x=Math.random()*c.width}x.fillRect(s.x,s.y,2,2)});
- requestAnimationFrame(loop);
-})();
-</script>
-</body>
-</html>
+<p class="small center">
+is about to begin.
+</p>
