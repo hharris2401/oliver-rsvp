@@ -47,55 +47,6 @@
       z-index: 9993;
     }
 
-    /* =========================
-       LIGHTSPEED MENU ENTRANCE
-       ========================= */
-    #lightspeedFX{
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 9992; /* below particles (9993) so particles still pop */
-      opacity: 0;
-    }
-    #lightspeedFX::before{
-      content:"";
-      position:absolute;
-      inset:-20%;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), rgba(0,0,0,0) 55%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255,255,255,.0) 0px,
-          rgba(255,255,255,.0) 10px,
-          rgba(255,255,255,.10) 12px,
-          rgba(255,255,255,.0) 18px
-        );
-      filter: blur(0px);
-      transform: scale(0.95);
-      opacity: 0;
-    }
-
-    body.lightspeed-in #lightspeedFX{ opacity: 1; }
-    body.lightspeed-in #lightspeedFX::before{
-      animation: lightspeedBurst .62s ease-out forwards;
-    }
-
-    @keyframes lightspeedBurst{
-      0%   { opacity: 0; transform: scale(0.92); filter: blur(0px); }
-      20%  { opacity: .95; transform: scale(1.04); filter: blur(1px); }
-      100% { opacity: 0; transform: scale(1.12); filter: blur(6px); }
-    }
-
-    /* card "camera punch" */
-    body.lightspeed-in #mainCard{
-      animation: cardPunch .62s ease-out both;
-    }
-    @keyframes cardPunch{
-      0%   { transform: translateY(18px) scale(.965); filter: blur(3px) brightness(.95); }
-      45%  { transform: translateY(0px)  scale(1.02); filter: blur(0px) brightness(1.03); }
-      100% { transform: translateY(0px)  scale(1);    filter: blur(0px) brightness(1); }
-    }
-
     /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
@@ -829,10 +780,6 @@
   <canvas id="starfield"></canvas>
   <canvas id="hyperspace"></canvas>
   <canvas id="particles"></canvas>
-
-  <!-- ✅ NEW: Lightspeed burst overlay -->
-  <div id="lightspeedFX" aria-hidden="true"></div>
-
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
@@ -1010,6 +957,14 @@
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
 
+    // ✅ NEW: Living Star Map (A) settings
+    const STAR_MAP_TEXT = "OLIVER";
+    const STAR_MAP_DELAY_MS = 12000;   // starts ~12s after main menu shows
+    const STAR_MAP_IN_MS = 1200;       // stars flow into the letters
+    const STAR_MAP_HOLD_MS = 900;      // hold the readable word
+    const STAR_MAP_OUT_MS = 1200;      // stars drift back to normal
+    const STAR_MAP_SESSION_KEY = "oliverStarMapRan_v1"; // once per session
+
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
@@ -1060,10 +1015,8 @@
     function playCantinaEgg(){
       try{
         getAudioCtx();
-
         cantina.pause();
         cantina.currentTime = 0;
-
         const p = cantina.play();
         if (p && typeof p.then === "function") p.catch(()=>{});
       }catch(e){}
@@ -1119,7 +1072,6 @@
     // ================== Droid Buddy (co-pilot popups) ==================
     function droidSay(html, ms=2200){
       if (!droidBubbleEl) return;
-
       droidBubbleEl.innerHTML = `<div class="small">${html}</div>`;
       document.body.classList.add("droid-speaking");
       clearTimeout(droidSay._t);
@@ -1172,7 +1124,7 @@
       sfCanvas.style.height = window.innerHeight + "px";
       sfCtx.setTransform(dpr,0,0,dpr,0,0);
 
-      const count = Math.min(220, Math.floor((window.innerWidth * window.innerHeight) / 6500));
+      const count = Math.min(260, Math.floor((window.innerWidth * window.innerHeight) / 5500));
       sfStars = Array.from({ length: count }, () => ({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
@@ -1180,32 +1132,197 @@
         a: 0.15 + Math.random() * 0.65,
         tw: 0.003 + Math.random() * 0.012,
         sp: 0.05 + Math.random() * 0.22,
+
+        // map fields (used only during Living Star Map)
+        _map: false,
+        ox: 0, oy: 0,
+        tx: 0, ty: 0
       }));
     }
     sfResize();
     window.addEventListener("resize", sfResize);
+
+    // ✅ NEW: Living Star Map (A) implementation
+    let starMapActive = false;
+    let starMapStart = 0;
+
+    function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+    function easeInOutCubic(t){
+      t = clamp01(t);
+      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+    }
+    function lerp(a,b,t){ return a + (b-a)*t; }
+
+    function buildTextTargets(text){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      const o = document.createElement("canvas");
+      o.width = w;
+      o.height = h;
+      const c = o.getContext("2d");
+
+      // big, clean, readable
+      const fontSize = Math.max(54, Math.floor(Math.min(w, h) * 0.12));
+      c.clearRect(0,0,w,h);
+      c.fillStyle = "#fff";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.font = `900 ${fontSize}px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif`;
+
+      // place it slightly above center so it feels “in the sky”
+      const y = h * 0.42;
+      c.fillText(text, w * 0.5, y);
+
+      const img = c.getImageData(0,0,w,h).data;
+
+      // sample points from the text pixels
+      const step = Math.max(5, Math.floor(fontSize / 16)); // auto scales
+      const targets = [];
+      for (let yy = 0; yy < h; yy += step){
+        for (let xx = 0; xx < w; xx += step){
+          const a = img[(yy*w + xx) * 4 + 3];
+          if (a > 20){
+            targets.push({ x: xx, y: yy });
+          }
+        }
+      }
+
+      // reduce target count to something that looks good with your star count
+      // shuffle targets and keep a cap
+      for (let i=targets.length-1;i>0;i--){
+        const j = (Math.random()*(i+1))|0;
+        const tmp = targets[i]; targets[i]=targets[j]; targets[j]=tmp;
+      }
+
+      const maxTargets = Math.min(sfStars.length, 210);
+      return targets.slice(0, maxTargets);
+    }
+
+    function assignStarsToTargets(targets){
+      // clear any existing map state
+      for (const s of sfStars){
+        s._map = false;
+      }
+
+      // pick stars that are reasonably spread out
+      const starsShuffled = sfStars.slice();
+      for (let i=starsShuffled.length-1;i>0;i--){
+        const j = (Math.random()*(i+1))|0;
+        const tmp = starsShuffled[i]; starsShuffled[i]=starsShuffled[j]; starsShuffled[j]=tmp;
+      }
+
+      const n = Math.min(targets.length, starsShuffled.length);
+      for (let i=0;i<n;i++){
+        const s = starsShuffled[i];
+        const t = targets[i];
+        s._map = true;
+        s.ox = s.x;
+        s.oy = s.y;
+        s.tx = t.x;
+        s.ty = t.y;
+      }
+    }
+
+    function startStarMap(text){
+      if (starMapActive) return;
+      if (!sfStars || sfStars.length < 40) return;
+
+      const targets = buildTextTargets(text);
+      if (!targets.length) return;
+
+      assignStarsToTargets(targets);
+
+      starMapActive = true;
+      starMapStart = performance.now();
+
+      // tiny “did you see that?” hint, but subtle
+      droidSay("Sensors: anomaly detected… stars aligning…", 1800);
+    }
+
+    function scheduleStarMap(){
+      // run once per session (tab open). Refreshing page = new session, so it can wow again.
+      if (sessionStorage.getItem(STAR_MAP_SESSION_KEY) === "1") return;
+      sessionStorage.setItem(STAR_MAP_SESSION_KEY, "1");
+
+      clearTimeout(scheduleStarMap._t);
+      scheduleStarMap._t = setTimeout(() => {
+        // only start if menu is actually visible
+        if (mainCard && mainCard.classList.contains("show")){
+          startStarMap(STAR_MAP_TEXT);
+        }
+      }, STAR_MAP_DELAY_MS);
+    }
 
     let lastSf = performance.now();
     function starfieldLoop(t){
       const dt = Math.min(32, t - lastSf);
       lastSf = t;
 
-      sfCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      sfCtx.clearRect(0,0,w,h);
       sfCtx.fillStyle = "#fff";
 
-      for (const s of sfStars){
-        s.y += s.sp * (dt / 16);
-        if (s.y > window.innerHeight + 2){ s.y = -2; s.x = Math.random() * window.innerWidth; }
+      // living star map timing
+      const total = STAR_MAP_IN_MS + STAR_MAP_HOLD_MS + STAR_MAP_OUT_MS;
+      let mapPhase = 0; // 0 normal, 1 in/hold/out
+      let mapT = 0;
+      if (starMapActive){
+        const elapsed = t - starMapStart;
+        mapT = clamp01(elapsed / total);
+        mapPhase = 1;
+        if (elapsed >= total){
+          // restore stars back to normal drift positions (keep where they ended, but un-map)
+          for (const s of sfStars){
+            s._map = false;
+          }
+          starMapActive = false;
+          droidSay("Anomaly resolved. Returning to standard star drift.", 1800);
+        }
+      }
 
+      for (const s of sfStars){
+        // normal drift update (only if NOT mapped)
+        if (!s._map){
+          s.y += s.sp * (dt / 16);
+          if (s.y > h + 2){ s.y = -2; s.x = Math.random() * w; }
+        }
+
+        // twinkle always
         s.a += s.tw * (dt / 16);
         if (s.a > 0.88) s.tw *= -1;
         if (s.a < 0.12) s.tw *= -1;
+
+        // map movement overrides position for mapped stars
+        if (mapPhase === 1 && s._map){
+          const elapsed = t - starMapStart;
+
+          let pIn = 0, pOut = 0, hold = 0;
+
+          if (elapsed <= STAR_MAP_IN_MS){
+            pIn = easeInOutCubic(elapsed / STAR_MAP_IN_MS);
+            s.x = lerp(s.ox, s.tx, pIn);
+            s.y = lerp(s.oy, s.ty, pIn);
+          } else if (elapsed <= STAR_MAP_IN_MS + STAR_MAP_HOLD_MS){
+            hold = 1;
+            s.x = s.tx;
+            s.y = s.ty;
+          } else {
+            const outElapsed = elapsed - (STAR_MAP_IN_MS + STAR_MAP_HOLD_MS);
+            pOut = easeInOutCubic(outElapsed / STAR_MAP_OUT_MS);
+            s.x = lerp(s.tx, s.ox, pOut);
+            s.y = lerp(s.ty, s.oy, pOut);
+          }
+        }
 
         sfCtx.globalAlpha = s.a;
         sfCtx.beginPath();
         sfCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         sfCtx.fill();
       }
+
       sfCtx.globalAlpha = 1;
       requestAnimationFrame(starfieldLoop);
     }
@@ -1536,8 +1653,10 @@
     function doRsvpWarp(){
       vibe([20,40,20]);
 
+      // make mobile browsers happier about playing audio
       getAudioCtx();
 
+      // stronger play: reset + catch promise
       try{
         hyper.pause();
         hyper.currentTime = 0;
@@ -1564,6 +1683,7 @@
       hyperspaceBurst();
       droidSay("Coordinates locked. Initiating <b>hyperspace</b>…", 1600);
 
+      // give the sound time to start before we leave the page
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
@@ -1703,20 +1823,15 @@
       if (mainCard.classList.contains("show")) return;
 
       mainCard.classList.add("show");
-
-      // ✅ NEW: Lightspeed menu entrance (runs once, safe)
-      document.body.classList.add("lightspeed-in");
-      clearTimeout(showMainMenuNow._ls);
-      showMainMenuNow._ls = setTimeout(() => {
-        document.body.classList.remove("lightspeed-in");
-      }, 700);
-
       burstAtElement(mainCard, PAL_BLUE, 1.4);
       showChewieBubble("Rrrrwwgh! New mission unlocked.");
       wookieeGrowl(520);
       showYoda("A great quest… begins now.");
 
       droidSay("Main menu loaded. Co-pilot standing by.");
+
+      // ✅ NEW: Living Star Map (A) starts AFTER menu appears (delayed)
+      scheduleStarMap();
 
       holoOff();
 
@@ -1853,7 +1968,7 @@
       setRetro(on);
     });
 
-    // Small “hello” from the co-pilot shortly after load
+    // Small “hello” from the co-pilot shortly after load (won’t disrupt anything)
     setTimeout(()=> droidSay("Co-pilot online. Try the <b>5-tap</b> title secret…", 2600), 900);
   </script>
 </body>
