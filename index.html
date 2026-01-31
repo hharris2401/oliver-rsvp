@@ -246,7 +246,7 @@
 
       transform: translateY(8px) scale(.992);
       opacity: 0;
-      transition: transform .05s ease, opacity .05s ease; /* snappy */
+      transition: transform .05s ease, opacity .05s ease;
       pointer-events:none;
     }
     .card.show{
@@ -326,6 +326,27 @@
       cursor:pointer;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
+
+    .crawlHint{
+      position:absolute;
+      bottom:18px;
+      left:50%;
+      transform:translateX(-50%);
+      font-weight:900;
+      letter-spacing:.9px;
+      font-size:12px;
+      opacity:.88;
+      text-align:center;
+      padding: 0 14px;
+      max-width: 92vw;
+    }
+    .crawlHint span{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+    }
 
     .crawlWrap{
       position:absolute;
@@ -515,55 +536,18 @@
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
         <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
-
         <p class="small">
-          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
-        </p>
-        <p class="small">
-          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+          A young legend named OLIVER has reached LEVEL 8. The galaxy is buzzing, the snacks are stocked,
+          and the Force is absolutely vibing.
         </p>
         <p class="small">
-          Today, birthday mode has been activated.
+          Your mission: tap to ignite, hit the theme, and lock in your RSVP.
+          Rumor has it there’s a hidden birthday message if you know where to tap…
         </p>
-        <p class="small">
-          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
-        </p>
-        <p class="small">
-          But before the party can begin, the arcade network must be fully powered.
-        </p>
-        <p class="small">
-          Training droids have prepared three heroic challenges.
-        </p>
-        <p class="small">
-          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
-        </p>
-        <p class="small">
-          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
-        </p>
-        <p class="small">
-          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
-        </p>
-        <p class="small">
-          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
-        </p>
-        <p class="small">
-          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
-        </p>
-
-        <p class="small center">
-          The joysticks are ready.<br>
-          The buttons are glowing.<br>
-          The Force is fully charged.
-        </p>
-        <p class="small center" style="margin-top:10px;">
-          And the quest for LEVEL 8…
-        </p>
-        <p class="small center">
-          is about to begin.
-        </p>
+        <p class="small center" style="margin-top:18px;">(Tap anywhere to begin)</p>
       </div>
     </div>
-    <!-- (intentionally no hint + no “tap to begin” line) -->
+    <div class="crawlHint"><span>Tap anywhere to start crawl + music 🎵</span></div>
   </div>
 
   <!-- Main UI -->
@@ -606,7 +590,7 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl duration (keep your tuned timing)
+    // Crawl duration
     const CRAWL_MS = 67200;
 
     // Mission brief timing (auto-dismiss)
@@ -971,10 +955,9 @@
       if (started) return;
       started = true;
 
-      getAudioCtx();      // enable WebAudio for chewie
+      getAudioCtx();
       vibe(15);
 
-      // play theme from the click (mobile requirement)
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
@@ -1004,6 +987,7 @@
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
       getAudioCtx();
+
       showDuel();
 
       showChewieBubble("RRRAWWR! (Wookiee hype)");
@@ -1020,7 +1004,9 @@
     musicBtn.addEventListener("click", async () => {
       vibe(25);
       getAudioCtx();
+
       await startThemeGuaranteed(true);
+
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
       wookieeGrowl(420);
     });
@@ -1036,7 +1022,6 @@
       doRsvpWarp();
     });
 
-    // Pills: haptic only
     pillLight.addEventListener("click", () => { vibe(12); });
     pillDark.addEventListener("click", () => { vibe(12); });
   </script>
