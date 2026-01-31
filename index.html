@@ -705,96 +705,6 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* ===== Boss Shadow Overlay (Vader-style) ===== */
-    #bossOverlay{
-      position:fixed;
-      inset:0;
-      z-index: 9996;
-      pointer-events:none;
-      opacity:0;
-      transition: opacity .12s ease;
-    }
-    #bossOverlay.show{ opacity:1; }
-
-    .bossStage{
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .bossVignette{
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 50% 45%, rgba(255,60,60,.16), rgba(0,0,0,0) 58%),
-        rgba(0,0,0,.22);
-      opacity:0;
-    }
-    #bossOverlay.show .bossVignette{
-      opacity:1;
-      animation: bossPulse 1.15s ease-in-out forwards;
-    }
-    @keyframes bossPulse{
-      0%   { filter: brightness(1); }
-      35%  { filter: brightness(1.15); }
-      70%  { filter: brightness(0.98); }
-      100% { filter: brightness(1); opacity:0; }
-    }
-
-    .bossShadow{
-      width: min(360px, 78vw);
-      height: min(420px, 58vh);
-      opacity:0;
-      transform: translateY(14px) scale(.98);
-      filter: drop-shadow(0 0 26px rgba(255,60,60,.22));
-      background:
-        radial-gradient(ellipse at 50% 16%, rgba(255,60,60,.14), rgba(0,0,0,0) 62%),
-        radial-gradient(ellipse at 50% 18%, rgba(0,0,0,.92) 0 58%, rgba(0,0,0,0) 60%),
-        radial-gradient(ellipse at 50% 46%, rgba(0,0,0,.90) 0 44%, rgba(0,0,0,0) 46%),
-        radial-gradient(circle at 42% 44%, rgba(255,255,255,.06), rgba(0,0,0,0) 42%),
-        radial-gradient(circle at 58% 44%, rgba(255,255,255,.06), rgba(0,0,0,0) 42%),
-        radial-gradient(ellipse at 35% 74%, rgba(0,0,0,.92) 0 46%, rgba(0,0,0,0) 48%),
-        radial-gradient(ellipse at 65% 74%, rgba(0,0,0,.92) 0 46%, rgba(0,0,0,0) 48%),
-        radial-gradient(ellipse at 50% 92%, rgba(0,0,0,.88) 0 58%, rgba(0,0,0,0) 60%);
-    }
-
-    .bossMist{
-      position:absolute;
-      width: min(540px, 92vw);
-      height: min(540px, 70vh);
-      opacity:0;
-      transform: translateY(10px);
-      background:
-        radial-gradient(circle at 50% 55%, rgba(255,60,60,.12), rgba(0,0,0,0) 60%),
-        radial-gradient(circle at 40% 60%, rgba(255,211,107,.06), rgba(0,0,0,0) 58%),
-        radial-gradient(circle at 60% 50%, rgba(0,170,255,.05), rgba(0,0,0,0) 62%);
-      filter: blur(12px);
-      mix-blend-mode: screen;
-    }
-
-    #bossOverlay.show .bossShadow{
-      opacity:1;
-      animation: bossRise 1.15s ease-in-out forwards;
-    }
-    #bossOverlay.show .bossMist{
-      opacity:1;
-      animation: bossMistDrift 1.15s ease-in-out forwards;
-    }
-
-    @keyframes bossRise{
-      0%   { transform: translateY(18px) scale(.965); opacity: 0; }
-      35%  { transform: translateY(0px)  scale(1);    opacity: 1; }
-      70%  { transform: translateY(-2px) scale(1.01); opacity: 1; }
-      100% { transform: translateY(10px) scale(.98);  opacity: 0; }
-    }
-    @keyframes bossMistDrift{
-      0%   { transform: translateY(14px) scale(.98); opacity: 0; }
-      35%  { transform: translateY(0px)  scale(1);   opacity: .9; }
-      100% { transform: translateY(8px)  scale(1.02); opacity: 0; }
-    }
-
     /* Retro mode overlay */
     #scanlines{
       position:fixed;
@@ -905,15 +815,6 @@
         <div class="saber red"></div>
         <div class="spark"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- Boss shadow overlay (BOSS button uses this) -->
-  <div id="bossOverlay" aria-hidden="true">
-    <div class="bossStage">
-      <div class="bossVignette"></div>
-      <div class="bossShadow"></div>
-      <div class="bossMist"></div>
     </div>
   </div>
 
@@ -1029,9 +930,6 @@
         </div>
 
         <button class="btn gold" id="rsvpBtn">CONTINUE TO RSVP 📋</button>
-
-        <!-- ✅ Boss mode button under RSVP -->
-        <button class="btn red" id="bossBtn">BOSS MODE ☠️</button>
       </div>
 
       <div class="fine">
@@ -1120,7 +1018,6 @@
     const crawlScreen   = document.getElementById("crawlScreen");
     const mainCard      = document.getElementById("mainCard");
     const duelOverlay   = document.getElementById("duelOverlay");
-    const bossOverlay   = document.getElementById("bossOverlay");
     const chewieBubble  = document.getElementById("chewieBubble");
     const yodaBubble    = document.getElementById("yodaBubble");
     const hudToast      = document.getElementById("hudToast");
@@ -1542,13 +1439,6 @@
       setTimeout(()=>duelOverlay.classList.remove("show"), 950);
     }
 
-    // ================== BOSS SHADOW VISUAL (BOSS BTN) ==================
-    function showBossShadow(){
-      if (!bossOverlay) return;
-      bossOverlay.classList.add("show");
-      setTimeout(()=>bossOverlay.classList.remove("show"), 1150);
-    }
-
     // ================== SECRET EGG (5 taps title) ==================
     (function birthdayEgg(){
       const title = document.getElementById("secretTitle");
@@ -1803,7 +1693,6 @@
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
-    const bossBtn   = document.getElementById("bossBtn");
     const pillLight = document.getElementById("pillLight");
     const pillDark  = document.getElementById("pillDark");
 
@@ -1854,28 +1743,6 @@
       burstAtElement(rsvpBtn, PAL_GOLD, 1.25);
       doRsvpWarp();
     });
-
-    // ✅ Boss button uses Vader shadow overlay (NOT the duel overlay)
-    if (bossBtn){
-      bossBtn.addEventListener("click", async () => {
-        vibe([20,10,20]);
-        getAudioCtx();
-
-        try{
-          vader.pause();
-          vader.currentTime = 0;
-          const p = vader.play();
-          if (p && typeof p.then === "function") p.catch(()=>{});
-        }catch(e){
-          window.open(VADER_URL, "_blank", "noopener");
-        }
-
-        showBossShadow();
-        burstAtElement(bossBtn, PAL_RED, 1.05);
-
-        droidSay("BOSS MODE engaged. <b>Breathing… detected</b>.");
-      });
-    }
 
     // Pills = Konami inputs (Dark=B, Light=A) + audio
     pillDark.addEventListener("click", async () => {
