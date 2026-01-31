@@ -47,6 +47,55 @@
       z-index: 9993;
     }
 
+    /* =========================
+       LIGHTSPEED MENU ENTRANCE
+       ========================= */
+    #lightspeedFX{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9992; /* below particles (9993) so particles still pop */
+      opacity: 0;
+    }
+    #lightspeedFX::before{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.18), rgba(0,0,0,0) 55%),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,.0) 0px,
+          rgba(255,255,255,.0) 10px,
+          rgba(255,255,255,.10) 12px,
+          rgba(255,255,255,.0) 18px
+        );
+      filter: blur(0px);
+      transform: scale(0.95);
+      opacity: 0;
+    }
+
+    body.lightspeed-in #lightspeedFX{ opacity: 1; }
+    body.lightspeed-in #lightspeedFX::before{
+      animation: lightspeedBurst .62s ease-out forwards;
+    }
+
+    @keyframes lightspeedBurst{
+      0%   { opacity: 0; transform: scale(0.92); filter: blur(0px); }
+      20%  { opacity: .95; transform: scale(1.04); filter: blur(1px); }
+      100% { opacity: 0; transform: scale(1.12); filter: blur(6px); }
+    }
+
+    /* card "camera punch" */
+    body.lightspeed-in #mainCard{
+      animation: cardPunch .62s ease-out both;
+    }
+    @keyframes cardPunch{
+      0%   { transform: translateY(18px) scale(.965); filter: blur(3px) brightness(.95); }
+      45%  { transform: translateY(0px)  scale(1.02); filter: blur(0px) brightness(1.03); }
+      100% { transform: translateY(0px)  scale(1);    filter: blur(0px) brightness(1); }
+    }
+
     /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
@@ -780,6 +829,10 @@
   <canvas id="starfield"></canvas>
   <canvas id="hyperspace"></canvas>
   <canvas id="particles"></canvas>
+
+  <!-- ✅ NEW: Lightspeed burst overlay -->
+  <div id="lightspeedFX" aria-hidden="true"></div>
+
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
@@ -1003,10 +1056,9 @@
       }
     }
 
-    // ✅ Cantina Easter Egg helper (this is what got "lost" before)
+    // ✅ Cantina Easter Egg helper
     function playCantinaEgg(){
       try{
-        // mobile-friendly: "unlock" audio path
         getAudioCtx();
 
         cantina.pause();
@@ -1455,7 +1507,7 @@
       function showBirthday(){
         msg.classList.add("show");
 
-        // ✅ Cantina sound ONLY when the 5-tap Easter egg fires
+        // Cantina sound ONLY when the 5-tap Easter egg fires
         playCantinaEgg();
 
         fireConfetti(2600);
@@ -1484,10 +1536,8 @@
     function doRsvpWarp(){
       vibe([20,40,20]);
 
-      // make mobile browsers happier about playing audio
       getAudioCtx();
 
-      // stronger play: reset + catch promise
       try{
         hyper.pause();
         hyper.currentTime = 0;
@@ -1514,7 +1564,6 @@
       hyperspaceBurst();
       droidSay("Coordinates locked. Initiating <b>hyperspace</b>…", 1600);
 
-      // give the sound time to start before we leave the page
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
@@ -1654,6 +1703,14 @@
       if (mainCard.classList.contains("show")) return;
 
       mainCard.classList.add("show");
+
+      // ✅ NEW: Lightspeed menu entrance (runs once, safe)
+      document.body.classList.add("lightspeed-in");
+      clearTimeout(showMainMenuNow._ls);
+      showMainMenuNow._ls = setTimeout(() => {
+        document.body.classList.remove("lightspeed-in");
+      }, 700);
+
       burstAtElement(mainCard, PAL_BLUE, 1.4);
       showChewieBubble("Rrrrwwgh! New mission unlocked.");
       wookieeGrowl(520);
@@ -1796,7 +1853,7 @@
       setRetro(on);
     });
 
-    // Small “hello” from the co-pilot shortly after load (won’t disrupt anything)
+    // Small “hello” from the co-pilot shortly after load
     setTimeout(()=> droidSay("Co-pilot online. Try the <b>5-tap</b> title secret…", 2600), 900);
   </script>
 </body>
