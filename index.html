@@ -327,27 +327,6 @@
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
 
-    .crawlHint{
-      position:absolute;
-      bottom:18px;
-      left:50%;
-      transform:translateX(-50%);
-      font-weight:900;
-      letter-spacing:.9px;
-      font-size:12px;
-      opacity:.88;
-      text-align:center;
-      padding: 0 14px;
-      max-width: 92vw;
-    }
-    .crawlHint span{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-    }
-
     .crawlWrap{
       position:absolute;
       inset:0;
@@ -358,6 +337,8 @@
       overflow:hidden;
       padding-bottom: 10vh;
     }
+
+    /* UPDATED: opacity 1 for immediate visibility */
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
@@ -369,18 +350,19 @@
       text-shadow: 0 0 16px rgba(255,211,107,.12);
       line-height: 1.55;
       font-size: clamp(14px, 3.2vw, 22px);
-      opacity: 0;
+      opacity: 1;
     }
     .crawl .center{ text-align:center; }
     .crawl .small{ font-weight:900; opacity:.92; }
 
     #crawlScreen.running .crawl{
-      opacity: 1;
       animation: crawlMove var(--crawlms) linear forwards;
     }
+
+    /* UPDATED: shorter travel distance (feels slower and easier to read) */
     @keyframes crawlMove{
-      0%   { transform: rotateX(24deg) translateY(120%); opacity: 1; }
-      100% { transform: rotateX(24deg) translateY(-230%); opacity: .0; }
+      0%   { transform: rotateX(24deg) translateY(95%); opacity: 1; }
+      100% { transform: rotateX(24deg) translateY(-165%); opacity: 0; }
     }
 
     /* ===== Dueling overlay (CSS graphic) ===== */
@@ -534,73 +516,73 @@
   <div id="crawlScreen">
     <div class="crawlWrap">
       <div class="crawl" id="crawlText">
-        <div class="crawl" id="crawlText">
-  <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
-  <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
+        <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
+        <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
 
-  <p class="small">
-    In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
-  </p>
+        <p class="small">
+          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
+        </p>
 
-  <p class="small">
-    The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
-  </p>
+        <p class="small">
+          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+        </p>
 
-  <p class="small">
-    Today, birthday mode has been activated.
-  </p>
+        <p class="small">
+          Today, birthday mode has been activated.
+        </p>
 
-  <p class="small">
-    From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
-  </p>
+        <p class="small">
+          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
+        </p>
 
-  <p class="small">
-    But before the party can begin, the arcade network must be fully powered.
-  </p>
+        <p class="small">
+          But before the party can begin, the arcade network must be fully powered.
+        </p>
 
-  <p class="small">
-    Training droids have prepared three heroic challenges.
-  </p>
+        <p class="small">
+          Training droids have prepared three heroic challenges.
+        </p>
 
-  <p class="small">
-    CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
-  </p>
+        <p class="small">
+          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
+        </p>
 
-  <p class="small">
-    CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
-  </p>
+        <p class="small">
+          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
+        </p>
 
-  <p class="small">
-    CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
-  </p>
+        <p class="small">
+          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
+        </p>
 
-  <p class="small">
-    Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
-  </p>
+        <p class="small">
+          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
+        </p>
 
-  <p class="small">
-    Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
-  </p>
+        <p class="small">
+          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
+        </p>
 
-  <p class="small">
-    Choose your path wisely, young player.
-  </p>
+        <p class="small">
+          Choose your path wisely, young player.
+        </p>
 
-  <p class="small center">
-    The joysticks are ready.<br>
-    The buttons are glowing.<br>
-    The Force is fully charged.
-  </p>
+        <p class="small center">
+          The joysticks are ready.<br>
+          The buttons are glowing.<br>
+          The Force is fully charged.
+        </p>
 
-  <p class="small center" style="margin-top:10px;">
-    And the quest for LEVEL 8…
-  </p>
+        <p class="small center" style="margin-top:10px;">
+          And the quest for LEVEL 8…
+        </p>
 
-  <p class="small center">
-    is about to begin.
-  </p>
-</div>
-    <div class="crawlHint"><span>Tap anywhere to start crawl + music 🎵</span></div>
+        <p class="small center">
+          is about to begin.
+        </p>
+      </div>
+    </div>
+    <!-- no hint, no extra tap text -->
   </div>
 
   <!-- Main UI -->
@@ -643,8 +625,8 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl duration
-    const CRAWL_MS = 120000;
+    // UPDATED: crawl duration (recommended with new keyframes)
+    const CRAWL_MS = 85000;
 
     // Mission brief timing (auto-dismiss)
     const MISSION_SHOW_MS = 1200;
@@ -863,6 +845,76 @@
       requestAnimationFrame(frame);
     }
 
+    // ================== CHEWIE (procedural) ==================
+    let audioCtx = null;
+
+    function getAudioCtx(){
+      if (!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended"){
+        audioCtx.resume().catch(()=>{});
+      }
+      return audioCtx;
+    }
+
+    function wookieeGrowl(ms = 520){
+      try{
+        const ctx = getAudioCtx();
+        const now = ctx.currentTime;
+        const end = now + ms/1000;
+
+        const bufferSize = Math.floor(ctx.sampleRate * (ms/1000));
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i=0;i<bufferSize;i++){
+          data[i] = (Math.random()*2 - 1) * 0.55;
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+
+        const osc = ctx.createOscillator();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(115, now);
+        osc.frequency.exponentialRampToValueAtTime(70, end);
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.setValueAtTime(260, now);
+        filter.Q.setValueAtTime(1.1, now);
+
+        const lowpass = ctx.createBiquadFilter();
+        lowpass.type = "lowpass";
+        lowpass.frequency.setValueAtTime(900, now);
+        lowpass.frequency.exponentialRampToValueAtTime(520, end);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.55, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, end);
+
+        const mix = ctx.createGain();
+        mix.gain.setValueAtTime(0.9, now);
+
+        osc.connect(filter);
+        noise.connect(filter);
+        filter.connect(lowpass);
+        lowpass.connect(mix);
+        mix.connect(gain);
+        gain.connect(ctx.destination);
+
+        noise.start(now);
+        osc.start(now);
+        noise.stop(end);
+        osc.stop(end);
+      }catch(e){}
+    }
+
+    function showChewieBubble(text){
+      chewieBubble.textContent = text;
+      chewieBubble.classList.add("show");
+      setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
+    }
 
     // ================== DUEL VISUAL ==================
     function showDuel(){
