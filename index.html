@@ -16,6 +16,31 @@
     }
     *{ box-sizing:border-box; }
 
+    /* =========================
+       THEME SYSTEM (RESTORED)
+       ========================= */
+    body{
+      --accent: var(--blue);
+      --accentGlow: rgba(0,170,255,.45);
+      --panelEdge: rgba(255,255,255,.18);
+      --panelBg: rgba(0,0,0,.55);
+      --vignette: rgba(0,0,0,.10);
+      --starOpacity: .78;
+      --holoOpacity: .22; /* subtle baseline */
+    }
+    body[data-theme="light"]{
+      --accent: var(--blue);
+      --accentGlow: rgba(0,170,255,.45);
+      --vignette: rgba(0,0,0,.08);
+      --starOpacity: .78;
+    }
+    body[data-theme="dark"]{
+      --accent: var(--red);
+      --accentGlow: rgba(255,60,60,.45);
+      --vignette: rgba(0,0,0,.22);
+      --starOpacity: .62;
+    }
+
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -23,6 +48,16 @@
       background: radial-gradient(circle at 30% 10%, var(--bg1), var(--bg2) 60%, #000);
       min-height:100vh;
       overflow:hidden;
+    }
+
+    /* Theme-aware cinematic vignette */
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background: radial-gradient(circle at 50% 30%, rgba(0,0,0,0), var(--vignette) 70%);
     }
 
     /* FX layers */
@@ -33,7 +68,7 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
+    #starfield{ z-index: 1; opacity: var(--starOpacity); transition: opacity .25s ease; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
@@ -104,7 +139,10 @@
           rgba(0,0,0,0) 60%
         );
     }
-    body.holo-on #holoFX{ opacity:.55; }
+    /* baseline holo ON (subtle) */
+    body.holo-on #holoFX{ opacity: var(--holoOpacity); }
+    /* stronger holo during crawl */
+    body.holo-strong #holoFX{ opacity: .55; }
 
     body.holo-on{
       animation: holoFlicker 2.6s infinite;
@@ -114,8 +152,8 @@
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
 
-    body.holo-on .stage,
-    body.holo-on #crawlScreen{
+    body.holo-strong .stage,
+    body.holo-strong #crawlScreen{
       animation: holoJitter 1.4s infinite;
     }
     @keyframes holoJitter{
@@ -256,8 +294,8 @@
 
     .card{
       width:min(720px,100%);
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(0,0,0,.55);
+      border:1px solid var(--panelEdge);
+      background:var(--panelBg);
       box-shadow:0 20px 60px rgba(0,0,0,.45);
       border-radius:18px;
       overflow:hidden;
@@ -281,9 +319,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* ==========================================================
-       NEW #1: HOLOGRAM TITLE (main menu) - subtle but premium
-       ========================================================== */
+    /* NEW #1: HOLOGRAM TITLE (main menu) */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -292,16 +328,13 @@
       display:inline-block;
       padding: 4px 10px;
       border-radius: 12px;
-      /* tiny base glow */
       text-shadow:
         0 0 18px rgba(0,170,255,.12),
         0 0 18px rgba(255,211,107,.08);
-      /* hint of hologram bloom behind */
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
     }
-    /* micro scanline sheen */
     .title::before{
       content:"";
       position:absolute;
@@ -323,7 +356,6 @@
         );
       mix-blend-mode: screen;
     }
-    /* shimmering sweep */
     .title::after{
       content:"";
       position:absolute;
@@ -349,7 +381,6 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
-    /* gentle hologram flicker */
     .title{
       animation: titleFlicker 3.8s infinite;
     }
@@ -380,11 +411,18 @@
       background:rgba(255,255,255,.06);
       user-select:none;
       cursor:pointer;
-      transition: filter .12s ease, transform .08s ease;
+      transition: filter .12s ease, transform .08s ease, box-shadow .18s ease;
     }
     .pill:active{ transform: translateY(1px); filter: brightness(.96); }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
+
+    /* theme active styling */
+    .pill.active{
+      border-color: var(--accentGlow);
+      box-shadow: 0 0 18px var(--accentGlow);
+      background: rgba(255,255,255,.09);
+    }
 
     #retroToggle{ display:none; }
     body.legend-unlocked #retroToggle{ display:inline-flex; }
@@ -410,10 +448,9 @@
       user-select:none;
       transform: translateY(0);
       transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
-      position: relative; /* helps particles visually align */
+      position: relative;
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
-
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
@@ -827,11 +864,18 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    const CRAWL_MS = 150000;      // 2:30 crawl
-    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
+    const CRAWL_MS = 150000;      // crawl animation length (2:30)
+    const MENU_REVEAL_MS = 95000; // menu appears at 1:35 (without killing crawl)
 
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
+
+    // Theme persistence
+    const THEME_KEY = "oliverTheme_v2";
+
+    // Legend & retro persistence
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+    const RETRO_KEY  = "oliverRetroMode_v1";
 
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
@@ -864,12 +908,42 @@
     const subtitleEl    = document.getElementById("subtitleEl");
     const retroToggle   = document.getElementById("retroToggle");
 
+    const pillLight     = document.getElementById("pillLight");
+    const pillDark      = document.getElementById("pillDark");
+
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
+    // ================== THEME SWITCHER (RESTORED) ==================
+    function applyTheme(t){
+      document.body.dataset.theme = t; // "light" or "dark"
+      localStorage.setItem(THEME_KEY, t);
+
+      pillLight.classList.toggle("active", t === "light");
+      pillDark.classList.toggle("active", t === "dark");
+    }
+
+    function initTheme(){
+      const saved = localStorage.getItem(THEME_KEY) || "light";
+      applyTheme(saved);
+    }
+    initTheme();
+
     // ================== HOLO FX CONTROLS ==================
-    function holoOn(){ document.body.classList.add("holo-on"); }
-    function holoOff(){ document.body.classList.remove("holo-on"); }
+    function holoOnStrong(){
+      document.body.classList.add("holo-on");
+      document.body.classList.add("holo-strong");
+    }
+    function holoOnSubtle(){
+      document.body.classList.add("holo-on");
+      document.body.classList.remove("holo-strong");
+    }
+    function holoOff(){
+      document.body.classList.remove("holo-on");
+      document.body.classList.remove("holo-strong");
+    }
+    // keep subtle holo always (designer vibe)
+    holoOnSubtle();
 
     // ================== HUD TOAST ==================
     function showHud(message, ms=1400){
@@ -896,7 +970,6 @@
     }
 
     // ================== RETRO MODE (Legend-only) ==================
-    const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -1105,7 +1178,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== NEW #3: BUTTON PARTICLE BURSTS ==================
+    // ================== BUTTON PARTICLE BURSTS ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1155,23 +1228,18 @@
 
       pCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
 
-      // draw/update
       for (let i=particles.length-1;i>=0;i--){
         const p = particles[i];
         p.age += dt;
 
-        // physics
         p.x += p.vx * (dt/16);
         p.y += p.vy * (dt/16);
         p.vy += p.g * (dt/16);
         p.vx *= 0.985;
         p.vy *= 0.985;
 
-        // fade
         const k = Math.min(1, p.age / p.life);
         const fade = (k < 0.7) ? 1 : (1 - (k-0.7)/0.3);
-
-        // tiny twinkle
         const tw = Math.sin((t * p.tw)) * 0.12;
 
         pCtx.globalAlpha = Math.max(0, fade + tw);
@@ -1180,7 +1248,6 @@
         pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
         pCtx.fill();
 
-        // remove
         if (p.age >= p.life) particles.splice(i,1);
       }
 
@@ -1322,10 +1389,8 @@
       }, 850);
     }
 
-    // ================== KONAMI (Dark = B, Light = A) ==================
+    // ================== KONAMI (Dark=B, Light=A via LONG PRESS) ==================
     const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-
     let inputBuffer = [];
     let konamiStartAt = 0;
 
@@ -1359,16 +1424,14 @@
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
-        document.body.classList.add("legend");
-        document.body.classList.add("legend-unlocked");
+        document.body.classList.add("legend","legend-unlocked");
         applyRetroOnLoad();
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
 
-      document.body.classList.add("legend-unlocked");
-      document.body.classList.add("legend");
+      document.body.classList.add("legend-unlocked","legend");
 
       vibe([30,40,30,60,30]);
       fireConfetti(2400);
@@ -1376,28 +1439,26 @@
       wookieeGrowl(620);
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
-
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
 
       const title = document.getElementById("secretTitle");
-      if (title && !title.dataset.legendApplied){
+      if (title){
         title.dataset.legendApplied = "1";
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
-
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+
       applyRetroOnLoad();
     }
 
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
-        document.body.classList.add("legend-unlocked");
-        document.body.classList.add("legend");
+        document.body.classList.add("legend-unlocked","legend");
         const title = document.getElementById("secretTitle");
         if (title){
           title.dataset.legendApplied = "1";
@@ -1407,6 +1468,7 @@
       applyRetroOnLoad();
     })();
 
+    // Keyboard Konami
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1417,6 +1479,7 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
+    // Swipe Konami (mobile)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
@@ -1445,8 +1508,35 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // ================== CRAWL FLOW (Menu pops at 95s) ==================
+    // LONG PRESS helper for A/B on pills
+    function addLongPress(el, ms, onLong){
+      let timer = null;
+      let longFired = false;
+
+      function start(){
+        longFired = false;
+        clearTimeout(timer);
+        timer = setTimeout(()=>{
+          longFired = true;
+          onLong();
+        }, ms);
+      }
+      function cancel(){
+        clearTimeout(timer);
+      }
+
+      el.addEventListener("pointerdown", start);
+      el.addEventListener("pointerup", cancel);
+      el.addEventListener("pointercancel", cancel);
+      el.addEventListener("pointerleave", cancel);
+
+      // return whether last press was long (used to suppress tap)
+      return () => longFired;
+    }
+
+    // ================== CRAWL FLOW (menu pops at 95s, crawl ends at 150s) ==================
     let started = false;
+    let menuShown = false;
 
     async function beginCrawl(){
       if (started) return;
@@ -1454,27 +1544,34 @@
 
       getAudioCtx();
 
-      // HOLO ON during crawl
-      holoOn();
+      // Strong holo during crawl
+      holoOnStrong();
 
       vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
 
+      // show menu at MENU_REVEAL_MS (without removing crawl)
       setTimeout(() => {
+        if (menuShown) return;
+        menuShown = true;
+
         mainCard.classList.add("show");
         burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // HOLO OFF when menu appears (clean)
-        holoOff();
-
-        crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
+        // Subtle holo continues during menu
+        holoOnSubtle();
       }, MENU_REVEAL_MS);
+
+      // finally remove crawl at the actual crawl end
+      setTimeout(() => {
+        crawlScreen.classList.add("hide");
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 160);
+      }, CRAWL_MS);
     }
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
@@ -1484,8 +1581,6 @@
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
-    const pillLight = document.getElementById("pillLight");
-    const pillDark  = document.getElementById("pillDark");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
@@ -1532,8 +1627,40 @@
       doRsvpWarp();
     });
 
-    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
-    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
+    // LIGHT/DARK pills:
+    // - TAP = theme switch (RESTORED)
+    // - LONG PRESS = Konami A/B (PERSISTENT UNLOCK)
+    const wasLongLight = addLongPress(pillLight, 420, () => {
+      vibe([10,20,10]);
+      pushKonami("A");
+      burstAtElement(pillLight, PAL_BLUE, 0.9);
+      showHud(`INPUT: <b>A</b>`, 650);
+    });
+
+    const wasLongDark = addLongPress(pillDark, 420, () => {
+      vibe([10,20,10]);
+      pushKonami("B");
+      burstAtElement(pillDark, PAL_RED, 0.9);
+      showHud(`INPUT: <b>B</b>`, 650);
+    });
+
+    pillLight.addEventListener("click", () => {
+      if (wasLongLight()) return; // long-press already used
+      vibe(12);
+      applyTheme("light");
+      burstAtElement(pillLight, PAL_BLUE, 0.75);
+      showYoda("Light side… chosen, you have.");
+      yodaSubtitle("Light side… active, it is.", 1900);
+    });
+
+    pillDark.addEventListener("click", () => {
+      if (wasLongDark()) return;
+      vibe(12);
+      applyTheme("dark");
+      burstAtElement(pillDark, PAL_RED, 0.75);
+      showYoda("Dark side… tempting, it is.");
+      yodaSubtitle("Dark side… active, it is.", 1900);
+    });
 
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
