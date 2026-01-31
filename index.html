@@ -12,7 +12,7 @@
       --red:#ff3c3c;
       --bg1:#173a66;
       --bg2:#04060a;
-      --crawlms: 85000ms; /* will be overwritten on tap */
+      --crawlms: 105000ms; /* sweet spot */
     }
     *{ box-sizing:border-box; }
 
@@ -339,14 +339,11 @@
       padding-bottom: 10vh;
     }
 
-    /* IMPORTANT:
-       - Start NOT animating until tap (no "late start" feeling)
-       - Keep it visible immediately
-    */
+    /* Crawl sits ready, starts moving immediately when "running" class is added */
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
-      transform: rotateX(24deg) translateY(95%); /* matches keyframe start */
+      transform: rotateX(24deg) translateY(95%);
       color: #ffd36b;
       font-weight: 900;
       letter-spacing: 1.4px;
@@ -355,6 +352,7 @@
       line-height: 1.55;
       font-size: clamp(14px, 3.2vw, 22px);
       opacity: 1;
+      will-change: transform;
     }
     .crawl .center{ text-align:center; }
     .crawl .small{ font-weight:900; opacity:.92; }
@@ -363,7 +361,6 @@
       animation: crawlMove var(--crawlms) linear forwards;
     }
 
-    /* Slightly shorter travel distance so it stays readable longer */
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(95%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-165%); opacity: 0; }
@@ -623,30 +620,23 @@
   <script>
     // ================== SETTINGS ==================
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
-
-    // Must match repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Base duration (before slow-down multiplier)
-    const CRAWL_BASE_MS = 85000;
+    // Sweet spot crawl time (105 seconds)
+    const CRAWL_MS = 105000;
 
-    // UPDATED: Slow scroll down by 80% => 5x longer
-    const CRAWL_MS = Math.round(CRAWL_BASE_MS * 5);
-
-    // Mission brief timing (auto-dismiss)
     const MISSION_SHOW_MS = 1200;
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
-    // ================== AUDIO (theme + saber) ==================
+    // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
 
-    // whole song, NO loop
-    theme.loop = false;
+    theme.loop = false;  // whole song, no loop
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -669,7 +659,7 @@
     const warpCountdown = document.getElementById("warpCountdown");
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // Set crawl timing variable (will be finalized on tap)
+    // Ensure CSS uses the same duration as JS
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
     // ================== STARFIELD ==================
@@ -724,7 +714,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    // ================== HYPERSPACE BURST (for RSVP only) ==================
+    // ================== HYPERSPACE BURST (RSVP only) ==================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
@@ -991,29 +981,22 @@
       }, 850);
     }
 
-    // ================== CRAWL FLOW (FIXED: start IMMEDIATELY + 80% slower) ==================
+    // ================== CRAWL FLOW (instant start + sweet spot speed) ==================
     let started = false;
 
     async function beginCrawl(){
       if (started) return;
       started = true;
 
-      // lock duration (and sync menu reveal) immediately on tap
       document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
-
-      // resume WebAudio inside gesture
       getAudioCtx();
-
-      // tactile feedback
       vibe(15);
 
-      // optional: start theme on tap (kept)
       await startThemeGuaranteed(true);
 
-      // START CRAWL IMMEDIATELY
+      // start crawl immediately
       crawlScreen.classList.add("running");
 
-      // When crawl completes -> show menu
       setTimeout(() => {
         mainCard.classList.add("show");
         showMissionBrief();
