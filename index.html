@@ -12,36 +12,9 @@
       --red:#ff3c3c;
       --bg1:#173a66;
       --bg2:#04060a;
+      --yoda:#7CFF8A;
     }
     *{ box-sizing:border-box; }
-
-    /* ===== THEME SYSTEM (uses existing LIGHT/DARK pills) ===== */
-    body{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --accentOverlay: rgba(0,170,255,.18);
-      --panelEdge: rgba(255,255,255,.18);
-      --panelBg: rgba(0,0,0,.55);
-      --vignette: rgba(0,0,0,.10);
-      --starOpacity: .78;
-      --missionBorder: rgba(0,170,255,.32);
-    }
-    body[data-theme="light"]{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --accentOverlay: rgba(0,170,255,.18);
-      --missionBorder: rgba(0,170,255,.32);
-      --vignette: rgba(0,0,0,.08);
-      --starOpacity: .78;
-    }
-    body[data-theme="dark"]{
-      --accent: var(--red);
-      --accentGlow: rgba(255,60,60,.45);
-      --accentOverlay: rgba(255,60,60,.18);
-      --missionBorder: rgba(255,60,60,.30);
-      --vignette: rgba(0,0,0,.22);
-      --starOpacity: .62;
-    }
 
     body{
       margin:0;
@@ -52,16 +25,6 @@
       overflow:hidden;
     }
 
-    /* Theme-aware cinematic vignette */
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      background: radial-gradient(circle at 50% 30%, rgba(0,0,0,0), var(--vignette) 70%);
-    }
-
     /* FX layers */
     #starfield, #hyperspace, #confetti{
       position:fixed;
@@ -70,9 +33,22 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity: var(--starOpacity); }
+    #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
+
+    /* NEW: button particle layer (above UI, below toasts/overlays) */
+    #particles{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      pointer-events:none;
+      z-index: 9993;
+    }
+
+    /* Legend pulse brightens starfield briefly */
+    body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
       position:fixed;
@@ -83,7 +59,7 @@
       z-index: 9997;
       background:
         radial-gradient(circle at 50% 50%, rgba(255,255,255,.16), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 50% 50%, var(--accentOverlay), rgba(0,0,0,0) 65%),
+        radial-gradient(circle at 50% 50%, rgba(0,170,255,.18), rgba(0,0,0,0) 65%),
         rgba(0,0,0,.0);
     }
     #warpOverlay.show{ opacity:1; }
@@ -104,7 +80,52 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* Chewie accent bubble */
+    /* =========================
+       HOLO-TRANSMISSION FX (#4)
+       ========================= */
+    #holoFX{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index: 9994;
+      opacity:0;
+      transition: opacity .25s ease;
+      mix-blend-mode: screen;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 6px
+        ),
+        radial-gradient(circle at 50% 20%,
+          rgba(0,170,255,.12),
+          rgba(0,0,0,0) 60%
+        );
+    }
+    body.holo-on #holoFX{ opacity:.55; }
+
+    body.holo-on{
+      animation: holoFlicker 2.6s infinite;
+    }
+    @keyframes holoFlicker{
+      0%,100%{ filter: brightness(1) contrast(1); }
+      50%{ filter: brightness(1.05) contrast(1.03); }
+    }
+
+    body.holo-on .stage,
+    body.holo-on #crawlScreen{
+      animation: holoJitter 1.4s infinite;
+    }
+    @keyframes holoJitter{
+      0%, 96%, 100% { transform: translate(0,0); }
+      97% { transform: translate(1px,0); }
+      98% { transform: translate(-1px,0); }
+      99% { transform: translate(0,1px); }
+    }
+
+    /* Chewie bubble */
     #chewieBubble{
       position:fixed;
       left:50%;
@@ -124,110 +145,69 @@
       text-shadow: 0 0 18px rgba(255,211,107,.18);
       max-width: 92vw;
       text-align:center;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 16px 60px rgba(0,0,0,.35);
     }
     #chewieBubble.show{
       opacity:1;
       transform:translateX(-50%) translateY(-2px);
     }
 
-    /* Mission briefing overlay (after crawl) */
-    #missionBrief{
+    /* Yoda bubble */
+    #yodaBubble{
       position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index: 99995;
-      pointer-events:none;
+      left:50%;
+      top:23%;
+      transform:translateX(-50%);
+      z-index: 31;
       opacity:0;
-      transition: opacity .18s ease, transform .18s ease;
-      transform: translateY(8px);
-    }
-    #missionBrief.show{
-      opacity:1;
-      transform: translateY(0);
-    }
-    .missionCard{
-      width:min(680px, 92vw);
-      border-radius: 20px;
-      padding: 16px 16px 14px;
-      background: rgba(0, 0, 0, .58);
-      border: 1px solid var(--missionBorder);
-      box-shadow: 0 22px 70px rgba(0,0,0,.55);
-      backdrop-filter: blur(7px);
-      position:relative;
-      overflow:hidden;
-    }
-    .missionCard::before{
-      content:"";
-      position:absolute;
-      inset:-40px;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,.06), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 20% 30%, var(--accentOverlay), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 80% 20%, rgba(255,211,107,.14), rgba(0,0,0,0) 55%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,0));
       pointer-events:none;
-    }
-    .missionInner{ position:relative; z-index:2; }
-    .missionTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
-    }
-    .holoTag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
+      transition: opacity .25s ease, transform .25s ease;
+      background: rgba(0,0,0,.62);
+      border:1px solid rgba(124,255,138,.28);
       border-radius: 999px;
-      border: 1px solid var(--accentGlow);
-      background: rgba(255,255,255,.06);
-      font-weight: 900;
-      letter-spacing: 1.1px;
-      font-size: 12px;
-      color: #eaf7ff;
-      text-transform: uppercase;
-    }
-    .holoDot{
-      width:8px; height:8px;
-      border-radius:999px;
-      background:#bfefff;
-      box-shadow: 0 0 16px rgba(191,239,255,.55);
-      animation: blink 1.1s infinite;
-    }
-    @keyframes blink{
-      0%,60%{ opacity:.25; }
-      70%,100%{ opacity:1; }
-    }
-    .missionTitle{
+      padding: 10px 14px;
       font-weight: 950;
-      letter-spacing: 1.6px;
-      font-size: clamp(18px, 4.6vw, 28px);
-      color: rgba(255,255,255,.95);
-      text-shadow: 0 0 18px rgba(255,255,255,.10);
-      margin: 2px 0 8px;
+      letter-spacing: .6px;
+      color: var(--yoda);
+      text-shadow: 0 0 18px rgba(124,255,138,.16);
+      max-width: 92vw;
       text-align:center;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 16px 60px rgba(0,0,0,.35);
     }
-    .missionGrid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      margin-top: 8px;
+    #yodaBubble.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-2px);
     }
-    .missionLine{
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      font-weight: 800;
-      letter-spacing: .4px;
-      line-height: 1.25;
-      font-size: 13px;
+    #yodaBubble b{ color: var(--gold); }
+
+    /* HUD toast */
+    #hudToast{
+      position:fixed;
+      left:50%;
+      top:14%;
+      transform:translateX(-50%) translateY(-6px);
+      z-index: 99999;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.64);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      text-align:center;
+      font-weight: 950;
+      letter-spacing: .9px;
+      color: rgba(255,255,255,.95);
     }
-    .missionLine b{ color: var(--gold); }
+    #hudToast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+    #hudToast b{ color: var(--gold); }
 
     /* Secret birthday overlay */
     .secretMsg{
@@ -276,8 +256,8 @@
 
     .card{
       width:min(720px,100%);
-      border:1px solid var(--panelEdge);
-      background:var(--panelBg);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.55);
       box-shadow:0 20px 60px rgba(0,0,0,.45);
       border-radius:18px;
       overflow:hidden;
@@ -294,9 +274,93 @@
       pointer-events:auto;
     }
 
+    body.legend-unlocked .card{
+      box-shadow: 0 22px 80px rgba(0,0,0,.50);
+      border-color: rgba(255,211,107,.22);
+    }
+
     .top{ padding:26px 22px 18px; text-align:center; }
-    .title{ font-weight:900; letter-spacing:3px; font-size:clamp(22px,4.6vw,36px); }
-    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; }
+
+    /* ==========================================================
+       NEW #1: HOLOGRAM TITLE (main menu) - subtle but premium
+       ========================================================== */
+    .title{
+      font-weight:900;
+      letter-spacing:3px;
+      font-size:clamp(22px,4.6vw,36px);
+      position:relative;
+      display:inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      /* tiny base glow */
+      text-shadow:
+        0 0 18px rgba(0,170,255,.12),
+        0 0 18px rgba(255,211,107,.08);
+      /* hint of hologram bloom behind */
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        0 18px 60px rgba(0,0,0,.12);
+    }
+    /* micro scanline sheen */
+    .title::before{
+      content:"";
+      position:absolute;
+      inset:-6px -8px;
+      border-radius: 14px;
+      pointer-events:none;
+      opacity:.28;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 7px
+        ),
+        radial-gradient(circle at 50% 40%,
+          rgba(0,170,255,.14),
+          rgba(0,0,0,0) 60%
+        );
+      mix-blend-mode: screen;
+    }
+    /* shimmering sweep */
+    .title::after{
+      content:"";
+      position:absolute;
+      top:-24px;
+      left:-45%;
+      width:55%;
+      height: 160%;
+      pointer-events:none;
+      opacity:.0;
+      transform: skewX(-18deg);
+      background: linear-gradient(
+        90deg,
+        rgba(0,0,0,0),
+        rgba(255,255,255,.16),
+        rgba(0,0,0,0)
+      );
+      mix-blend-mode: screen;
+      animation: holoSweep 6.2s ease-in-out infinite;
+    }
+    @keyframes holoSweep{
+      0%   { left:-55%; opacity:0; }
+      12%  { opacity:.55; }
+      24%  { left:110%; opacity:0; }
+      100% { left:110%; opacity:0; }
+    }
+    /* gentle hologram flicker */
+    .title{
+      animation: titleFlicker 3.8s infinite;
+    }
+    @keyframes titleFlicker{
+      0%,100% { filter: brightness(1) contrast(1); }
+      48%     { filter: brightness(1.03) contrast(1.02); }
+      50%     { filter: brightness(0.98) contrast(1.02); }
+      52%     { filter: brightness(1.04) contrast(1.03); }
+    }
+
+    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
     .subchewie{
       margin-top:10px;
       font-weight:900;
@@ -316,15 +380,18 @@
       background:rgba(255,255,255,.06);
       user-select:none;
       cursor:pointer;
-      transition: box-shadow .18s ease, border-color .18s ease, background .18s ease;
+      transition: filter .12s ease, transform .08s ease;
     }
+    .pill:active{ transform: translateY(1px); filter: brightness(.96); }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
 
-    .pill.active{
-      border-color: var(--accentGlow);
-      box-shadow: 0 0 18px var(--accentGlow);
-      background: rgba(255,255,255,.09);
+    #retroToggle{ display:none; }
+    body.legend-unlocked #retroToggle{ display:inline-flex; }
+    body.retro #retroToggle{
+      border-color: rgba(255,211,107,.45);
+      background: rgba(255,211,107,.12);
+      box-shadow: 0 0 18px rgba(255,211,107,.14);
     }
 
     .mid{ padding:0 22px 18px; display:grid; gap:12px; }
@@ -343,17 +410,38 @@
       user-select:none;
       transform: translateY(0);
       transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
-      box-shadow: 0 0 0 rgba(0,0,0,0);
+      position: relative; /* helps particles visually align */
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
+
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
 
-    /* subtle “AI polish” glow tied to current theme */
-    .btn.gold{ box-shadow: 0 0 18px rgba(255,211,107,.12); }
-    body[data-theme="light"] .btn.blue{ box-shadow: 0 0 18px rgba(0,170,255,.16); }
-    body[data-theme="dark"]  .btn.red{  box-shadow: 0 0 18px rgba(255,60,60,.16); }
+    body.legend .btn{
+      box-shadow:
+        0 0 10px rgba(255,211,107,.35),
+        0 0 22px rgba(0,170,255,.25),
+        inset 0 0 8px rgba(255,255,255,.15);
+    }
+    body.legend .btn.gold{
+      box-shadow:
+        0 0 14px rgba(255,211,107,.55),
+        0 0 34px rgba(255,211,107,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+    body.legend .btn.blue{
+      box-shadow:
+        0 0 14px rgba(0,170,255,.55),
+        0 0 34px rgba(0,170,255,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+    body.legend .btn.red{
+      box-shadow:
+        0 0 14px rgba(255,60,60,.55),
+        0 0 34px rgba(255,60,60,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
 
     .fine{
       opacity:.75;
@@ -376,29 +464,9 @@
       opacity:1;
       transition: opacity .06s linear;
       cursor:pointer;
+      touch-action: none;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
-
-    .crawlHint{
-      position:absolute;
-      bottom:18px;
-      left:50%;
-      transform:translateX(-50%);
-      font-weight:900;
-      letter-spacing:.9px;
-      font-size:12px;
-      opacity:.88;
-      text-align:center;
-      padding: 0 14px;
-      max-width: 92vw;
-    }
-    .crawlHint span{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-    }
 
     .crawlWrap{
       position:absolute;
@@ -413,29 +481,30 @@
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
-      transform: rotateX(24deg) translateY(110%);
+      transform: rotateX(24deg) translateY(75%);
       color: #ffd36b;
       font-weight: 900;
       letter-spacing: 1.4px;
       text-align: justify;
       text-shadow: 0 0 16px rgba(255,211,107,.12);
-      line-height: 1.55;
+      line-height: 1.70;
       font-size: clamp(14px, 3.2vw, 22px);
-      opacity: 0;
+      opacity: 1;
+      will-change: transform;
     }
     .crawl .center{ text-align:center; }
     .crawl .small{ font-weight:900; opacity:.92; }
 
     #crawlScreen.running .crawl{
-      opacity: 1;
       animation: crawlMove var(--crawlms) linear forwards;
     }
+
     @keyframes crawlMove{
-      0%   { transform: rotateX(24deg) translateY(120%); opacity: 1; }
-      100% { transform: rotateX(24deg) translateY(-230%); opacity: .0; }
+      0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
+      100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
     }
 
-    /* ===== Dueling overlay (CSS graphic) ===== */
+    /* ===== Dueling overlay ===== */
     #duelOverlay{
       position:fixed;
       inset:0;
@@ -529,16 +598,97 @@
       20%  { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
+
+    /* Retro mode overlay */
+    #scanlines{
+      position:fixed;
+      inset:0;
+      z-index: 9999;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .18s ease;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.05) 0px,
+          rgba(255,255,255,.05) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 4px
+        );
+      mix-blend-mode: overlay;
+    }
+    body.retro #scanlines{ opacity:.42; }
+
+    body.retro{
+      image-rendering: pixelated;
+      filter: saturate(1.08) contrast(1.04);
+    }
+    body.retro .card{
+      border-radius: 14px;
+      box-shadow:
+        0 24px 90px rgba(0,0,0,.60),
+        0 0 0 1px rgba(255,211,107,.10),
+        0 0 30px rgba(0,170,255,.10);
+      background: rgba(0,0,0,.62);
+    }
+    body.retro .title,
+    body.retro .subtitle,
+    body.retro .pill,
+    body.retro .btn{
+      text-shadow:
+        1px 0 rgba(0,170,255,.18),
+        -1px 0 rgba(255,60,60,.12);
+      letter-spacing: 1.2px;
+    }
+    body.retro .btn{
+      border-radius: 10px;
+      outline: 1px solid rgba(255,255,255,.12);
+      outline-offset: -1px;
+    }
+    body.retro .btn:active{
+      filter: brightness(.92) contrast(1.02);
+    }
+    body.retro .btn.gold{
+      box-shadow:
+        0 0 0 1px rgba(255,211,107,.16),
+        0 0 18px rgba(255,211,107,.22),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+    body.retro .btn.blue{
+      box-shadow:
+        0 0 0 1px rgba(0,170,255,.16),
+        0 0 18px rgba(0,170,255,.20),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+    body.retro .btn.red{
+      box-shadow:
+        0 0 0 1px rgba(255,60,60,.16),
+        0 0 18px rgba(255,60,60,.20),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
   </style>
 </head>
 
-<body data-theme="light">
+<body>
   <!-- FX -->
   <canvas id="starfield"></canvas>
   <canvas id="hyperspace"></canvas>
+  <canvas id="particles"></canvas>
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
+
+  <!-- HOLO-TRANSMISSION overlay -->
+  <div id="holoFX" aria-hidden="true"></div>
+
+  <!-- Retro scanlines overlay -->
+  <div id="scanlines" aria-hidden="true"></div>
+
+  <!-- HUD Toast -->
+  <div id="hudToast" aria-hidden="true"></div>
+
+  <!-- Yoda bubble -->
+  <div id="yodaBubble" aria-hidden="true"></div>
 
   <!-- Dueling overlay -->
   <div id="duelOverlay" aria-hidden="true">
@@ -551,28 +701,8 @@
     </div>
   </div>
 
-  <!-- Mission Brief -->
-  <div id="missionBrief" aria-hidden="true">
-    <div class="missionCard">
-      <div class="missionInner">
-        <div class="missionTop">
-          <div class="holoTag"><span class="holoDot"></span> HOLO-NET BRIEF</div>
-          <div class="holoTag" style="border-color:rgba(255,211,107,.35); background:rgba(255,211,107,.10); color:#ffe9b4;">
-            LEVEL 8
-          </div>
-        </div>
-        <div class="missionTitle">MISSION BRIEFING</div>
-        <div class="missionGrid">
-          <div class="missionLine">1) Tap <b>PLAY THEME</b> to start the soundtrack.</div>
-          <div class="missionLine">2) Tap <b>IGNITE</b> for a lightsaber duel moment.</div>
-          <div class="missionLine">3) Tap <b>CONTINUE TO RSVP</b> to jump to the form.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Chewie bubble -->
-  <div id="chewieBubble">Rrrrwwgh! (Chewie approves.)</div>
+  <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
   <!-- Secret Easter Egg -->
   <div id="secretMsg" class="secretMsg" aria-hidden="true">
@@ -588,18 +718,74 @@
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
         <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
+
         <p class="small">
-          A young legend named OLIVER has reached LEVEL 8. The galaxy is buzzing, the snacks are stocked,
-          and the Force is absolutely vibing.
+          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
         </p>
+
         <p class="small">
-          Your mission: tap to ignite, hit the theme, and lock in your RSVP.
-          Rumor has it there’s a hidden birthday message if you know where to tap…
+          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
         </p>
-        <p class="small center" style="margin-top:18px;">(Tap anywhere to begin)</p>
+
+        <p class="small">
+          From the quiet shadows, Master Yoda watches… proud, he is.
+        </p>
+
+        <p class="small">
+          Today, birthday mode has been activated.
+        </p>
+
+        <p class="small">
+          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
+        </p>
+
+        <p class="small">
+          But before the party can begin, the arcade network must be fully powered.
+        </p>
+
+        <p class="small">
+          Training droids have prepared three heroic challenges.
+        </p>
+
+        <p class="small">
+          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
+        </p>
+
+        <p class="small">
+          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
+        </p>
+
+        <p class="small">
+          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
+        </p>
+
+        <p class="small">
+          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
+        </p>
+
+        <p class="small">
+          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
+        </p>
+
+        <p class="small">
+          Choose your path wisely, young player.
+        </p>
+
+        <p class="small center">
+          The joysticks are ready.<br>
+          The buttons are glowing.<br>
+          The Force is fully charged.
+        </p>
+
+        <p class="small center" style="margin-top:10px;">
+          And the quest for LEVEL 8…
+        </p>
+
+        <p class="small center">
+          is about to begin.
+        </p>
       </div>
     </div>
-    <div class="crawlHint"><span>Tap anywhere to start crawl + music 🎵</span></div>
   </div>
 
   <!-- Main UI -->
@@ -607,12 +793,13 @@
     <div class="card" id="mainCard">
       <div class="top">
         <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
-        <div class="subtitle">Tap to ignite. Then continue to RSVP.</div>
+        <div class="subtitle" id="subtitleEl">Tap to ignite. Then continue to RSVP.</div>
         <div class="subchewie">Wookiee translation: “Bring snacks.”</div>
 
         <div class="pillrow">
           <div class="pill blue" id="pillLight">LIGHT SIDE</div>
           <div class="pill red" id="pillDark">DARK SIDE</div>
+          <div class="pill" id="retroToggle">RETRO MODE</div>
         </div>
       </div>
 
@@ -637,25 +824,22 @@
   <script>
     // ================== SETTINGS ==================
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
-
-    // Must match repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl duration
-    const CRAWL_MS = 67200;
+    const CRAWL_MS = 150000;      // 2:30 crawl
+    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
-    // Mission brief timing (auto-dismiss)
-    const MISSION_SHOW_MS = 1200;
+    const KONAMI_WINDOW_MS = 8000;
+    const SWIPE_THRESHOLD_PX = 45;
 
-    // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
-    // ================== AUDIO (theme + saber) ==================
+    // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = true;
+    theme.loop = false;
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -669,34 +853,76 @@
     }
 
     // ================== DOM ==================
-    const crawlScreen = document.getElementById("crawlScreen");
-    const mainCard = document.getElementById("mainCard");
-    const duelOverlay = document.getElementById("duelOverlay");
-    const chewieBubble = document.getElementById("chewieBubble");
-    const missionBrief = document.getElementById("missionBrief");
-    const warpOverlay = document.getElementById("warpOverlay");
+    const crawlScreen   = document.getElementById("crawlScreen");
+    const mainCard      = document.getElementById("mainCard");
+    const duelOverlay   = document.getElementById("duelOverlay");
+    const chewieBubble  = document.getElementById("chewieBubble");
+    const yodaBubble    = document.getElementById("yodaBubble");
+    const hudToast      = document.getElementById("hudToast");
+    const warpOverlay   = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
+    const subtitleEl    = document.getElementById("subtitleEl");
+    const retroToggle   = document.getElementById("retroToggle");
+
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
-    // ================== THEME SWITCHER (AI/persistent) ==================
-    const THEME_KEY = "oliverTheme_v1";
-    const pillLight = document.getElementById("pillLight");
-    const pillDark  = document.getElementById("pillDark");
+    // ================== HOLO FX CONTROLS ==================
+    function holoOn(){ document.body.classList.add("holo-on"); }
+    function holoOff(){ document.body.classList.remove("holo-on"); }
 
-    function applyTheme(t){
-      document.body.dataset.theme = t; // "light" or "dark"
-      try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
-      pillLight.classList.toggle("active", t === "light");
-      pillDark.classList.toggle("active",  t === "dark");
+    // ================== HUD TOAST ==================
+    function showHud(message, ms=1400){
+      hudToast.innerHTML = message;
+      hudToast.classList.add("show");
+      clearTimeout(showHud._t);
+      showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
     }
 
-    function initTheme(){
-      let saved = "light";
-      try{ saved = localStorage.getItem(THEME_KEY) || "light"; }catch(e){}
-      applyTheme(saved);
+    // ================== YODA ELEMENTS ==================
+    function showYoda(text, ms=1600){
+      yodaBubble.innerHTML = text;
+      yodaBubble.classList.add("show");
+      clearTimeout(showYoda._t);
+      showYoda._t = setTimeout(()=> yodaBubble.classList.remove("show"), ms);
     }
-    initTheme();
+
+    const baseSubtitle = subtitleEl ? subtitleEl.textContent : "Tap to ignite. Then continue to RSVP.";
+    function yodaSubtitle(tempText, ms=2600){
+      if (!subtitleEl) return;
+      subtitleEl.textContent = tempText;
+      clearTimeout(yodaSubtitle._t);
+      yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
+    }
+
+    // ================== RETRO MODE (Legend-only) ==================
+    const RETRO_KEY = "oliverRetroMode_v1";
+    function setRetro(on){
+      if (on){
+        document.body.classList.add("retro");
+        localStorage.setItem(RETRO_KEY, "1");
+        showYoda("Retro mode… <b>strong</b>, it is.");
+        yodaSubtitle("Retro mode… activated, it is.", 2200);
+        vibe([15,20,15]);
+      }else{
+        document.body.classList.remove("retro");
+        localStorage.setItem(RETRO_KEY, "0");
+        showYoda("Modern mode… returned.");
+        yodaSubtitle("Modern mode… restored, it is.", 2200);
+        vibe(15);
+      }
+    }
+
+    function applyRetroOnLoad(){
+      const legend = localStorage.getItem(LEGEND_KEY) === "1";
+      if (!legend){
+        document.body.classList.remove("retro");
+        return;
+      }
+      const on = localStorage.getItem(RETRO_KEY) === "1";
+      if (on) document.body.classList.add("retro");
+      else document.body.classList.remove("retro");
+    }
 
     // ================== STARFIELD ==================
     const sfCanvas = document.getElementById("starfield");
@@ -750,7 +976,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    // ================== HYPERSPACE BURST (for RSVP only) ==================
+    // ================== HYPERSPACE BURST (RSVP) ==================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
@@ -879,15 +1105,99 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== CHEWIE SOUND (procedural) ==================
+    // ================== NEW #3: BUTTON PARTICLE BURSTS ==================
+    const pCanvas = document.getElementById("particles");
+    const pCtx = pCanvas.getContext("2d", { alpha:true });
+    let particles = [];
+
+    function pResize(){
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      pCanvas.width = Math.floor(window.innerWidth * dpr);
+      pCanvas.height = Math.floor(window.innerHeight * dpr);
+      pCanvas.style.width = window.innerWidth + "px";
+      pCanvas.style.height = window.innerHeight + "px";
+      pCtx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    pResize();
+    window.addEventListener("resize", pResize);
+
+    function burstAt(x, y, palette, power=1){
+      const count = Math.floor(26 * power);
+      for (let i=0;i<count;i++){
+        const a = Math.random() * Math.PI * 2;
+        const sp = (2.2 + Math.random()*4.2) * power;
+        particles.push({
+          x, y,
+          vx: Math.cos(a)*sp,
+          vy: Math.sin(a)*sp,
+          g: 0.06 + Math.random()*0.06,
+          life: 420 + Math.random()*380,
+          age: 0,
+          r: 1.2 + Math.random()*2.6,
+          c: palette[(Math.random()*palette.length)|0],
+          tw: 0.003 + Math.random()*0.012
+        });
+      }
+    }
+
+    function burstAtElement(el, palette, power=1){
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width/2;
+      const y = r.top + r.height/2;
+      burstAt(x, y, palette, power);
+    }
+
+    let lastP = performance.now();
+    function particleLoop(t){
+      const dt = Math.min(40, t - lastP);
+      lastP = t;
+
+      pCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+      // draw/update
+      for (let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.age += dt;
+
+        // physics
+        p.x += p.vx * (dt/16);
+        p.y += p.vy * (dt/16);
+        p.vy += p.g * (dt/16);
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+
+        // fade
+        const k = Math.min(1, p.age / p.life);
+        const fade = (k < 0.7) ? 1 : (1 - (k-0.7)/0.3);
+
+        // tiny twinkle
+        const tw = Math.sin((t * p.tw)) * 0.12;
+
+        pCtx.globalAlpha = Math.max(0, fade + tw);
+        pCtx.fillStyle = p.c;
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        pCtx.fill();
+
+        // remove
+        if (p.age >= p.life) particles.splice(i,1);
+      }
+
+      pCtx.globalAlpha = 1;
+      requestAnimationFrame(particleLoop);
+    }
+    requestAnimationFrame(particleLoop);
+
+    const PAL_GOLD = ["rgba(255,211,107,.95)","rgba(255,245,210,.85)","rgba(255,255,255,.75)"];
+    const PAL_BLUE = ["rgba(0,170,255,.95)","rgba(200,245,255,.85)","rgba(255,255,255,.70)"];
+    const PAL_RED  = ["rgba(255,60,60,.95)","rgba(255,170,170,.85)","rgba(255,255,255,.70)"];
+
+    // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
     function getAudioCtx(){
-      if (!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === "suspended"){
-        audioCtx.resume().catch(()=>{});
-      }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume().catch(()=>{});
       return audioCtx;
     }
 
@@ -900,7 +1210,8 @@
         const bufferSize = Math.floor(ctx.sampleRate * (ms/1000));
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = noiseBuffer.getChannelData(0);
-        for (let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2 - 1) * 0.55; }
+        for (let i=0;i<bufferSize;i++) data[i] = (Math.random()*2 - 1) * 0.55;
+
         const noise = ctx.createBufferSource();
         noise.buffer = noiseBuffer;
 
@@ -944,19 +1255,14 @@
     function showChewieBubble(text){
       chewieBubble.textContent = text;
       chewieBubble.classList.add("show");
-      setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
+      clearTimeout(showChewieBubble._t);
+      showChewieBubble._t = setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
     }
 
     // ================== DUEL VISUAL ==================
     function showDuel(){
       duelOverlay.classList.add("show");
       setTimeout(()=>duelOverlay.classList.remove("show"), 950);
-    }
-
-    // ================== MISSION BRIEF ==================
-    function showMissionBrief(){
-      missionBrief.classList.add("show");
-      setTimeout(()=> missionBrief.classList.remove("show"), MISSION_SHOW_MS);
     }
 
     // ================== SECRET EGG (5 taps title) ==================
@@ -971,9 +1277,11 @@
       function showBirthday(){
         msg.classList.add("show");
         fireConfetti(2600);
+        burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
         wookieeGrowl(620);
         showChewieBubble("RRRAWWR! Birthday protocol engaged.");
+        showYoda("A birthday… <b>legendary</b>, it is.");
         setTimeout(() => msg.classList.remove("show"), 2500);
       }
 
@@ -1009,10 +1317,135 @@
 
       hyperspaceBurst();
 
-      setTimeout(()=>{ window.location.href = RSVP_FORM; }, 850);
+      setTimeout(()=>{
+        window.location.href = RSVP_FORM;
+      }, 850);
     }
 
-    // ================== CRAWL FLOW (SNAPPY + MENU INSTANT) ==================
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){
+      inputBuffer = [];
+      konamiStartAt = 0;
+    }
+
+    function pushKonami(token){
+      const now = Date.now();
+
+      if (inputBuffer.length === 0) konamiStartAt = now;
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
+
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
+    function unlockLegendMode(){
+      if (localStorage.getItem(LEGEND_KEY) === "1"){
+        vibe([20,30,20]);
+        fireConfetti(900);
+        showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
+        showYoda("Already unlocked… <b>legend</b>, you are.");
+        document.body.classList.add("legend");
+        document.body.classList.add("legend-unlocked");
+        applyRetroOnLoad();
+        return;
+      }
+
+      localStorage.setItem(LEGEND_KEY, "1");
+
+      document.body.classList.add("legend-unlocked");
+      document.body.classList.add("legend");
+
+      vibe([30,40,30,60,30]);
+      fireConfetti(2400);
+      showDuel();
+      wookieeGrowl(620);
+      showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
+      showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
+
+      showYoda("Legend… you have become. Proud, I am.");
+
+      document.body.classList.add("legend-pulse");
+      setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
+
+      const title = document.getElementById("secretTitle");
+      if (title && !title.dataset.legendApplied){
+        title.dataset.legendApplied = "1";
+        title.textContent = "THE BALANCE OF EIGHT ✨";
+      }
+
+      burstAtElement(mainCard, PAL_GOLD, 1.7);
+
+      yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+      applyRetroOnLoad();
+    }
+
+    (function applyLegendOnLoad(){
+      if (localStorage.getItem(LEGEND_KEY) === "1"){
+        document.body.classList.add("legend-unlocked");
+        document.body.classList.add("legend");
+        const title = document.getElementById("secretTitle");
+        if (title){
+          title.dataset.legendApplied = "1";
+          title.textContent = "THE BALANCE OF EIGHT ✨";
+        }
+      }
+      applyRetroOnLoad();
+    })();
+
+    window.addEventListener("keydown", (e) => {
+      const k = e.key;
+      if (k === "ArrowUp") pushKonami("U");
+      else if (k === "ArrowDown") pushKonami("D");
+      else if (k === "ArrowLeft") pushKonami("L");
+      else if (k === "ArrowRight") pushKonami("R");
+      else if (k === "b" || k === "B") pushKonami("B");
+      else if (k === "a" || k === "A") pushKonami("A");
+    });
+
+    let tStartX = 0, tStartY = 0, tStartTime = 0;
+    function onTouchStart(ev){
+      if (!ev.touches || ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      tStartX = t.clientX;
+      tStartY = t.clientY;
+      tStartTime = Date.now();
+    }
+    function onTouchEnd(ev){
+      const dt = Date.now() - tStartTime;
+      if (dt > 900) return;
+
+      const t = (ev.changedTouches && ev.changedTouches[0]) ? ev.changedTouches[0] : null;
+      if (!t) return;
+
+      const dx = t.clientX - tStartX;
+      const dy = t.clientY - tStartY;
+
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      if (Math.max(adx, ady) < SWIPE_THRESHOLD_PX) return;
+
+      if (ady > adx) pushKonami(dy < 0 ? "U" : "D");
+      else pushKonami(dx < 0 ? "L" : "R");
+    }
+    document.addEventListener("touchstart", onTouchStart, { passive:true });
+    document.addEventListener("touchend", onTouchEnd, { passive:true });
+
+    // ================== CRAWL FLOW (Menu pops at 95s) ==================
     let started = false;
 
     async function beginCrawl(){
@@ -1020,21 +1453,28 @@
       started = true;
 
       getAudioCtx();
-      vibe(15);
 
+      // HOLO ON during crawl
+      holoOn();
+
+      vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
 
       setTimeout(() => {
         mainCard.classList.add("show");
-        showMissionBrief();
+        burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
+        showYoda("A great quest… begins now.");
+
+        // HOLO OFF when menu appears (clean)
+        holoOff();
 
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
-      }, CRAWL_MS);
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
+      }, MENU_REVEAL_MS);
     }
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
@@ -1044,11 +1484,14 @@
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
+    const pillLight = document.getElementById("pillLight");
+    const pillDark  = document.getElementById("pillDark");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
       getAudioCtx();
 
+      burstAtElement(igniteBtn, PAL_RED, 1.2);
       showDuel();
       showChewieBubble("RRRAWWR! (Wookiee hype)");
       wookieeGrowl(620);
@@ -1065,25 +1508,44 @@
       vibe(25);
       getAudioCtx();
 
+      burstAtElement(musicBtn, PAL_BLUE, 1.15);
       await startThemeGuaranteed(true);
+
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
       wookieeGrowl(420);
     });
 
     stopBtn.addEventListener("click", () => {
       vibe(15);
+
+      burstAtElement(stopBtn, ["rgba(255,255,255,.85)","rgba(255,211,107,.55)","rgba(0,170,255,.55)"], 0.9);
       theme.pause();
       theme.currentTime = 0;
+
       showChewieBubble("Grrr… (music paused)");
+      showYoda("Silence? Hmm. Music… you need.");
+      yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
     });
 
     rsvpBtn.addEventListener("click", () => {
+      burstAtElement(rsvpBtn, PAL_GOLD, 1.25);
       doRsvpWarp();
     });
 
-    // Pills act as THEME switcher (persistent + active glow)
-    pillLight.addEventListener("click", () => { vibe(12); applyTheme("light"); });
-    pillDark.addEventListener("click",  () => { vibe(12); applyTheme("dark");  });
+    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
+    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
+
+    retroToggle.addEventListener("click", () => {
+      const legend = localStorage.getItem(LEGEND_KEY) === "1";
+      if (!legend){
+        showHud(`<b>LOCKED</b> • Unlock Legend Mode first`, 1200);
+        showYoda("Patience… you must have.");
+        return;
+      }
+      burstAtElement(retroToggle, PAL_GOLD, 0.9);
+      const on = !document.body.classList.contains("retro");
+      setRetro(on);
+    });
   </script>
 </body>
 </html>
