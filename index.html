@@ -47,6 +47,7 @@
       z-index: 9993;
     }
 
+    /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
@@ -79,9 +80,7 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* =========================
-       HOLO-TRANSMISSION FX
-       ========================= */
+    /* HOLO-TRANSMISSION FX */
     #holoFX{
       position:fixed;
       inset:0;
@@ -122,31 +121,6 @@
       97% { transform: translate(1px,0); }
       98% { transform: translate(-1px,0); }
       99% { transform: translate(0,1px); }
-    }
-
-    /* ✅ NEW: Signal Loss wow effect (separate from holo-on; safe) */
-    body.signal-loss #holoFX{ opacity:.70; }
-    body.signal-loss{
-      animation: signalFlicker .6s steps(2,end) 1;
-      filter: brightness(1.06) contrast(1.06);
-    }
-    body.signal-loss .stage,
-    body.signal-loss #crawlScreen{
-      animation: signalJitter .6s steps(2,end) 1;
-    }
-    @keyframes signalFlicker{
-      0%{ filter: brightness(1.02) contrast(1.02); }
-      35%{ filter: brightness(1.10) contrast(1.10); }
-      70%{ filter: brightness(0.98) contrast(1.08); }
-      100%{ filter: brightness(1.04) contrast(1.04); }
-    }
-    @keyframes signalJitter{
-      0%{ transform: translate(0,0); }
-      15%{ transform: translate(1px,0); }
-      35%{ transform: translate(-1px,0); }
-      55%{ transform: translate(0,1px); }
-      75%{ transform: translate(1px,1px); }
-      100%{ transform: translate(0,0); }
     }
 
     /* Chewie bubble */
@@ -233,6 +207,53 @@
     }
     #hudToast b{ color: var(--gold); }
 
+    /* ✅ NEW: Droid buddy (co-pilot) */
+    #droidBuddy{
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 99992; /* above card, below secret overlay */
+      pointer-events: none;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .18s ease, transform .18s ease, filter .18s ease;
+      filter: saturate(1.05);
+    }
+    #droidBuddy.show{
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .droidDot{
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(0,170,255,.65));
+      box-shadow:
+        0 0 14px rgba(0,170,255,.35),
+        0 0 28px rgba(255,211,107,.10);
+    }
+
+    .droidBubble{
+      max-width: min(68vw, 340px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.62);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      font-weight: 900;
+      letter-spacing: .4px;
+      font-size: 12px;
+      color: rgba(255,255,255,.92);
+    }
+    .droidBubble b{ color: var(--gold); }
+
     /* Secret birthday overlay */
     .secretMsg{
       position: fixed;
@@ -267,6 +288,7 @@
       font-size: clamp(12px, 3.2vw, 16px);
     }
 
+    /* UI wrapper */
     .stage{
       position:fixed;
       inset:0;
@@ -304,6 +326,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
+    /* HOLOGRAM TITLE */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -463,7 +486,7 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl ===== */
+    /* Opening Crawl */
     #crawlScreen{
       position:fixed;
       inset:0;
@@ -515,6 +538,7 @@
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
     }
 
+    /* Skip Crawl button */
     #skipCrawlBtn{
       position:absolute;
       right:16px;
@@ -547,7 +571,7 @@
       filter: brightness(.96);
     }
 
-    /* ===== Dueling overlay ===== */
+    /* Dueling overlay */
     #duelOverlay{
       position:fixed;
       inset:0;
@@ -642,7 +666,7 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* Retro scanlines overlay */
+    /* Retro mode overlay */
     #scanlines{
       position:fixed;
       inset:0;
@@ -721,11 +745,25 @@
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
+  <!-- HOLO overlay -->
   <div id="holoFX" aria-hidden="true"></div>
+
+  <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
+
+  <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
+
+  <!-- ✅ NEW: Droid Buddy (co-pilot, bottom-left) -->
+  <div id="droidBuddy" aria-hidden="true">
+    <div class="droidDot"></div>
+    <div class="droidBubble" id="droidBubbleText">…</div>
+  </div>
+
+  <!-- Yoda bubble -->
   <div id="yodaBubble" aria-hidden="true"></div>
 
+  <!-- Dueling overlay -->
   <div id="duelOverlay" aria-hidden="true">
     <div class="duelStage">
       <div class="sabers">
@@ -736,8 +774,10 @@
     </div>
   </div>
 
+  <!-- Chewie bubble -->
   <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
+  <!-- Secret Easter Egg -->
   <div id="secretMsg" class="secretMsg" aria-hidden="true">
     <div class="secretCard">
       <div class="secretTitleMsg">🎉 HAPPY BIRTHDAY, OLIVER!</div>
@@ -745,25 +785,64 @@
     </div>
   </div>
 
+  <!-- Opening Crawl -->
   <div id="crawlScreen">
     <div class="crawlWrap">
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
         <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
 
-        <p class="small">In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.</p>
-        <p class="small">The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.</p>
-        <p class="small">From the quiet shadows, Master Yoda watches… proud, he is.</p>
-        <p class="small">Today, birthday mode has been activated.</p>
-        <p class="small">From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.</p>
-        <p class="small">But before the party can begin, the arcade network must be fully powered.</p>
-        <p class="small">Training droids have prepared three heroic challenges.</p>
-        <p class="small">CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.</p>
-        <p class="small">CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.</p>
-        <p class="small">CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.</p>
-        <p class="small">Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.</p>
-        <p class="small">Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.</p>
-        <p class="small">Choose your path wisely, young player.</p>
+        <p class="small">
+          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
+        </p>
+
+        <p class="small">
+          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+        </p>
+
+        <p class="small">
+          From the quiet shadows, Master Yoda watches… proud, he is.
+        </p>
+
+        <p class="small">
+          Today, birthday mode has been activated.
+        </p>
+
+        <p class="small">
+          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
+        </p>
+
+        <p class="small">
+          But before the party can begin, the arcade network must be fully powered.
+        </p>
+
+        <p class="small">
+          Training droids have prepared three heroic challenges.
+        </p>
+
+        <p class="small">
+          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
+        </p>
+
+        <p class="small">
+          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
+        </p>
+
+        <p class="small">
+          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
+        </p>
+
+        <p class="small">
+          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
+        </p>
+
+        <p class="small">
+          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
+        </p>
+
+        <p class="small">
+          Choose your path wisely, young player.
+        </p>
 
         <p class="small center">
           The joysticks are ready.<br>
@@ -771,14 +850,20 @@
           The Force is fully charged.
         </p>
 
-        <p class="small center" style="margin-top:10px;">And the quest for LEVEL 8…</p>
-        <p class="small center">is about to begin.</p>
+        <p class="small center" style="margin-top:10px;">
+          And the quest for LEVEL 8…
+        </p>
+
+        <p class="small center">
+          is about to begin.
+        </p>
       </div>
     </div>
 
     <button id="skipCrawlBtn" type="button" aria-label="Skip intro">SKIP CRAWL ⏭️</button>
   </div>
 
+  <!-- Main UI -->
   <div class="stage">
     <div class="card" id="mainCard">
       <div class="top">
@@ -817,13 +902,14 @@
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
 
-    // no renaming; encode spaces
-    const HYPER_URL   = "./Star%20Wars%20Hyper%20space.mp3";
-    const R2_URL      = "./R2d2 scream.mp3";
+    // NOTE: no renaming files. URL-encode spaces so the browser can fetch it.
+    const HYPER_URL = "./Star%20Wars%20Hyper%20space.mp3";
+
+    const R2_URL = "./R2d2 scream.mp3";
     const CANTINA_URL = "./cantina%208%20bit.mp3";
 
-    const CRAWL_MS = 150000;
-    const MENU_REVEAL_MS = 95000;
+    const CRAWL_MS = 150000;      // 2:30 crawl
+    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
@@ -832,29 +918,38 @@
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
     // ================== AUDIO ==================
-    const theme   = safeAudio(MUSIC_URL);
-    const saber   = safeAudio(SABER_URL);
-    const vader   = safeAudio(VADER_URL);
-    const r2      = safeAudio(R2_URL);
+    const theme = safeAudio(MUSIC_URL);
+    const saber = safeAudio(SABER_URL);
+    const vader = safeAudio(VADER_URL);
+    vader.loop = false;
+    vader.volume = 0.75;
+
+    const r2 = safeAudio(R2_URL);
+    r2.loop = false;
+    r2.volume = 0.90;
+
     const cantina = safeAudio(CANTINA_URL);
-    const hyper   = safeAudio(HYPER_URL);
+    cantina.loop = false;
+    cantina.volume = 0.85;
 
-    theme.loop = false; theme.volume = 0.70;
+    const hyper = safeAudio(HYPER_URL);
+    hyper.loop = false;
+    hyper.volume = 0.95;
+    hyper.load(); // helps mobile start faster
 
-    vader.loop = false; vader.volume = 0.75;
-    r2.loop = false; r2.volume = 0.90;
-    cantina.loop = false; cantina.volume = 0.85;
-
-    hyper.loop = false; hyper.volume = 0.95;
-    hyper.load();
+    theme.loop = false;
+    theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
       try{
         if (restart) theme.currentTime = 0;
         await theme.play();
         return true;
-      }catch(e){ return false; }
+      }catch(e){
+        return false;
+      }
     }
+
     async function playR2(){
       try{
         r2.currentTime = 0;
@@ -877,6 +972,10 @@
     const retroToggle   = document.getElementById("retroToggle");
     const skipBtn       = document.getElementById("skipCrawlBtn");
 
+    // ✅ NEW: droid buddy elements
+    const droidBuddy = document.getElementById("droidBuddy");
+    const droidBubbleText = document.getElementById("droidBubbleText");
+
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
@@ -892,7 +991,21 @@
       showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
     }
 
-    // ================== YODA ==================
+    // ================== ✅ DROID BUDDY (safe overlay) ==================
+    function droidSay(msg, ms=1700){
+      if (!droidBuddy || !droidBubbleText) return;
+
+      const now = Date.now();
+      if (droidSay._cool && (now - droidSay._cool < 380)) return; // tiny cooldown
+      droidSay._cool = now;
+
+      droidBubbleText.innerHTML = msg;
+      droidBuddy.classList.add("show");
+      clearTimeout(droidSay._t);
+      droidSay._t = setTimeout(()=> droidBuddy.classList.remove("show"), ms);
+    }
+
+    // ================== YODA ELEMENTS ==================
     function showYoda(text, ms=1600){
       yodaBubble.innerHTML = text;
       yodaBubble.classList.add("show");
@@ -908,7 +1021,7 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
-    // ================== RETRO MODE ==================
+    // ================== RETRO MODE (Legend-only) ==================
     const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
       if (on){
@@ -917,18 +1030,29 @@
         showYoda("Retro mode… <b>strong</b>, it is.");
         yodaSubtitle("Retro mode… activated, it is.", 2200);
         vibe([15,20,15]);
+        droidSay("Retro overlay: <b>online</b>.");
       }else{
         document.body.classList.remove("retro");
         localStorage.setItem(RETRO_KEY, "0");
         showYoda("Modern mode… returned.");
         yodaSubtitle("Modern mode… restored, it is.", 2200);
         vibe(15);
+        droidSay("Back to modern visuals.");
       }
     }
 
-    // ================== STARFIELD / FX / CONFETTI / PARTICLES ==================
-    // (This section is unchanged from your file. Leaving as-is.)
-    // --- STARFIELD ---
+    function applyRetroOnLoad(){
+      const legend = localStorage.getItem(LEGEND_KEY) === "1";
+      if (!legend){
+        document.body.classList.remove("retro");
+        return;
+      }
+      const on = localStorage.getItem(RETRO_KEY) === "1";
+      if (on) document.body.classList.add("retro");
+      else document.body.classList.remove("retro");
+    }
+
+    // ================== STARFIELD ==================
     const sfCanvas = document.getElementById("starfield");
     const sfCtx = sfCanvas.getContext("2d", { alpha:true });
     let sfStars = [];
@@ -980,7 +1104,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    // --- Hyperspace canvas burst ---
+    // ================== HYPERSPACE BURST (RSVP) ==================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
@@ -1047,7 +1171,7 @@
       requestAnimationFrame(frame);
     }
 
-    // --- confetti ---
+    // ================== CONFETTI ==================
     const confettiCanvas = document.getElementById("confetti");
     const confettiCtx = confettiCanvas.getContext("2d", { alpha:true });
 
@@ -1109,7 +1233,7 @@
       requestAnimationFrame(frame);
     }
 
-    // --- particles ---
+    // ================== BUTTON PARTICLE BURSTS ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1143,10 +1267,13 @@
         });
       }
     }
+
     function burstAtElement(el, palette, power=1){
       if (!el) return;
       const r = el.getBoundingClientRect();
-      burstAt(r.left + r.width/2, r.top + r.height/2, palette, power);
+      const x = r.left + r.width/2;
+      const y = r.top + r.height/2;
+      burstAt(x, y, palette, power);
     }
 
     let lastP = performance.now();
@@ -1168,6 +1295,7 @@
 
         const k = Math.min(1, p.age / p.life);
         const fade = (k < 0.7) ? 1 : (1 - (k-0.7)/0.3);
+
         const tw = Math.sin((t * p.tw)) * 0.12;
 
         pCtx.globalAlpha = Math.max(0, fade + tw);
@@ -1274,21 +1402,10 @@
         fireConfetti(2600);
         burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
-
-        // ✅ ensure audio context is active for mobile
-        getAudioCtx();
-
-        // ✅ PLAY CANTINA 8-BIT HERE (this is the fix)
-        try{
-          cantina.pause();
-          cantina.currentTime = 0;
-          const p = cantina.play();
-          if (p && typeof p.then === "function") p.catch(()=>{});
-        }catch(e){}
-
         wookieeGrowl(620);
         showChewieBubble("RRRAWWR! Birthday protocol engaged.");
         showYoda("A birthday… <b>legendary</b>, it is.");
+        droidSay("Secret unlocked. Status: <b>party mode</b>.");
 
         setTimeout(() => msg.classList.remove("show"), 2500);
       }
@@ -1300,6 +1417,9 @@
         if (taps >= 5){
           taps = 0;
           showBirthday();
+        }else{
+          // tiny “co-pilot” hint on early taps, but only occasionally
+          if (taps === 2) droidSay("Scanning… keep going.", 900);
         }
       });
     })();
@@ -1307,14 +1427,19 @@
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
       vibe([20,40,20]);
+
+      // make mobile browsers happier about playing audio
       getAudioCtx();
 
+      // stronger play: reset + catch promise
       try{
         hyper.pause();
         hyper.currentTime = 0;
         const p = hyper.play();
         if (p && typeof p.then === "function") p.catch(()=>{});
       }catch(e){}
+
+      droidSay("Coordinates locked. Preparing <b>jump</b>…", 1200);
 
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
@@ -1334,12 +1459,13 @@
 
       hyperspaceBurst();
 
+      // give sound time to start before leaving page
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
     }
 
-    // ================== KONAMI (Dark=B, Light=A) ==================
+    // ================== KONAMI (Dark = B, Light = A) ==================
     const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
     const LEGEND_KEY = "oliverLegendUnlocked_v1";
 
@@ -1376,6 +1502,7 @@
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
+        droidSay("Legend mode: already <b>authorized</b>.");
         document.body.classList.add("legend");
         document.body.classList.add("legend-unlocked");
         applyRetroOnLoad();
@@ -1383,6 +1510,7 @@
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
+
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1394,6 +1522,7 @@
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
 
       showYoda("Legend… you have become. Proud, I am.");
+      droidSay("Override accepted. Welcome, <b>Legend</b>.");
 
       document.body.classList.add("legend-pulse");
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
@@ -1405,19 +1534,9 @@
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
+
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
       applyRetroOnLoad();
-    }
-
-    function applyRetroOnLoad(){
-      const legend = localStorage.getItem(LEGEND_KEY) === "1";
-      if (!legend){
-        document.body.classList.remove("retro");
-        return;
-      }
-      const on = localStorage.getItem(RETRO_KEY) === "1";
-      if (on) document.body.classList.add("retro");
-      else document.body.classList.remove("retro");
     }
 
     (function applyLegendOnLoad(){
@@ -1471,7 +1590,7 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // ================== CRAWL FLOW + SKIP ==================
+    // ================== CRAWL FLOW + SKIP (safe timers) ==================
     let started = false;
     let crawlMenuTimer = null;
     let crawlEndTimer  = null;
@@ -1484,6 +1603,7 @@
       showChewieBubble("Rrrrwwgh! New mission unlocked.");
       wookieeGrowl(520);
       showYoda("A great quest… begins now.");
+      droidSay("Co-pilot online. Ready for <b>mission</b>.", 1900);
 
       holoOff();
 
@@ -1496,12 +1616,14 @@
       started = true;
 
       getAudioCtx();
+
       holoOn();
 
       vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
+      droidSay("Intro running. Systems: <b>nominal</b>.", 1400);
 
       crawlMenuTimer = setTimeout(() => {
         showMainMenuNow();
@@ -1516,8 +1638,11 @@
 
     skipBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+
       if (crawlMenuTimer){ clearTimeout(crawlMenuTimer); crawlMenuTimer = null; }
       if (crawlEndTimer){  clearTimeout(crawlEndTimer);  crawlEndTimer  = null; }
+
+      droidSay("Skipping intro. Jumping to <b>menu</b>.", 1200);
       showMainMenuNow();
     }, { passive:false });
 
@@ -1537,6 +1662,7 @@
       showDuel();
       showChewieBubble("RRRAWWR! (Wookiee hype)");
       wookieeGrowl(620);
+      droidSay("Saber ignition: <b>confirmed</b>.", 1200);
 
       try{
         saber.currentTime = 0;
@@ -1551,6 +1677,7 @@
       getAudioCtx();
 
       burstAtElement(musicBtn, PAL_BLUE, 1.15);
+      droidSay("Broadcasting theme to all decks…", 1200);
       await startThemeGuaranteed(true);
 
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
@@ -1559,9 +1686,12 @@
 
     stopBtn.addEventListener("click", () => {
       vibe(15);
+
       burstAtElement(stopBtn, ["rgba(255,255,255,.85)","rgba(255,211,107,.55)","rgba(0,170,255,.55)"], 0.9);
       theme.pause();
       theme.currentTime = 0;
+
+      droidSay("Audio muted. Respectful silence engaged.", 1400);
 
       showChewieBubble("Grrr… (music paused)");
       showYoda("Silence? Hmm. Music… you need.");
@@ -1579,6 +1709,8 @@
       pushKonami("B");
       burstAtElement(pillDark, PAL_RED, 0.75);
 
+      droidSay("Dark side selected. Threat level: <b>elevated</b>.", 1400);
+
       try{
         vader.currentTime = 0;
         await vader.play();
@@ -1592,6 +1724,8 @@
       getAudioCtx();
       pushKonami("A");
       burstAtElement(pillLight, PAL_BLUE, 0.75);
+
+      droidSay("Light side selected. Morale: <b>excellent</b>.", 1400);
       await playR2();
     });
 
@@ -1600,39 +1734,13 @@
       if (!legend){
         showHud(`<b>LOCKED</b> • Unlock Legend Mode first`, 1200);
         showYoda("Patience… you must have.");
+        droidSay("Retro locked. Requires <b>Legend</b> clearance.");
         return;
       }
       burstAtElement(retroToggle, PAL_GOLD, 0.9);
-      setRetro(!document.body.classList.contains("retro"));
+      const on = !document.body.classList.contains("retro");
+      setRetro(on);
     });
-
-    // ==========================================================
-    // ✅ NEW WOW: Hologram Signal Loss (only after menu shows)
-    // ==========================================================
-    (function signalLossLoop(){
-      let t = null;
-
-      function trigger(){
-        // never stack or interfere with crawl holo mode
-        if (document.body.classList.contains("holo-on")) return;
-        if (!mainCard.classList.contains("show")) return;
-        if (document.body.classList.contains("signal-loss")) return;
-
-        document.body.classList.add("signal-loss");
-        clearTimeout(t);
-        t = setTimeout(()=> document.body.classList.remove("signal-loss"), 650);
-      }
-
-      function schedule(){
-        const delay = 25000 + Math.random()*30000; // 25–55 sec
-        setTimeout(()=>{
-          trigger();
-          schedule();
-        }, delay);
-      }
-
-      schedule();
-    })();
   </script>
 </body>
 </html>
