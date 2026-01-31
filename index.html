@@ -36,6 +36,86 @@
     #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
     #hyperspace{ z-index: 3; }
     #confetti{ z-index: 9998; }
+    /* =========================
+   FOREGROUND DEBRIS LAYER
+   ========================= */
+#debris{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index: 9;           /* above starfield/hyperspace, below UI card (z=10) */
+  opacity: .55;
+  mix-blend-mode: screen;
+}
+
+/* =========================
+   COCKPIT FRAMING OVERLAY
+   ========================= */
+#cockpitFrame{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index: 9; /* same layer as debris */
+  opacity: .65;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(0,0,0,0), rgba(0,0,0,.32) 68%, rgba(0,0,0,.55) 100%),
+    linear-gradient(90deg, rgba(0,0,0,.42), rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,.42)),
+    linear-gradient(180deg, rgba(0,0,0,.50), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 78%, rgba(0,0,0,.52));
+}
+
+/* subtle “panel seams” */
+#cockpitFrame::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  opacity:.45;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,.08) 0px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) calc(100% - 10px),
+      rgba(255,255,255,.08) 100%
+    ),
+    linear-gradient(180deg,
+      rgba(255,255,255,.06) 0px,
+      rgba(255,255,255,0) 10px,
+      rgba(255,255,255,0) calc(100% - 10px),
+      rgba(255,255,255,.06) 100%
+    );
+  mix-blend-mode: screen;
+}
+
+/* =========================
+   HOLOGRAM NAV DOTS (inside card)
+   ========================= */
+.navDots{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:10px;
+  opacity:.92;
+}
+.navDots .dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 0 12px rgba(0,170,255,.10);
+  transform: translateZ(0);
+}
+.navDots .dot.active{
+  background: rgba(0,170,255,.65);
+  border-color: rgba(0,170,255,.55);
+  box-shadow: 0 0 18px rgba(0,170,255,.35);
+}
+body.legend .navDots .dot.active{
+  background: rgba(255,211,107,.70);
+  border-color: rgba(255,211,107,.55);
+  box-shadow: 0 0 22px rgba(255,211,107,.35);
+}
 
     /* NEW: button particle layer (above UI, below toasts/overlays) */
     #particles{
@@ -750,6 +830,8 @@
 
   <canvas id="hyperspace"></canvas>
   <canvas id="particles"></canvas>
+  <canvas id="debris"></canvas>
+<div id="cockpitFrame" aria-hidden="true"></div>
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
@@ -870,6 +952,12 @@
       <div class="top">
         <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
         <div class="subtitle" id="subtitleEl">Tap to ignite. Then continue to RSVP.</div>
+        <div class="navDots" id="navDots" aria-hidden="true">
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</div>
         <div class="subchewie">Wookiee translation: “Bring snacks.”</div>
 
         <div class="pillrow">
