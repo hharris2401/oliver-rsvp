@@ -859,6 +859,7 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
+    const HYPER_URL = "./Star Wars Hyper space.mp3";
 
     // ✅ NEW: R2 audio (space-safe)
     const R2_URL = "./R2d2 scream.mp3";
@@ -883,6 +884,10 @@ vader.volume = 0.75;
     const r2 = safeAudio(R2_URL);
     r2.loop = false;
     r2.volume = 0.90;
+    // 🚀 NEW: Hyperspace object
+const hyper = safeAudio(HYPER_URL);
+hyper.loop = false;
+hyper.volume = 0.95;
 
     theme.loop = false;
     theme.volume = 0.70;
@@ -1349,28 +1354,34 @@ vader.volume = 0.75;
 
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
-      vibe([20,40,20]);
+  vibe([20,40,20]);
 
-      warpOverlay.classList.add("show");
-      warpCountdown.classList.add("show");
+  try{
+    hyper.currentTime = 0;
+    hyper.play();
+  }catch(e){}
 
-      let n = 3;
+  warpOverlay.classList.add("show");
+  warpCountdown.classList.add("show");
+
+  let n = 3;
+  warpCountdown.textContent = `JUMP IN ${n}…`;
+
+  const tick = setInterval(()=>{
+    n--;
+    if (n <= 0){
+      clearInterval(tick);
+      warpCountdown.textContent = "JUMP!";
+    } else {
       warpCountdown.textContent = `JUMP IN ${n}…`;
-      const tick = setInterval(()=>{
-        n--;
-        if (n <= 0){
-          clearInterval(tick);
-          warpCountdown.textContent = "JUMP!";
-        } else {
-          warpCountdown.textContent = `JUMP IN ${n}…`;
-        }
-      }, 280);
+    }
+  }, 280);
 
-      hyperspaceBurst();
+  hyperspaceBurst();
 
-      setTimeout(()=>{
-        window.location.href = RSVP_FORM;
-      }, 850);
+  setTimeout(()=>{
+    window.location.href = RSVP_FORM;
+  }, 850);
     }
 
     // ================== KONAMI (Dark = B, Light = A) ==================
