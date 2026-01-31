@@ -13,8 +13,8 @@
       --bg1:#173a66;
       --bg2:#04060a;
     }
-
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -32,17 +32,16 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity: .75; }
+    #starfield{ z-index: 1; opacity:.78; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* Warp overlay for RSVP */
     #warpOverlay{
       position:fixed;
       inset:0;
       pointer-events:none;
       opacity:0;
-      transition:opacity .18s ease;
+      transition:opacity .14s ease;
       z-index: 9997;
       background:
         radial-gradient(circle at 50% 50%, rgba(255,255,255,.16), rgba(0,0,0,0) 55%),
@@ -61,7 +60,7 @@
       font-size:clamp(18px,5vw,32px);
       text-shadow:0 0 18px rgba(255,255,255,.3);
       opacity:0;
-      transition:opacity .18s ease;
+      transition:opacity .16s ease;
       z-index:9999;
       pointer-events:none;
     }
@@ -75,11 +74,11 @@
       transform:translateX(-50%);
       text-align:center;
       font-weight:900;
-      letter-spacing:1.5px;
+      letter-spacing:1.4px;
       font-size:clamp(16px,4vw,26px);
       opacity:0;
       pointer-events:none;
-      transition:opacity .4s ease;
+      transition:opacity .35s ease;
       z-index: 20;
       text-shadow:0 0 18px rgba(255,255,255,.25);
       padding: 0 14px;
@@ -87,6 +86,33 @@
     }
     #forceQuote.light{ color:#9fe7ff; }
     #forceQuote.dark{ color:#ff9a9a; }
+    #forceQuote.gold{ color:var(--gold); }
+
+    /* Chewie accent bubble */
+    #chewieBubble{
+      position:fixed;
+      left:50%;
+      top:30%;
+      transform:translateX(-50%);
+      z-index: 30;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(255,211,107,.18);
+      max-width: 92vw;
+      text-align:center;
+    }
+    #chewieBubble.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-2px);
+    }
 
     /* Secret birthday overlay */
     .secretMsg{
@@ -101,7 +127,6 @@
       z-index: 9999;
     }
     .secretMsg.show{ opacity:1; }
-
     .secretCard{
       text-align:center;
       padding: 18px 18px;
@@ -142,28 +167,40 @@
       border-radius:18px;
       overflow:hidden;
       position:relative;
-      transform: translateY(14px) scale(.985);
+
+      transform: translateY(12px) scale(.988);
       opacity: 0;
-      transition: transform .18s ease, opacity .18s ease; /* snappy */
+      transition: transform .12s ease, opacity .12s ease; /* super snappy */
+      pointer-events:none;
     }
     .card.show{
       transform: translateY(0) scale(1);
       opacity: 1;
+      pointer-events:auto;
     }
 
     .top{ padding:26px 22px 18px; text-align:center; }
     .title{ font-weight:900; letter-spacing:3px; font-size:clamp(22px,4.6vw,36px); }
     .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; }
+    .subchewie{
+      margin-top:10px;
+      font-weight:900;
+      letter-spacing:.8px;
+      font-size:12px;
+      opacity:.88;
+      color: rgba(255,211,107,.95);
+    }
 
     .pillrow{ display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
     .pill{
       padding:8px 12px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:900;
       font-size:12px;
       border:1px solid rgba(255,255,255,.18);
       background:rgba(255,255,255,.06);
       user-select:none;
+      cursor:pointer;
     }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
@@ -209,7 +246,8 @@
       justify-content:center;
       background: radial-gradient(circle at 50% 20%, rgba(25,60,110,.65), rgba(0,0,0,.85) 65%, #000);
       opacity:1;
-      transition: opacity .18s ease; /* snappy */
+      transition: opacity .06s linear; /* faster fade */
+      cursor:pointer;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
 
@@ -218,10 +256,10 @@
       bottom:18px;
       left:50%;
       transform:translateX(-50%);
-      font-weight:800;
-      letter-spacing:1px;
+      font-weight:900;
+      letter-spacing:.9px;
       font-size:12px;
-      opacity:.85;
+      opacity:.88;
       text-align:center;
       padding: 0 14px;
       max-width: 92vw;
@@ -258,7 +296,7 @@
       opacity: 0;
     }
     .crawl .center{ text-align:center; }
-    .crawl .small{ font-weight:800; opacity:.92; }
+    .crawl .small{ font-weight:900; opacity:.92; }
 
     #crawlScreen.running .crawl{
       opacity: 1;
@@ -269,7 +307,7 @@
       100% { transform: rotateX(24deg) translateY(-230%); opacity: .0; }
     }
 
-    /* ===== Dueling overlay (no external asset) ===== */
+    /* ===== Dueling overlay (CSS graphic) ===== */
     #duelOverlay{
       position:fixed;
       inset:0;
@@ -277,8 +315,7 @@
       pointer-events:none;
       opacity:0;
       transition: opacity .12s ease;
-      background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.08), rgba(0,0,0,.0) 55%),
-                  rgba(0,0,0,.18);
+      background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.08), rgba(0,0,0,.0) 55%), rgba(0,0,0,.18);
     }
     #duelOverlay.show{ opacity:1; }
 
@@ -303,8 +340,7 @@
       height: 280px;
       transform-origin: 50% 92%;
       border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.0));
-      opacity: .0;
+      opacity: 0;
     }
     .saber::before{
       content:"";
@@ -319,14 +355,13 @@
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 10px 24px rgba(0,0,0,.35);
     }
-
     .saber.red{
-      box-shadow: 0 0 18px rgba(255,60,60,.55), 0 0 42px rgba(255,60,60,.25);
       background: linear-gradient(180deg, rgba(255,60,60,.98), rgba(255,60,60,.0));
+      box-shadow: 0 0 18px rgba(255,60,60,.55), 0 0 42px rgba(255,60,60,.25);
     }
     .saber.blue{
-      box-shadow: 0 0 18px rgba(0,170,255,.55), 0 0 42px rgba(0,170,255,.25);
       background: linear-gradient(180deg, rgba(0,170,255,.98), rgba(0,170,255,.0));
+      box-shadow: 0 0 18px rgba(0,170,255,.55), 0 0 42px rgba(0,170,255,.25);
     }
 
     #duelOverlay.show .saber{
@@ -381,16 +416,18 @@
   <div id="duelOverlay" aria-hidden="true">
     <div class="duelStage">
       <div class="sabers">
-        <div class="saber blue" style="transform:translate(-50%,-50%) rotate(-24deg) scaleY(.05);"></div>
-        <div class="saber red"  style="transform:translate(-50%,-50%) rotate(18deg)  scaleY(.05);"></div>
+        <div class="saber blue"></div>
+        <div class="saber red"></div>
         <div class="spark"></div>
       </div>
     </div>
   </div>
 
-  <!-- Quote + Secret overlay -->
+  <!-- Overlays -->
   <div id="forceQuote"></div>
+  <div id="chewieBubble">Rrrrwwgh! (Chewie approves.)</div>
 
+  <!-- Secret Easter Egg -->
   <div id="secretMsg" class="secretMsg" aria-hidden="true">
     <div class="secretCard">
       <div class="secretTitleMsg">🎉 HAPPY BIRTHDAY, OLIVER!</div>
@@ -409,15 +446,13 @@
           and the Force is absolutely vibing.
         </p>
         <p class="small">
-          Your mission: tap to ignite, press play, and lock in your RSVP. Rumor has it there’s a hidden
-          birthday message if you know where to tap…
+          Your mission: tap to ignite, hit the theme, and lock in your RSVP.
+          Rumor has it there’s a hidden birthday message if you know where to tap…
         </p>
-        <p class="small center" style="margin-top:18px;">
-          (Tap anywhere to begin)
-        </p>
+        <p class="small center" style="margin-top:18px;">(Tap anywhere to begin)</p>
       </div>
     </div>
-    <div class="crawlHint"><span>Tap anywhere to start the opening crawl + music 🎵</span></div>
+    <div class="crawlHint"><span>Tap anywhere to start crawl + music 🎵</span></div>
   </div>
 
   <!-- Main UI -->
@@ -426,6 +461,7 @@
       <div class="top">
         <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
         <div class="subtitle">Tap to ignite. Then continue to RSVP.</div>
+        <div class="subchewie">Wookiee translation: “Bring snacks.”</div>
 
         <div class="pillrow">
           <div class="pill blue" id="pillLight">LIGHT SIDE</div>
@@ -455,56 +491,52 @@
     // ================== SETTINGS ==================
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
 
-    // Must match repo filenames EXACTLY:
+    // Must match your repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
-    // Optional: if you have a duel sound, put it in your repo and set it here:
-    // const DUEL_URL  = "./Lightsaber Duel.mp3";
-    const DUEL_URL  = ""; // leave blank if you don't have one
 
-    // Crawl timing (you already slowed it; keep your value)
-    // If you want even slower, raise this number.
+    // Crawl length must match your preference:
     const CRAWL_MS = 67200;
 
-    // ✅ SUPER SNAPPY GAP between crawl end and menu
-    const MENU_GAP_MS = 100; // <<<<<< this is the "gap" you asked to shorten
-
-    // Menu pop speed (snappy)
-    const MENU_POP_MS = 180;
+    // ✅ Super snappy: menu appears immediately at crawl end
+    // (no gap timer; we reveal UI first then fade crawl)
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
-
-    function safeAudio(url){
-      const a = new Audio(url);
-      a.preload = "auto";
-      return a;
-    }
+    function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
     // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    const duel  = DUEL_URL ? safeAudio(DUEL_URL) : null;
-
     theme.loop = true;
     theme.volume = 0.70;
 
-    // If you have a duel file, keep it punchy
-    if (duel){ duel.loop = false; duel.volume = 0.90; }
+    // Mobile audio policy: must start from a user gesture
+    async function startThemeGuaranteed(restart=true){
+      try{
+        if (restart) theme.currentTime = 0;
+        await theme.play();
+        return true;
+      }catch(e){
+        return false;
+      }
+    }
 
     // ================== DOM ==================
     const crawlScreen = document.getElementById("crawlScreen");
-    const crawlText   = document.getElementById("crawlText");
-    const mainCard    = document.getElementById("mainCard");
-    const forceQuote  = document.getElementById("forceQuote");
+    const mainCard = document.getElementById("mainCard");
+    const forceQuote = document.getElementById("forceQuote");
+    const duelOverlay = document.getElementById("duelOverlay");
+    const chewieBubble = document.getElementById("chewieBubble");
     const warpOverlay = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
 
     document.getElementById("formLink").href = RSVP_FORM;
+    document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
-    // ================== IDLE STARFIELD (background) ==================
+    // ================== STARFIELD ==================
     const sfCanvas = document.getElementById("starfield");
-    const sfCtx = sfCanvas.getContext("2d", { alpha: true });
+    const sfCtx = sfCanvas.getContext("2d", { alpha:true });
     let sfStars = [];
 
     function sfResize(){
@@ -550,13 +582,14 @@
         sfCtx.fill();
       }
       sfCtx.globalAlpha = 1;
+
       requestAnimationFrame(starfieldLoop);
     }
     requestAnimationFrame(starfieldLoop);
 
-    // ================== HYPERSPACE BURST (light) ==================
+    // ================== HYPERSPACE BURST ==================
     const fxCanvas = document.getElementById("hyperspace");
-    const fxCtx = fxCanvas.getContext("2d", { alpha: true });
+    const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
     function fxResize(){
       const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -626,7 +659,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== FORCE QUOTES (random) ==================
+    // ================== FORCE QUOTES ==================
     const lightQuotes = [
       "The Force is strong with you.",
       "A Jedi trusts the living Force.",
@@ -641,19 +674,24 @@
       "Embrace your destiny.",
       "The galaxy will bend."
     ];
+    const goldQuotes = [
+      "Legendary roll. The galaxy approves.",
+      "Rare Force surge. Choose wisely.",
+      "You feel destiny clicking into place."
+    ];
 
     function showQuote(side){
-      const list = side === "dark" ? darkQuotes : lightQuotes;
+      const list = side === "gold" ? goldQuotes : (side === "dark" ? darkQuotes : lightQuotes);
       const q = list[Math.floor(Math.random() * list.length)];
       forceQuote.textContent = q;
-      forceQuote.className = side; // sets color via .light/.dark
+      forceQuote.className = side;
       forceQuote.style.opacity = 1;
-      setTimeout(()=>{ forceQuote.style.opacity = 0; }, 2000);
+      setTimeout(()=>{ forceQuote.style.opacity = 0; }, 1800);
     }
 
     // ================== CONFETTI ==================
     const confettiCanvas = document.getElementById("confetti");
-    const confettiCtx = confettiCanvas.getContext("2d", { alpha: true });
+    const confettiCtx = confettiCanvas.getContext("2d", { alpha:true });
 
     function confettiResize(){
       const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -713,7 +751,64 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== SECRET EGG: 5 taps on title ==================
+    // ================== CHEWIE ACCENT (procedural “growl-ish” sound) ==================
+    // No external audio file required. It’s not Chewbacca audio, just a fun Wookiee-ish accent.
+    let audioCtx = null;
+    function wookieeGrowl(ms = 420){
+      try{
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(70, now + ms/1000);
+
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(900, now);
+        filter.frequency.exponentialRampToValueAtTime(450, now + ms/1000);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + ms/1000);
+
+        // subtle “throat” wobble
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.type = "sine";
+        lfo.frequency.setValueAtTime(7, now);
+        lfoGain.gain.setValueAtTime(22, now);
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        lfo.start(now);
+        osc.start(now);
+        osc.stop(now + ms/1000);
+        lfo.stop(now + ms/1000);
+      } catch(e){}
+    }
+
+    function showChewieBubble(text){
+      chewieBubble.textContent = text;
+      chewieBubble.classList.add("show");
+      setTimeout(()=>chewieBubble.classList.remove("show"), 1200);
+    }
+
+    // ================== DUEL VISUAL ==================
+    function showDuel(){
+      duelOverlay.classList.add("show");
+      setTimeout(()=>duelOverlay.classList.remove("show"), 950);
+    }
+
+    // ================== SECRET EGG (5 taps title) ==================
     (function birthdayEgg(){
       const title = document.getElementById("secretTitle");
       const msg = document.getElementById("secretMsg");
@@ -726,6 +821,7 @@
         msg.classList.add("show");
         fireConfetti(2600);
         vibe([30,40,30]);
+        wookieeGrowl(520);
         setTimeout(() => msg.classList.remove("show"), 2500);
       }
 
@@ -733,7 +829,6 @@
         taps++;
         clearTimeout(timer);
         timer = setTimeout(() => (taps = 0), 900);
-
         if (taps >= 5){
           taps = 0;
           showBirthday();
@@ -741,17 +836,9 @@
       });
     })();
 
-    // ================== DUEL VISUAL ==================
-    const duelOverlay = document.getElementById("duelOverlay");
-    function showDuel(){
-      duelOverlay.classList.add("show");
-      setTimeout(()=>duelOverlay.classList.remove("show"), 950);
-    }
-
     // ================== RSVP WARP + COUNTDOWN ==================
-    async function doRsvpWarp(){
+    function doRsvpWarp(){
       vibe([20,40,20]);
-
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
 
@@ -765,9 +852,8 @@
         } else {
           warpCountdown.textContent = `JUMP IN ${n}…`;
         }
-      }, 300);
+      }, 280);
 
-      // tiny hyperspace flash
       hyperspaceBurst("light");
 
       setTimeout(()=>{
@@ -775,101 +861,94 @@
       }, 850);
     }
 
-    // ================== CRAWL FLOW (SUPER SNAPPY) ==================
+    // ================== CRAWL FLOW (FIXED: MENU SHOWS IMMEDIATELY) ==================
     let started = false;
 
-    // Set crawl duration into CSS variable
-    document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
-
-    async function startThemeGuaranteed(restart=true){
-      try{
-        if (restart) theme.currentTime = 0;
-        await theme.play();
-      }catch(e){
-        // If blocked, we just keep trying on next tap.
-      }
-    }
-
-    function showMenuSuperFast(){
-      // super snappy reveal
-      mainCard.style.transitionDuration = (MENU_POP_MS/1000) + "s";
-      mainCard.classList.add("show");
-    }
-
-    function beginCrawl(){
+    async function beginCrawl(){
       if (started) return;
       started = true;
 
       vibe(15);
 
-      // Start music (mobile requires the gesture we are currently in)
-      startThemeGuaranteed(true);
+      // start theme from gesture
+      await startThemeGuaranteed(true);
 
-      // Start crawl animation
+      // start crawl anim
       crawlScreen.classList.add("running");
 
-      // When crawl ends -> SUPER SNAPPY gap -> show menu
-      setTimeout(()=>{
+      // end crawl after duration:
+      setTimeout(() => {
+        // ✅ SHOW MENU FIRST (instant feel)
+        mainCard.classList.add("show");
+
+        // quick Chewie accent on arrival
+        showChewieBubble("Rrrrwwgh! New mission unlocked.");
+        wookieeGrowl(380);
+
+        // ✅ THEN fade crawl away (doesn't block menu)
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{
-          showMenuSuperFast();
-        }, MENU_GAP_MS); // ✅ the shortened gap you asked for
+
+        // remove crawl node after fade
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
       }, CRAWL_MS);
     }
 
-    // Any tap on crawl screen starts it
+    // Tap anywhere on crawl starts it
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
 
-    // ================== MAIN BUTTONS ==================
+    // ================== BUTTONS ==================
     const igniteBtn = document.getElementById("igniteBtn");
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
+    const pillLight = document.getElementById("pillLight");
+    const pillDark  = document.getElementById("pillDark");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
 
-      // Replace dark warp with saber duel graphic
-      showQuote("dark");
+      // duel graphic replaces dark warp
       showDuel();
+      showQuote("dark");
+
+      // tiny chewie accent sometimes
+      if (Math.random() < 0.18){
+        showChewieBubble("Raaahhh! (Chewie hype)");
+        wookieeGrowl(420);
+      }
 
       try{
         saber.currentTime = 0;
         await saber.play();
-      }catch(e){
+      } catch(e){
         window.open(SABER_URL, "_blank", "noopener");
-      }
-
-      if (duel){
-        try{
-          duel.currentTime = 0;
-          duel.play().catch(()=>{});
-        }catch(e){}
       }
     });
 
     musicBtn.addEventListener("click", async () => {
       vibe(25);
       showQuote("light");
-      hyperspaceBurst("light");
-      await startThemeGuaranteed(true); // "100% of the time when tapped" attempt
+      // “100% when tapped” as much as browsers allow: called directly in click handler
+      await startThemeGuaranteed(true);
+      // little friendly roar when theme starts
+      showChewieBubble("Wookiee DJ says: TURN IT UP.");
+      wookieeGrowl(280);
     });
 
     stopBtn.addEventListener("click", () => {
       vibe(15);
       theme.pause();
       theme.currentTime = 0;
+      showChewieBubble("Grrr… (music paused)");
     });
 
     rsvpBtn.addEventListener("click", () => {
       doRsvpWarp();
     });
 
-    // Optional: pills can do something subtle (quote only)
-    document.getElementById("pillLight").addEventListener("click", ()=>{ vibe(10); showQuote("light"); });
-    document.getElementById("pillDark").addEventListener("click", ()=>{ vibe(10); showQuote("dark"); });
-
-    // Start with crawl visible, menu hidden (already)
+    // Light/Dark pills: quotes + mini haptics + tiny hyperspace wink
+    pillLight.addEventListener("click", () => { vibe(12); showQuote("light"); hyperspaceBurst("light"); });
+    pillDark.addEventListener("click", () => { vibe(12); showQuote("dark"); hyperspaceBurst("dark"); });
   </script>
 </body>
 </html>
