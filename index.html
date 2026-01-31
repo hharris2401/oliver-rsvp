@@ -37,7 +37,7 @@
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* NEW: button particle layer (above UI, below toasts/overlays) */
+    /* button particle layer */
     #particles{
       position:fixed;
       inset:0;
@@ -47,7 +47,6 @@
       z-index: 9993;
     }
 
-    /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
@@ -80,9 +79,7 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* =========================
-       HOLO-TRANSMISSION FX
-       ========================= */
+    /* HOLO-TRANSMISSION FX */
     #holoFX{
       position:fixed;
       inset:0;
@@ -106,18 +103,14 @@
     }
     body.holo-on #holoFX{ opacity:.55; }
 
-    body.holo-on{
-      animation: holoFlicker 2.6s infinite;
-    }
+    body.holo-on{ animation: holoFlicker 2.6s infinite; }
     @keyframes holoFlicker{
       0%,100%{ filter: brightness(1) contrast(1); }
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
 
     body.holo-on .stage,
-    body.holo-on #crawlScreen{
-      animation: holoJitter 1.4s infinite;
-    }
+    body.holo-on #crawlScreen{ animation: holoJitter 1.4s infinite; }
     @keyframes holoJitter{
       0%, 96%, 100% { transform: translate(0,0); }
       97% { transform: translate(1px,0); }
@@ -281,7 +274,6 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* HOLOGRAM TITLE */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -441,7 +433,7 @@
     }
     a{ color:var(--gold); }
 
-    /* ===== Opening Crawl ===== */
+    /* Opening Crawl */
     #crawlScreen{
       position:fixed;
       inset:0;
@@ -487,13 +479,12 @@
     #crawlScreen.running .crawl{
       animation: crawlMove var(--crawlms) linear forwards;
     }
-
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
     }
 
-    /* ✅ Skip Crawl button (hidden until crawl starts) */
+    /* Skip Crawl button */
     #skipCrawlBtn{
       position:absolute;
       right:16px;
@@ -510,7 +501,6 @@
       cursor:pointer;
       backdrop-filter: blur(6px);
       box-shadow: 0 14px 50px rgba(0,0,0,.35);
-
       opacity:0;
       pointer-events:none;
       transform: translateY(6px);
@@ -526,7 +516,7 @@
       filter: brightness(.96);
     }
 
-    /* ===== Dueling overlay ===== */
+    /* Dueling overlay */
     #duelOverlay{
       position:fixed;
       inset:0;
@@ -700,16 +690,9 @@
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
-  <!-- HOLO overlay -->
   <div id="holoFX" aria-hidden="true"></div>
-
-  <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
-
-  <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
-
-  <!-- Yoda bubble -->
   <div id="yodaBubble" aria-hidden="true"></div>
 
   <!-- Dueling overlay -->
@@ -723,7 +706,6 @@
     </div>
   </div>
 
-  <!-- Chewie bubble -->
   <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
   <!-- Secret Easter Egg -->
@@ -741,57 +723,19 @@
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
         <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
 
-        <p class="small">
-          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
-        </p>
-
-        <p class="small">
-          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
-        </p>
-
-        <p class="small">
-          From the quiet shadows, Master Yoda watches… proud, he is.
-        </p>
-
-        <p class="small">
-          Today, birthday mode has been activated.
-        </p>
-
-        <p class="small">
-          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
-        </p>
-
-        <p class="small">
-          But before the party can begin, the arcade network must be fully powered.
-        </p>
-
-        <p class="small">
-          Training droids have prepared three heroic challenges.
-        </p>
-
-        <p class="small">
-          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
-        </p>
-
-        <p class="small">
-          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
-        </p>
-
-        <p class="small">
-          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
-        </p>
-
-        <p class="small">
-          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
-        </p>
-
-        <p class="small">
-          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
-        </p>
-
-        <p class="small">
-          Choose your path wisely, young player.
-        </p>
+        <p class="small">In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.</p>
+        <p class="small">The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.</p>
+        <p class="small">From the quiet shadows, Master Yoda watches… proud, he is.</p>
+        <p class="small">Today, birthday mode has been activated.</p>
+        <p class="small">From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.</p>
+        <p class="small">But before the party can begin, the arcade network must be fully powered.</p>
+        <p class="small">Training droids have prepared three heroic challenges.</p>
+        <p class="small">CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.</p>
+        <p class="small">CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.</p>
+        <p class="small">CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.</p>
+        <p class="small">Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.</p>
+        <p class="small">Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.</p>
+        <p class="small">Choose your path wisely, young player.</p>
 
         <p class="small center">
           The joysticks are ready.<br>
@@ -799,13 +743,8 @@
           The Force is fully charged.
         </p>
 
-        <p class="small center" style="margin-top:10px;">
-          And the quest for LEVEL 8…
-        </p>
-
-        <p class="small center">
-          is about to begin.
-        </p>
+        <p class="small center" style="margin-top:10px;">And the quest for LEVEL 8…</p>
+        <p class="small center">is about to begin.</p>
       </div>
     </div>
 
@@ -851,11 +790,10 @@
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
 
-    // ✅ NOTE: no renaming files. We just URL-encode the spaces so the browser can fetch it.
-    const HYPER_URL = "./Star%20Wars%20Hyper%20space.mp3";
-
-    const R2_URL = "./R2d2 scream.mp3";
-    const CANTINA_URL = "./cantina 8 bit.mp3";
+    // No renaming: URL-encode spaces
+    const HYPER_URL   = "./Star%20Wars%20Hyper%20space.mp3";
+    const R2_URL      = "./R2d2 scream.mp3";
+    const CANTINA_URL = "./cantina%208%20bit.mp3";
 
     const CRAWL_MS = 150000;      // 2:30 crawl
     const MENU_REVEAL_MS = 95000; // 1:35 menu pop
@@ -866,29 +804,47 @@
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
+    // ✅ Mobile unlock helper: primes audio silently on a user gesture
+    function primeAudio(a){
+      try{
+        const originalVol = a.volume;
+        a.pause();
+        a.currentTime = 0;
+        a.volume = 0;
+
+        const p = a.play();
+        if (p && typeof p.then === "function"){
+          p.then(() => {
+            a.pause();
+            a.currentTime = 0;
+            a.volume = originalVol;
+          }).catch(() => {
+            a.volume = originalVol;
+          });
+        }else{
+          a.pause();
+          a.currentTime = 0;
+          a.volume = originalVol;
+        }
+      }catch(e){}
+    }
+
     // ================== AUDIO ==================
-    const theme = safeAudio(MUSIC_URL);
-    const saber = safeAudio(SABER_URL);
-    const vader = safeAudio(VADER_URL);
-
-    vader.loop = false;
-    vader.volume = 0.75;
-
-    const r2 = safeAudio(R2_URL);
-    r2.loop = false;
-    r2.volume = 0.90;
-
+    const theme   = safeAudio(MUSIC_URL);
+    const saber   = safeAudio(SABER_URL);
+    const vader   = safeAudio(VADER_URL);
+    const r2      = safeAudio(R2_URL);
     const cantina = safeAudio(CANTINA_URL);
-    cantina.loop = false;
-    cantina.volume = 0.85;
+    const hyper   = safeAudio(HYPER_URL);
 
-    const hyper = safeAudio(HYPER_URL);
-    hyper.loop = false;
-    hyper.volume = 0.95;
-    hyper.load(); // ✅ helps mobile start faster
+    theme.loop = false; theme.volume = 0.70;
 
-    theme.loop = false;
-    theme.volume = 0.70;
+    vader.loop = false; vader.volume = 0.75;
+    r2.loop = false;    r2.volume = 0.90;
+    cantina.loop = false; cantina.volume = 0.85;
+
+    hyper.loop = false; hyper.volume = 0.95;
+    hyper.load(); // helps some mobile browsers
 
     async function startThemeGuaranteed(restart=true){
       try{
@@ -1225,7 +1181,6 @@
 
         const k = Math.min(1, p.age / p.life);
         const fade = (k < 0.7) ? 1 : (1 - (k-0.7)/0.3);
-
         const tw = Math.sin((t * p.tw)) * 0.12;
 
         pCtx.globalAlpha = Math.max(0, fade + tw);
@@ -1326,15 +1281,18 @@
 
       let taps = 0;
       let timer = null;
+      let cantinaPrimed = false;
 
       function showBirthday(){
+        // Make sure audio context is awake
+        getAudioCtx();
+
         msg.classList.add("show");
         fireConfetti(2600);
         burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
 
-        // ✅ NEW: wake audio + play Cantina 8-bit on the secret egg
-        getAudioCtx();
+        // ✅ PLAY CANTINA ONLY HERE (on the 5-tap trigger)
         try{
           cantina.pause();
           cantina.currentTime = 0;
@@ -1349,9 +1307,18 @@
       }
 
       title.addEventListener("click", () => {
+        // ✅ Prime cantina silently on the FIRST title tap only (no audible sound)
+        if (!cantinaPrimed){
+          cantinaPrimed = true;
+          getAudioCtx();
+          cantina.load();
+          primeAudio(cantina);
+        }
+
         taps++;
         clearTimeout(timer);
         timer = setTimeout(() => (taps = 0), 900);
+
         if (taps >= 5){
           taps = 0;
           showBirthday();
@@ -1363,10 +1330,8 @@
     function doRsvpWarp(){
       vibe([20,40,20]);
 
-      // ✅ make mobile browsers happier about playing audio
       getAudioCtx();
 
-      // ✅ stronger play: reset + catch promise
       try{
         hyper.pause();
         hyper.currentTime = 0;
@@ -1392,7 +1357,7 @@
 
       hyperspaceBurst();
 
-      // ✅ give the sound time to start before we leave the page
+      // give sound time to start before leaving
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
@@ -1521,7 +1486,7 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // ================== ✅ CRAWL FLOW + SKIP (safe timers) ==================
+    // ================== CRAWL FLOW + SKIP ==================
     let started = false;
     let crawlMenuTimer = null;
     let crawlEndTimer  = null;
@@ -1546,7 +1511,6 @@
       started = true;
 
       getAudioCtx();
-
       holoOn();
 
       vibe(15);
@@ -1594,7 +1558,7 @@
       try{
         saber.currentTime = 0;
         await saber.play();
-      } catch(e){
+      }catch(e){
         window.open(SABER_URL, "_blank", "noopener");
       }
     });
@@ -1627,6 +1591,7 @@
       doRsvpWarp();
     });
 
+    // Pills = Konami inputs (Dark=B, Light=A)
     pillDark.addEventListener("click", async () => {
       vibe(12);
       getAudioCtx();
