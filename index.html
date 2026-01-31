@@ -12,6 +12,7 @@
       --red:#ff3c3c;
       --bg1:#173a66;
       --bg2:#04060a;
+      --yoda:#7CFF8A;
     }
     *{ box-sizing:border-box; }
 
@@ -94,6 +95,35 @@
       opacity:1;
       transform:translateX(-50%) translateY(-2px);
     }
+
+    /* Yoda bubble */
+    #yodaBubble{
+      position:fixed;
+      left:50%;
+      top:23%;
+      transform:translateX(-50%);
+      z-index: 31;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      background: rgba(0,0,0,.62);
+      border:1px solid rgba(124,255,138,.28);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 950;
+      letter-spacing: .6px;
+      color: var(--yoda);
+      text-shadow: 0 0 18px rgba(124,255,138,.16);
+      max-width: 92vw;
+      text-align:center;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 16px 60px rgba(0,0,0,.35);
+    }
+    #yodaBubble.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(-2px);
+    }
+    #yodaBubble b{ color: var(--gold); }
 
     /* HUD toast (Konami feedback) */
     #hudToast{
@@ -202,7 +232,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
     .title{ font-weight:900; letter-spacing:3px; font-size:clamp(22px,4.6vw,36px); }
-    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; }
+    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
     .subchewie{
       margin-top:10px;
       font-weight:900;
@@ -269,7 +299,7 @@
       opacity:1;
       transition: opacity .06s linear;
       cursor:pointer;
-      touch-action: none; /* helps swipe detection */
+      touch-action: none;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
 
@@ -417,6 +447,9 @@
   <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
 
+  <!-- Yoda bubble -->
+  <div id="yodaBubble" aria-hidden="true"></div>
+
   <!-- Dueling overlay -->
   <div id="duelOverlay" aria-hidden="true">
     <div class="duelStage">
@@ -452,6 +485,11 @@
 
         <p class="small">
           The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+        </p>
+
+        <!-- ✅ YODA CRAWL LINE (#6) -->
+        <p class="small">
+          From the quiet shadows, Master Yoda watches… proud, he is.
         </p>
 
         <p class="small">
@@ -516,7 +554,7 @@
     <div class="card" id="mainCard">
       <div class="top">
         <div class="title" id="secretTitle">THE BALANCE OF EIGHT</div>
-        <div class="subtitle">Tap to ignite. Then continue to RSVP.</div>
+        <div class="subtitle" id="subtitleEl">Tap to ignite. Then continue to RSVP.</div>
         <div class="subchewie">Wookiee translation: “Bring snacks.”</div>
 
         <div class="pillrow">
@@ -557,8 +595,8 @@
     const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     // Konami timing
-    const KONAMI_WINDOW_MS = 8000;  // must complete within 8s
-    const SWIPE_THRESHOLD_PX = 45;  // min swipe distance
+    const KONAMI_WINDOW_MS = 8000;
+    const SWIPE_THRESHOLD_PX = 45;
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
@@ -585,9 +623,11 @@
     const mainCard      = document.getElementById("mainCard");
     const duelOverlay   = document.getElementById("duelOverlay");
     const chewieBubble  = document.getElementById("chewieBubble");
+    const yodaBubble    = document.getElementById("yodaBubble");
     const hudToast      = document.getElementById("hudToast");
     const warpOverlay   = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
+    const subtitleEl    = document.getElementById("subtitleEl");
 
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
@@ -598,6 +638,22 @@
       hudToast.classList.add("show");
       clearTimeout(showHud._t);
       showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
+    }
+
+    // ================== YODA ELEMENTS (#2, #3, #5) ==================
+    function showYoda(text, ms=1600){
+      yodaBubble.innerHTML = text;
+      yodaBubble.classList.add("show");
+      clearTimeout(showYoda._t);
+      showYoda._t = setTimeout(()=> yodaBubble.classList.remove("show"), ms);
+    }
+
+    const baseSubtitle = subtitleEl ? subtitleEl.textContent : "Tap to ignite. Then continue to RSVP.";
+    function yodaSubtitle(tempText, ms=2600){
+      if (!subtitleEl) return;
+      subtitleEl.textContent = tempText;
+      clearTimeout(yodaSubtitle._t);
+      yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
     // ================== STARFIELD ==================
@@ -867,6 +923,7 @@
         vibe([30,40,30]);
         wookieeGrowl(620);
         showChewieBubble("RRRAWWR! Birthday protocol engaged.");
+        showYoda("A birthday… <b>legendary</b>, it is.");
         setTimeout(() => msg.classList.remove("show"), 2500);
       }
 
@@ -921,21 +978,15 @@
     function pushKonami(token){
       const now = Date.now();
 
-      // start timing window on first input
       if (inputBuffer.length === 0) konamiStartAt = now;
-
-      // if too slow, reset
       if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
         resetKonami();
         konamiStartAt = now;
       }
 
       inputBuffer.push(token);
-      if (inputBuffer.length > KONAMI_CODE.length){
-        inputBuffer.shift();
-      }
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
 
-      // check match
       const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
       if (ok){
         resetKonami();
@@ -945,17 +996,17 @@
 
     function unlockLegendMode(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
-        // already unlocked: still give a tiny reward moment
         vibe([20,30,20]);
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
+        // ✅ Yoda on repeat unlock (#2)
+        showYoda("Already unlocked… <b>legend</b>, you are.");
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
       document.body.classList.add("legend-unlocked");
 
-      // big moment
       vibe([30,40,30,60,30]);
       fireConfetti(2400);
       showDuel();
@@ -963,19 +1014,22 @@
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
 
-      // quick starfield brighten pulse
+      // ✅ Yoda celebrates Konami unlock (#2)
+      showYoda("Legend… you have become. Proud, I am.");
+
       document.body.classList.add("legend-pulse");
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
 
-      // optional tiny title tweak (persistent)
       const title = document.getElementById("secretTitle");
       if (title && !title.dataset.legendApplied){
         title.dataset.legendApplied = "1";
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
+
+      // ✅ Subtitle Yoda-flip moment (#5)
+      yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
     }
 
-    // Apply persistent unlock on load
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         document.body.classList.add("legend-unlocked");
@@ -987,18 +1041,16 @@
       }
     })();
 
-    // Desktop keyboard support (classic)
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
       else if (k === "ArrowDown") pushKonami("D");
       else if (k === "ArrowLeft") pushKonami("L");
       else if (k === "ArrowRight") pushKonami("R");
-      else if (k === "b" || k === "B") pushKonami("B"); // Dark
-      else if (k === "a" || k === "A") pushKonami("A"); // Light
+      else if (k === "b" || k === "B") pushKonami("B");
+      else if (k === "a" || k === "A") pushKonami("A");
     });
 
-    // Mobile swipe detection (works on crawl + menu)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
 
     function onTouchStart(ev){
@@ -1011,7 +1063,7 @@
 
     function onTouchEnd(ev){
       const dt = Date.now() - tStartTime;
-      if (dt > 900) return; // too slow = likely scroll
+      if (dt > 900) return;
       const t = (ev.changedTouches && ev.changedTouches[0]) ? ev.changedTouches[0] : null;
       if (!t) return;
 
@@ -1022,16 +1074,10 @@
       const ady = Math.abs(dy);
       if (Math.max(adx, ady) < SWIPE_THRESHOLD_PX) return;
 
-      if (ady > adx){
-        // vertical
-        pushKonami(dy < 0 ? "U" : "D");
-      } else {
-        // horizontal
-        pushKonami(dx < 0 ? "L" : "R");
-      }
+      if (ady > adx) pushKonami(dy < 0 ? "U" : "D");
+      else pushKonami(dx < 0 ? "L" : "R");
     }
 
-    // attach to whole document so it works anywhere
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
@@ -1042,21 +1088,20 @@
       if (started) return;
       started = true;
 
-      // unlock WebAudio inside gesture
       getAudioCtx();
       vibe(15);
 
-      // start theme on tap
       await startThemeGuaranteed(true);
 
-      // start crawl immediately
       crawlScreen.classList.add("running");
 
-      // menu reveals at your set time
       setTimeout(() => {
         mainCard.classList.add("show");
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
+
+        // ✅ optional tiny Yoda welcome (light touch, short)
+        showYoda("A great quest… begins now.");
 
         crawlScreen.classList.add("hide");
         setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
@@ -1102,14 +1147,21 @@
       vibe(15);
       theme.pause();
       theme.currentTime = 0;
+
       showChewieBubble("Grrr… (music paused)");
+
+      // ✅ Yoda corrects you (#3)
+      showYoda("Silence? Hmm. Music… you need.");
+
+      // ✅ Subtitle Yoda-flip (#5)
+      yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
     });
 
     rsvpBtn.addEventListener("click", () => {
       doRsvpWarp();
     });
 
-    // Pills: now also feed Konami (Dark=B, Light=A)
+    // Pills: Konami B/A
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); });
   </script>
