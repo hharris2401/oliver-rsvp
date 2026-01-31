@@ -207,53 +207,6 @@
     }
     #hudToast b{ color: var(--gold); }
 
-    /* ✅ NEW: Droid buddy (co-pilot) */
-    #droidBuddy{
-      position: fixed;
-      left: 16px;
-      bottom: 16px;
-      z-index: 99992; /* above card, below secret overlay */
-      pointer-events: none;
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-
-      opacity: 0;
-      transform: translateY(8px);
-      transition: opacity .18s ease, transform .18s ease, filter .18s ease;
-      filter: saturate(1.05);
-    }
-    #droidBuddy.show{
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .droidDot{
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 35% 35%, rgba(255,255,255,.95), rgba(0,170,255,.65));
-      box-shadow:
-        0 0 14px rgba(0,170,255,.35),
-        0 0 28px rgba(255,211,107,.10);
-    }
-
-    .droidBubble{
-      max-width: min(68vw, 340px);
-      padding: 10px 12px;
-      border-radius: 14px;
-      background: rgba(0,0,0,.62);
-      border: 1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
-      font-weight: 900;
-      letter-spacing: .4px;
-      font-size: 12px;
-      color: rgba(255,255,255,.92);
-    }
-    .droidBubble b{ color: var(--gold); }
-
     /* Secret birthday overlay */
     .secretMsg{
       position: fixed;
@@ -286,6 +239,92 @@
       opacity: .9;
       margin-top: 8px;
       font-size: clamp(12px, 3.2vw, 16px);
+    }
+
+    /* Droid buddy (bottom-left co-pilot) */
+    #droidBuddy{
+      position: fixed;
+      left: 14px;
+      bottom: 14px;
+      z-index: 99995;
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      pointer-events:none; /* never blocks taps */
+      user-select:none;
+    }
+    .droidBody{
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 16px 50px rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      position:relative;
+      overflow:hidden;
+      transform: translateY(6px);
+      opacity:.0;
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .droidBody::before{
+      content:"";
+      position:absolute;
+      inset:-40px -60px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(0,170,255,.20), rgba(0,0,0,0) 60%),
+        radial-gradient(circle at 70% 70%, rgba(255,211,107,.18), rgba(0,0,0,0) 60%);
+      filter: blur(0px);
+    }
+    .droidEye{
+      position:absolute;
+      left: 14px;
+      top: 14px;
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 0 14px rgba(0,170,255,.55), 0 0 22px rgba(255,255,255,.25);
+      animation: eyeBlink 4.8s infinite;
+    }
+    @keyframes eyeBlink{
+      0%, 92%, 100%{ transform: scaleY(1); opacity:1; }
+      94%{ transform: scaleY(.15); opacity:.7; }
+      96%{ transform: scaleY(1); opacity:1; }
+    }
+    .droidStripe{
+      position:absolute;
+      right:10px;
+      top: 10px;
+      width: 6px;
+      height: 28px;
+      border-radius: 99px;
+      background: linear-gradient(180deg, rgba(0,170,255,.75), rgba(0,170,255,.08));
+      box-shadow: 0 0 16px rgba(0,170,255,.18);
+    }
+
+    .droidBubble{
+      max-width: min(62vw, 320px);
+      background: rgba(0,0,0,.62);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      opacity:0;
+      transform: translateY(8px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .droidBubble b{ color: var(--gold); }
+    .droidBubble .small{ opacity:.9; font-weight: 800; letter-spacing:.3px; font-size: 12px; }
+
+    body.droid-speaking #droidBuddy .droidBubble{
+      opacity:1;
+      transform: translateY(0);
+    }
+    body.droid-speaking #droidBuddy .droidBody{
+      opacity:1;
+      transform: translateY(0);
     }
 
     /* UI wrapper */
@@ -754,14 +793,19 @@
   <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
 
-  <!-- ✅ NEW: Droid Buddy (co-pilot, bottom-left) -->
-  <div id="droidBuddy" aria-hidden="true">
-    <div class="droidDot"></div>
-    <div class="droidBubble" id="droidBubbleText">…</div>
-  </div>
-
   <!-- Yoda bubble -->
   <div id="yodaBubble" aria-hidden="true"></div>
+
+  <!-- Droid buddy (co-pilot) -->
+  <div id="droidBuddy" aria-hidden="true">
+    <div class="droidBody">
+      <div class="droidEye"></div>
+      <div class="droidStripe"></div>
+    </div>
+    <div class="droidBubble" id="droidBubble">
+      <div class="small">Co-pilot online. Awaiting input…</div>
+    </div>
+  </div>
 
   <!-- Dueling overlay -->
   <div id="duelOverlay" aria-hidden="true">
@@ -902,9 +946,8 @@
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
 
-    // NOTE: no renaming files. URL-encode spaces so the browser can fetch it.
+    // no renaming: URL-encode spaces
     const HYPER_URL = "./Star%20Wars%20Hyper%20space.mp3";
-
     const R2_URL = "./R2d2 scream.mp3";
     const CANTINA_URL = "./cantina%208%20bit.mp3";
 
@@ -921,12 +964,7 @@
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
     const vader = safeAudio(VADER_URL);
-    vader.loop = false;
-    vader.volume = 0.75;
-
     const r2 = safeAudio(R2_URL);
-    r2.loop = false;
-    r2.volume = 0.90;
 
     const cantina = safeAudio(CANTINA_URL);
     cantina.loop = false;
@@ -936,6 +974,12 @@
     hyper.loop = false;
     hyper.volume = 0.95;
     hyper.load(); // helps mobile start faster
+
+    vader.loop = false;
+    vader.volume = 0.75;
+
+    r2.loop = false;
+    r2.volume = 0.90;
 
     theme.loop = false;
     theme.volume = 0.70;
@@ -959,6 +1003,20 @@
       }
     }
 
+    // ✅ Cantina Easter Egg helper (this is what got "lost" before)
+    function playCantinaEgg(){
+      try{
+        // mobile-friendly: "unlock" audio path
+        getAudioCtx();
+
+        cantina.pause();
+        cantina.currentTime = 0;
+
+        const p = cantina.play();
+        if (p && typeof p.then === "function") p.catch(()=>{});
+      }catch(e){}
+    }
+
     // ================== DOM ==================
     const crawlScreen   = document.getElementById("crawlScreen");
     const mainCard      = document.getElementById("mainCard");
@@ -972,9 +1030,8 @@
     const retroToggle   = document.getElementById("retroToggle");
     const skipBtn       = document.getElementById("skipCrawlBtn");
 
-    // ✅ NEW: droid buddy elements
-    const droidBuddy = document.getElementById("droidBuddy");
-    const droidBubbleText = document.getElementById("droidBubbleText");
+    // Droid buddy DOM
+    const droidBubbleEl = document.getElementById("droidBubble");
 
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
@@ -989,20 +1046,6 @@
       hudToast.classList.add("show");
       clearTimeout(showHud._t);
       showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
-    }
-
-    // ================== ✅ DROID BUDDY (safe overlay) ==================
-    function droidSay(msg, ms=1700){
-      if (!droidBuddy || !droidBubbleText) return;
-
-      const now = Date.now();
-      if (droidSay._cool && (now - droidSay._cool < 380)) return; // tiny cooldown
-      droidSay._cool = now;
-
-      droidBubbleText.innerHTML = msg;
-      droidBuddy.classList.add("show");
-      clearTimeout(droidSay._t);
-      droidSay._t = setTimeout(()=> droidBuddy.classList.remove("show"), ms);
     }
 
     // ================== YODA ELEMENTS ==================
@@ -1021,6 +1064,18 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
+    // ================== Droid Buddy (co-pilot popups) ==================
+    function droidSay(html, ms=2200){
+      if (!droidBubbleEl) return;
+
+      droidBubbleEl.innerHTML = `<div class="small">${html}</div>`;
+      document.body.classList.add("droid-speaking");
+      clearTimeout(droidSay._t);
+      droidSay._t = setTimeout(()=>{
+        document.body.classList.remove("droid-speaking");
+      }, ms);
+    }
+
     // ================== RETRO MODE (Legend-only) ==================
     const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
@@ -1029,15 +1084,15 @@
         localStorage.setItem(RETRO_KEY, "1");
         showYoda("Retro mode… <b>strong</b>, it is.");
         yodaSubtitle("Retro mode… activated, it is.", 2200);
+        droidSay("Visual filter applied. <b>Retro</b> protocol engaged.");
         vibe([15,20,15]);
-        droidSay("Retro overlay: <b>online</b>.");
       }else{
         document.body.classList.remove("retro");
         localStorage.setItem(RETRO_KEY, "0");
         showYoda("Modern mode… returned.");
         yodaSubtitle("Modern mode… restored, it is.", 2200);
+        droidSay("Modern optics restored.");
         vibe(15);
-        droidSay("Back to modern visuals.");
       }
     }
 
@@ -1399,6 +1454,10 @@
 
       function showBirthday(){
         msg.classList.add("show");
+
+        // ✅ Cantina sound ONLY when the 5-tap Easter egg fires
+        playCantinaEgg();
+
         fireConfetti(2600);
         burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
@@ -1417,9 +1476,6 @@
         if (taps >= 5){
           taps = 0;
           showBirthday();
-        }else{
-          // tiny “co-pilot” hint on early taps, but only occasionally
-          if (taps === 2) droidSay("Scanning… keep going.", 900);
         }
       });
     })();
@@ -1439,8 +1495,6 @@
         if (p && typeof p.then === "function") p.catch(()=>{});
       }catch(e){}
 
-      droidSay("Coordinates locked. Preparing <b>jump</b>…", 1200);
-
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
 
@@ -1458,8 +1512,9 @@
       }, 280);
 
       hyperspaceBurst();
+      droidSay("Coordinates locked. Initiating <b>hyperspace</b>…", 1600);
 
-      // give sound time to start before leaving page
+      // give the sound time to start before we leave the page
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
@@ -1502,7 +1557,7 @@
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
-        droidSay("Legend mode: already <b>authorized</b>.");
+        droidSay("Legend mode verified. Welcome back, <b>elite</b> user.");
         document.body.classList.add("legend");
         document.body.classList.add("legend-unlocked");
         applyRetroOnLoad();
@@ -1522,7 +1577,7 @@
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
 
       showYoda("Legend… you have become. Proud, I am.");
-      droidSay("Override accepted. Welcome, <b>Legend</b>.");
+      droidSay("Override accepted. Status: <b>ULTRA LEGEND</b>.");
 
       document.body.classList.add("legend-pulse");
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
@@ -1603,7 +1658,8 @@
       showChewieBubble("Rrrrwwgh! New mission unlocked.");
       wookieeGrowl(520);
       showYoda("A great quest… begins now.");
-      droidSay("Co-pilot online. Ready for <b>mission</b>.", 1900);
+
+      droidSay("Main menu loaded. Co-pilot standing by.");
 
       holoOff();
 
@@ -1616,14 +1672,13 @@
       started = true;
 
       getAudioCtx();
-
       holoOn();
 
       vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
-      droidSay("Intro running. Systems: <b>nominal</b>.", 1400);
+      droidSay("Intro sequence running. Tap <b>SKIP</b> if you’re in a hurry.");
 
       crawlMenuTimer = setTimeout(() => {
         showMainMenuNow();
@@ -1642,7 +1697,6 @@
       if (crawlMenuTimer){ clearTimeout(crawlMenuTimer); crawlMenuTimer = null; }
       if (crawlEndTimer){  clearTimeout(crawlEndTimer);  crawlEndTimer  = null; }
 
-      droidSay("Skipping intro. Jumping to <b>menu</b>.", 1200);
       showMainMenuNow();
     }, { passive:false });
 
@@ -1662,7 +1716,7 @@
       showDuel();
       showChewieBubble("RRRAWWR! (Wookiee hype)");
       wookieeGrowl(620);
-      droidSay("Saber ignition: <b>confirmed</b>.", 1200);
+      droidSay("Combat demo launched. Please keep hands inside the starship.");
 
       try{
         saber.currentTime = 0;
@@ -1677,11 +1731,11 @@
       getAudioCtx();
 
       burstAtElement(musicBtn, PAL_BLUE, 1.15);
-      droidSay("Broadcasting theme to all decks…", 1200);
       await startThemeGuaranteed(true);
 
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
       wookieeGrowl(420);
+      droidSay("Theme engaged. Volume: <b>galactic</b>.");
     });
 
     stopBtn.addEventListener("click", () => {
@@ -1691,11 +1745,10 @@
       theme.pause();
       theme.currentTime = 0;
 
-      droidSay("Audio muted. Respectful silence engaged.", 1400);
-
       showChewieBubble("Grrr… (music paused)");
       showYoda("Silence? Hmm. Music… you need.");
       yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
+      droidSay("Audio halted. Standing by.");
     });
 
     rsvpBtn.addEventListener("click", () => {
@@ -1703,13 +1756,14 @@
       doRsvpWarp();
     });
 
+    // Pills = Konami inputs (Dark=B, Light=A) + audio
     pillDark.addEventListener("click", async () => {
       vibe(12);
       getAudioCtx();
       pushKonami("B");
       burstAtElement(pillDark, PAL_RED, 0.75);
 
-      droidSay("Dark side selected. Threat level: <b>elevated</b>.", 1400);
+      droidSay("Dark side selected. Temper your feelings…");
 
       try{
         vader.currentTime = 0;
@@ -1725,7 +1779,7 @@
       pushKonami("A");
       burstAtElement(pillLight, PAL_BLUE, 0.75);
 
-      droidSay("Light side selected. Morale: <b>excellent</b>.", 1400);
+      droidSay("Light side selected. <b>Good vibes</b> confirmed.");
       await playR2();
     });
 
@@ -1734,13 +1788,16 @@
       if (!legend){
         showHud(`<b>LOCKED</b> • Unlock Legend Mode first`, 1200);
         showYoda("Patience… you must have.");
-        droidSay("Retro locked. Requires <b>Legend</b> clearance.");
+        droidSay("Retro optics locked. Enter the <b>Legend</b> code first.");
         return;
       }
       burstAtElement(retroToggle, PAL_GOLD, 0.9);
       const on = !document.body.classList.contains("retro");
       setRetro(on);
     });
+
+    // Small “hello” from the co-pilot shortly after load (won’t disrupt anything)
+    setTimeout(()=> droidSay("Co-pilot online. Try the <b>5-tap</b> title secret…", 2600), 900);
   </script>
 </body>
 </html>
