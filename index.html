@@ -125,66 +125,6 @@
       99% { transform: translate(0,1px); }
     }
 
-    /* ===== VHS INTRO GLITCH (NEW: #4 parent nostalgia) ===== */
-    #vhsIntro{
-      position: fixed;
-      inset: 0;
-      z-index: 99996; /* above crawl */
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity .08s linear;
-      mix-blend-mode: screen;
-    }
-    #vhsIntro::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,.10), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 50% 50%, rgba(0,170,255,.08), rgba(0,0,0,0) 60%);
-      opacity:.9;
-    }
-    #vhsIntro::after{
-      content:"";
-      position:absolute;
-      inset:-12px;
-      background:
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,.10) 0px,
-          rgba(255,255,255,.10) 1px,
-          rgba(0,0,0,0) 3px,
-          rgba(0,0,0,0) 6px
-        ),
-        linear-gradient(
-          180deg,
-          rgba(255,255,255,.10),
-          rgba(0,0,0,0) 40%,
-          rgba(255,255,255,.08)
-        );
-      opacity:.55;
-      transform: translateX(0);
-      animation: vhsJitter .22s steps(2,end) infinite;
-    }
-    @keyframes vhsJitter{
-      0% { transform: translateX(-1px) translateY(0); }
-      50% { transform: translateX(1px) translateY(-1px); }
-      100% { transform: translateX(0) translateY(1px); }
-    }
-    .vhsTag{
-      position:absolute;
-      left:50%;
-      top:18%;
-      transform:translateX(-50%);
-      font-weight: 950;
-      letter-spacing: 2.4px;
-      font-size: clamp(16px, 4.8vw, 32px);
-      color: rgba(255,255,255,.92);
-      text-shadow: 0 0 22px rgba(255,255,255,.20);
-      opacity:.95;
-      user-select:none;
-    }
-
     /* Chewie bubble */
     #chewieBubble{
       position:fixed;
@@ -341,7 +281,9 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* NEW #1: HOLOGRAM TITLE (main menu) */
+    /* ==========================================================
+       NEW #1: HOLOGRAM TITLE (main menu) - subtle but premium
+       ========================================================== */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -356,7 +298,6 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
-      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -403,6 +344,9 @@
       12%  { opacity:.55; }
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
+    }
+    .title{
+      animation: titleFlicker 3.8s infinite;
     }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
@@ -732,11 +676,6 @@
   <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
 
-  <!-- NEW: VHS intro splash overlay -->
-  <div id="vhsIntro" aria-hidden="true">
-    <div class="vhsTag">LUCASFILM LTD.</div>
-  </div>
-
   <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
 
@@ -768,77 +707,81 @@
     </div>
   </div>
 
-  <!-- Opening Crawl -->
+  <!-- Opening Crawl (UPDATED: PROPHECY TEXT) -->
   <div id="crawlScreen">
     <div class="crawlWrap">
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
-        <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
+        <div class="center" style="margin-top:8px; font-size:1.55em;">THE PROPHECY OF LEVEL EIGHT</div>
 
         <p class="small">
-          In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
+          Long ago, in a glowing arcade sector of the galaxy, ancient Jedi scrolls foretold the rise of a young champion.
         </p>
 
         <p class="small">
-          The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
+          They spoke of flashing cabinets, humming joysticks, and a hero who would master both pixels and the Force.
         </p>
 
         <p class="small">
-          From the quiet shadows, Master Yoda watches… proud, he is.
+          That hero… is OLIVER.
         </p>
 
         <p class="small">
-          Today, birthday mode has been activated.
+          Now, on his eighth rotation around the birthday sun, the prophecy awakens.
         </p>
 
         <p class="small">
-          From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
+          Game reactors power up across distant systems. High-score beacons ignite. Prize tickets tremble at lightspeed.
         </p>
 
         <p class="small">
-          But before the party can begin, the arcade network must be fully powered.
+          From hyperspeed racers to pixel-powered battles, champions from every quadrant are summoned to SIDE QUEST ARCADE.
         </p>
 
         <p class="small">
-          Training droids have prepared three heroic challenges.
+          But before celebration may begin, three trials must be completed.
         </p>
 
         <p class="small">
-          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
+          TRIAL ONE: Activate the Celebration Soundtrack by pressing PLAY THEME.
         </p>
 
         <p class="small">
-          CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
+          TRIAL TWO: Ignite your lightsaber and prove your skills in the ceremonial duel.
         </p>
 
         <p class="small">
-          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
+          TRIAL THREE: Lock in your RSVP coordinates so the party fleet knows who is landing.
         </p>
 
         <p class="small">
-          Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
+          Meanwhile, snack droids prepare galactic treats, ticket counters overflow, and the birthday cake waits inside a hidden bonus level.
         </p>
 
         <p class="small">
-          Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
+          Master Yoda watches quietly from the shadows.
         </p>
 
         <p class="small">
-          Choose your path wisely, young player.
+          “Strong with the joystick, this one is,” he whispers.
+        </p>
+
+        <p class="small">
+          Rumors echo through hyperspace of secret transmissions, unlocked only by those with Jedi reflexes and legendary courage.
         </p>
 
         <p class="small center">
-          The joysticks are ready.<br>
           The buttons are glowing.<br>
-          The Force is fully charged.
+          The Force is charged.<br>
+          The arcade awaits.
         </p>
 
         <p class="small center" style="margin-top:10px;">
-          And the quest for LEVEL 8…
+          And the prophecy of LEVEL EIGHT…
         </p>
 
         <p class="small center">
-          is about to begin.
+          begins now.
         </p>
       </div>
     </div>
@@ -895,7 +838,7 @@
     // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;   // full song, no loops
+    theme.loop = false;
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -951,33 +894,6 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
-    // ================== KONAMI (Dark = B, Light = A) ==================
-    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-    let inputBuffer = [];
-    let konamiStartAt = 0;
-
-    function resetKonami(){
-      inputBuffer = [];
-      konamiStartAt = 0;
-    }
-    function pushKonami(token){
-      const now = Date.now();
-      if (inputBuffer.length === 0) konamiStartAt = now;
-      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
-        resetKonami();
-        konamiStartAt = now;
-      }
-      inputBuffer.push(token);
-      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
-
-      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
-      if (ok){
-        resetKonami();
-        unlockLegendMode();
-      }
-    }
-
     // ================== RETRO MODE (Legend-only) ==================
     const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
@@ -995,6 +911,7 @@
         vibe(15);
       }
     }
+
     function applyRetroOnLoad(){
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
@@ -1187,7 +1104,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== BUTTON PARTICLE BURSTS ==================
+    // ================== NEW #3: BUTTON PARTICLE BURSTS ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1328,56 +1245,6 @@
       }catch(e){}
     }
 
-    /* ===== CINEMATIC DEEP NOTE SWELL (NEW: #9) ===== */
-    function deepNoteSwell(){
-      // Must be called after a user gesture (crawl tap) for mobile.
-      const ctx = getAudioCtx();
-      const now = ctx.currentTime;
-
-      const master = ctx.createGain();
-      master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.55, now + 0.12);
-      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.25);
-      master.connect(ctx.destination);
-
-      const sub = ctx.createOscillator();
-      sub.type = "sine";
-      sub.frequency.setValueAtTime(38, now);
-      sub.frequency.exponentialRampToValueAtTime(22, now + 1.15);
-
-      const harm = ctx.createOscillator();
-      harm.type = "triangle";
-      harm.frequency.setValueAtTime(76, now);
-      harm.frequency.exponentialRampToValueAtTime(44, now + 1.15);
-
-      const dur = 1.25;
-      const bufferSize = Math.floor(ctx.sampleRate * dur);
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++){
-        data[i] = (Math.random()*2 - 1) * 0.25;
-      }
-      const noise = ctx.createBufferSource();
-      noise.buffer = noiseBuffer;
-
-      const lp = ctx.createBiquadFilter();
-      lp.type = "lowpass";
-      lp.frequency.setValueAtTime(240, now);
-      lp.frequency.exponentialRampToValueAtTime(1200, now + 0.55);
-      lp.frequency.exponentialRampToValueAtTime(360, now + 1.20);
-
-      const gSub = ctx.createGain();  gSub.gain.setValueAtTime(0.95, now);
-      const gHarm = ctx.createGain(); gHarm.gain.setValueAtTime(0.35, now);
-      const gNoise = ctx.createGain();gNoise.gain.setValueAtTime(0.18, now);
-
-      sub.connect(gSub);     gSub.connect(master);
-      harm.connect(gHarm);   gHarm.connect(master);
-      noise.connect(lp);     lp.connect(gNoise); gNoise.connect(master);
-
-      sub.start(now); harm.start(now); noise.start(now);
-      sub.stop(now + dur); harm.stop(now + dur); noise.stop(now + dur);
-    }
-
     function showChewieBubble(text){
       chewieBubble.textContent = text;
       chewieBubble.classList.add("show");
@@ -1448,7 +1315,37 @@
       }, 850);
     }
 
-    // ================== KONAMI + LEGEND MODE ==================
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){
+      inputBuffer = [];
+      konamiStartAt = 0;
+    }
+
+    function pushKonami(token){
+      const now = Date.now();
+
+      if (inputBuffer.length === 0) konamiStartAt = now;
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
+
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
     function unlockLegendMode(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
@@ -1462,6 +1359,7 @@
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
+
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1471,6 +1369,7 @@
       wookieeGrowl(620);
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
+
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
@@ -1483,6 +1382,7 @@
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
+
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
       applyRetroOnLoad();
     }
@@ -1547,14 +1447,6 @@
 
       getAudioCtx();
 
-      // NEW: VHS splash + cinematic deep note on the FIRST tap
-      const vhs = document.getElementById("vhsIntro");
-      if (vhs){
-        vhs.style.opacity = "1";
-        setTimeout(()=> vhs.style.opacity = "0", 420);
-      }
-      deepNoteSwell();
-
       // HOLO ON during crawl
       holoOn();
 
@@ -1570,7 +1462,7 @@
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // HOLO OFF when menu appears
+        // HOLO OFF when menu appears (clean)
         holoOff();
 
         crawlScreen.classList.add("hide");
@@ -1633,7 +1525,6 @@
       doRsvpWarp();
     });
 
-    // Konami B/A on pills
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
