@@ -37,6 +37,16 @@
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
+    /* NEW: button particle layer (above UI, below toasts/overlays) */
+    #particles{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      pointer-events:none;
+      z-index: 9993;
+    }
+
     /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
@@ -77,12 +87,11 @@
       position:fixed;
       inset:0;
       pointer-events:none;
-      z-index: 9994; /* above most things, below HUD/toasts */
+      z-index: 9994;
       opacity:0;
       transition: opacity .25s ease;
       mix-blend-mode: screen;
       background:
-        /* scanlines */
         repeating-linear-gradient(
           to bottom,
           rgba(255,255,255,.06) 0px,
@@ -90,7 +99,6 @@
           rgba(0,0,0,0) 3px,
           rgba(0,0,0,0) 6px
         ),
-        /* subtle cyan glow */
         radial-gradient(circle at 50% 20%,
           rgba(0,170,255,.12),
           rgba(0,0,0,0) 60%
@@ -98,7 +106,6 @@
     }
     body.holo-on #holoFX{ opacity:.55; }
 
-    /* flicker */
     body.holo-on{
       animation: holoFlicker 2.6s infinite;
     }
@@ -107,7 +114,6 @@
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
 
-    /* micro-jitter */
     body.holo-on .stage,
     body.holo-on #crawlScreen{
       animation: holoJitter 1.4s infinite;
@@ -268,21 +274,92 @@
       pointer-events:auto;
     }
 
-    /* Persistent Legend Mode styling */
     body.legend-unlocked .card{
       box-shadow: 0 22px 80px rgba(0,0,0,.50);
       border-color: rgba(255,211,107,.22);
     }
-    body.legend-unlocked .title{
-      text-shadow: 0 0 18px rgba(255,211,107,.14);
-    }
-    body.legend-unlocked .pill.blue,
-    body.legend-unlocked .pill.red{
-      border-color: rgba(255,211,107,.22);
-    }
 
     .top{ padding:26px 22px 18px; text-align:center; }
-    .title{ font-weight:900; letter-spacing:3px; font-size:clamp(22px,4.6vw,36px); }
+
+    /* ==========================================================
+       NEW #1: HOLOGRAM TITLE (main menu) - subtle but premium
+       ========================================================== */
+    .title{
+      font-weight:900;
+      letter-spacing:3px;
+      font-size:clamp(22px,4.6vw,36px);
+      position:relative;
+      display:inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      /* tiny base glow */
+      text-shadow:
+        0 0 18px rgba(0,170,255,.12),
+        0 0 18px rgba(255,211,107,.08);
+      /* hint of hologram bloom behind */
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        0 18px 60px rgba(0,0,0,.12);
+    }
+    /* micro scanline sheen */
+    .title::before{
+      content:"";
+      position:absolute;
+      inset:-6px -8px;
+      border-radius: 14px;
+      pointer-events:none;
+      opacity:.28;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 7px
+        ),
+        radial-gradient(circle at 50% 40%,
+          rgba(0,170,255,.14),
+          rgba(0,0,0,0) 60%
+        );
+      mix-blend-mode: screen;
+    }
+    /* shimmering sweep */
+    .title::after{
+      content:"";
+      position:absolute;
+      top:-24px;
+      left:-45%;
+      width:55%;
+      height: 160%;
+      pointer-events:none;
+      opacity:.0;
+      transform: skewX(-18deg);
+      background: linear-gradient(
+        90deg,
+        rgba(0,0,0,0),
+        rgba(255,255,255,.16),
+        rgba(0,0,0,0)
+      );
+      mix-blend-mode: screen;
+      animation: holoSweep 6.2s ease-in-out infinite;
+    }
+    @keyframes holoSweep{
+      0%   { left:-55%; opacity:0; }
+      12%  { opacity:.55; }
+      24%  { left:110%; opacity:0; }
+      100% { left:110%; opacity:0; }
+    }
+    /* gentle hologram flicker */
+    .title{
+      animation: titleFlicker 3.8s infinite;
+    }
+    @keyframes titleFlicker{
+      0%,100% { filter: brightness(1) contrast(1); }
+      48%     { filter: brightness(1.03) contrast(1.02); }
+      50%     { filter: brightness(0.98) contrast(1.02); }
+      52%     { filter: brightness(1.04) contrast(1.03); }
+    }
+
     .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
     .subchewie{
       margin-top:10px;
@@ -309,11 +386,8 @@
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
 
-    /* Retro toggle only appears after Legend unlock */
     #retroToggle{ display:none; }
     body.legend-unlocked #retroToggle{ display:inline-flex; }
-
-    /* When Retro is ON, highlight the toggle pill */
     body.retro #retroToggle{
       border-color: rgba(255,211,107,.45);
       background: rgba(255,211,107,.12);
@@ -336,13 +410,14 @@
       user-select:none;
       transform: translateY(0);
       transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
+      position: relative; /* helps particles visually align */
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
+
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
 
-    /* ===== LEGEND MODE BUTTON GLOW ===== */
     body.legend .btn{
       box-shadow:
         0 0 10px rgba(255,211,107,.35),
@@ -524,9 +599,7 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* =========================================================
-       RETRO MODE (Legend-only): scanlines + CRT feel
-       ========================================================= */
+    /* Retro mode overlay */
     #scanlines{
       position:fixed;
       inset:0;
@@ -550,7 +623,6 @@
       image-rendering: pixelated;
       filter: saturate(1.08) contrast(1.04);
     }
-
     body.retro .card{
       border-radius: 14px;
       box-shadow:
@@ -559,7 +631,6 @@
         0 0 30px rgba(0,170,255,.10);
       background: rgba(0,0,0,.62);
     }
-
     body.retro .title,
     body.retro .subtitle,
     body.retro .pill,
@@ -569,17 +640,14 @@
         -1px 0 rgba(255,60,60,.12);
       letter-spacing: 1.2px;
     }
-
     body.retro .btn{
       border-radius: 10px;
       outline: 1px solid rgba(255,255,255,.12);
       outline-offset: -1px;
     }
-
     body.retro .btn:active{
       filter: brightness(.92) contrast(1.02);
     }
-
     body.retro .btn.gold{
       box-shadow:
         0 0 0 1px rgba(255,211,107,.16),
@@ -605,6 +673,7 @@
   <!-- FX -->
   <canvas id="starfield"></canvas>
   <canvas id="hyperspace"></canvas>
+  <canvas id="particles"></canvas>
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
@@ -612,7 +681,7 @@
   <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
 
-  <!-- Retro scanlines overlay (only visible when body.retro) -->
+  <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
 
   <!-- HUD Toast -->
@@ -799,7 +868,6 @@
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
     // ================== HOLO FX CONTROLS ==================
-    // Crawl = holo ON, Menu = holo OFF (clean UI)
     function holoOn(){ document.body.classList.add("holo-on"); }
     function holoOff(){ document.body.classList.remove("holo-on"); }
 
@@ -829,7 +897,6 @@
 
     // ================== RETRO MODE (Legend-only) ==================
     const RETRO_KEY = "oliverRetroMode_v1";
-
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -867,7 +934,7 @@
       sfCanvas.width = Math.floor(window.innerWidth * dpr);
       sfCanvas.height = Math.floor(window.innerHeight * dpr);
       sfCanvas.style.width = window.innerWidth + "px";
-      sfCanvas.style.height = window.innerWidth + "px";
+      sfCanvas.style.height = window.innerHeight + "px";
       sfCtx.setTransform(dpr,0,0,dpr,0,0);
 
       const count = Math.min(220, Math.floor((window.innerWidth * window.innerHeight) / 6500));
@@ -1038,6 +1105,94 @@
       requestAnimationFrame(frame);
     }
 
+    // ================== NEW #3: BUTTON PARTICLE BURSTS ==================
+    const pCanvas = document.getElementById("particles");
+    const pCtx = pCanvas.getContext("2d", { alpha:true });
+    let particles = [];
+
+    function pResize(){
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      pCanvas.width = Math.floor(window.innerWidth * dpr);
+      pCanvas.height = Math.floor(window.innerHeight * dpr);
+      pCanvas.style.width = window.innerWidth + "px";
+      pCanvas.style.height = window.innerHeight + "px";
+      pCtx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    pResize();
+    window.addEventListener("resize", pResize);
+
+    function burstAt(x, y, palette, power=1){
+      const count = Math.floor(26 * power);
+      for (let i=0;i<count;i++){
+        const a = Math.random() * Math.PI * 2;
+        const sp = (2.2 + Math.random()*4.2) * power;
+        particles.push({
+          x, y,
+          vx: Math.cos(a)*sp,
+          vy: Math.sin(a)*sp,
+          g: 0.06 + Math.random()*0.06,
+          life: 420 + Math.random()*380,
+          age: 0,
+          r: 1.2 + Math.random()*2.6,
+          c: palette[(Math.random()*palette.length)|0],
+          tw: 0.003 + Math.random()*0.012
+        });
+      }
+    }
+
+    function burstAtElement(el, palette, power=1){
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const x = r.left + r.width/2;
+      const y = r.top + r.height/2;
+      burstAt(x, y, palette, power);
+    }
+
+    let lastP = performance.now();
+    function particleLoop(t){
+      const dt = Math.min(40, t - lastP);
+      lastP = t;
+
+      pCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+      // draw/update
+      for (let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.age += dt;
+
+        // physics
+        p.x += p.vx * (dt/16);
+        p.y += p.vy * (dt/16);
+        p.vy += p.g * (dt/16);
+        p.vx *= 0.985;
+        p.vy *= 0.985;
+
+        // fade
+        const k = Math.min(1, p.age / p.life);
+        const fade = (k < 0.7) ? 1 : (1 - (k-0.7)/0.3);
+
+        // tiny twinkle
+        const tw = Math.sin((t * p.tw)) * 0.12;
+
+        pCtx.globalAlpha = Math.max(0, fade + tw);
+        pCtx.fillStyle = p.c;
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        pCtx.fill();
+
+        // remove
+        if (p.age >= p.life) particles.splice(i,1);
+      }
+
+      pCtx.globalAlpha = 1;
+      requestAnimationFrame(particleLoop);
+    }
+    requestAnimationFrame(particleLoop);
+
+    const PAL_GOLD = ["rgba(255,211,107,.95)","rgba(255,245,210,.85)","rgba(255,255,255,.75)"];
+    const PAL_BLUE = ["rgba(0,170,255,.95)","rgba(200,245,255,.85)","rgba(255,255,255,.70)"];
+    const PAL_RED  = ["rgba(255,60,60,.95)","rgba(255,170,170,.85)","rgba(255,255,255,.70)"];
+
     // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
     function getAudioCtx(){
@@ -1122,6 +1277,7 @@
       function showBirthday(){
         msg.classList.add("show");
         fireConfetti(2600);
+        burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
         wookieeGrowl(620);
         showChewieBubble("RRRAWWR! Birthday protocol engaged.");
@@ -1232,12 +1388,12 @@
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
-      yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+      burstAtElement(mainCard, PAL_GOLD, 1.7);
 
+      yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
       applyRetroOnLoad();
     }
 
-    // Apply persistent unlock on load
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         document.body.classList.add("legend-unlocked");
@@ -1251,7 +1407,6 @@
       applyRetroOnLoad();
     })();
 
-    // Keyboard support (desktop)
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1262,9 +1417,7 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
-    // Swipe support (mobile)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
-
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
       const t = ev.touches[0];
@@ -1272,7 +1425,6 @@
       tStartY = t.clientY;
       tStartTime = Date.now();
     }
-
     function onTouchEnd(ev){
       const dt = Date.now() - tStartTime;
       if (dt > 900) return;
@@ -1290,7 +1442,6 @@
       if (ady > adx) pushKonami(dy < 0 ? "U" : "D");
       else pushKonami(dx < 0 ? "L" : "R");
     }
-
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
@@ -1313,6 +1464,7 @@
 
       setTimeout(() => {
         mainCard.classList.add("show");
+        burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
@@ -1339,6 +1491,7 @@
       vibe([40,20,40]);
       getAudioCtx();
 
+      burstAtElement(igniteBtn, PAL_RED, 1.2);
       showDuel();
       showChewieBubble("RRRAWWR! (Wookiee hype)");
       wookieeGrowl(620);
@@ -1354,6 +1507,8 @@
     musicBtn.addEventListener("click", async () => {
       vibe(25);
       getAudioCtx();
+
+      burstAtElement(musicBtn, PAL_BLUE, 1.15);
       await startThemeGuaranteed(true);
 
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
@@ -1362,6 +1517,8 @@
 
     stopBtn.addEventListener("click", () => {
       vibe(15);
+
+      burstAtElement(stopBtn, ["rgba(255,255,255,.85)","rgba(255,211,107,.55)","rgba(0,170,255,.55)"], 0.9);
       theme.pause();
       theme.currentTime = 0;
 
@@ -1371,14 +1528,13 @@
     });
 
     rsvpBtn.addEventListener("click", () => {
+      burstAtElement(rsvpBtn, PAL_GOLD, 1.25);
       doRsvpWarp();
     });
 
-    // Pills: Konami B/A (Dark=B, Light=A)
-    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); });
-    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); });
+    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
+    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
-    // Retro toggle (Legend-only)
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
@@ -1386,6 +1542,7 @@
         showYoda("Patience… you must have.");
         return;
       }
+      burstAtElement(retroToggle, PAL_GOLD, 0.9);
       const on = !document.body.classList.contains("retro");
       setRetro(on);
     });
