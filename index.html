@@ -242,13 +242,13 @@
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
-      transform: rotateX(24deg) translateY(75%); /* UPDATED start position */
+      transform: rotateX(24deg) translateY(75%);
       color: #ffd36b;
       font-weight: 900;
       letter-spacing: 1.4px;
       text-align: justify;
       text-shadow: 0 0 16px rgba(255,211,107,.12);
-      line-height: 1.70; /* UPDATED: slightly more readable */
+      line-height: 1.70;
       font-size: clamp(14px, 3.2vw, 22px);
       opacity: 1;
       will-change: transform;
@@ -260,7 +260,6 @@
       animation: crawlMove var(--crawlms) linear forwards;
     }
 
-    /* UPDATED distance: shorter runway (feels slower + finishes sooner visually) */
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
@@ -505,10 +504,10 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // UPDATED: Crawl scroll speed stays slow/readable
-    const CRAWL_MS = 150000;      // 2:30 crawl (recommended)
-    // NEW: Menu reveals sooner so you don't wait forever
-    const MENU_REVEAL_MS = 70000; // 1:10 menu pop
+    // Crawl scroll speed (keeps your readable pace)
+    const CRAWL_MS = 150000;      // 2:30 crawl
+    // ✅ UPDATED per your request: menu pops at 95 seconds
+    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
@@ -517,7 +516,7 @@
     // ================== AUDIO (theme + saber) ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;       // whole song, no loop
+    theme.loop = false;
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -539,7 +538,7 @@
     const warpCountdown = document.getElementById("warpCountdown");
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // sync CSS crawl duration with JS (controls scroll speed)
+    // sync crawl duration
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
     // ================== STARFIELD ==================
@@ -856,17 +855,13 @@
       if (started) return;
       started = true;
 
-      // unlock WebAudio inside gesture for Chewie
       getAudioCtx();
       vibe(15);
 
-      // start theme on tap
       await startThemeGuaranteed(true);
 
-      // start crawl immediately
       crawlScreen.classList.add("running");
 
-      // ✅ Menu reveals sooner (Option B)
       setTimeout(() => {
         mainCard.classList.add("show");
 
