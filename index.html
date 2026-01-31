@@ -858,6 +858,7 @@
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
+    const VADER_URL = "./Darth Vader.mp3";
 
     // ✅ NEW: R2 audio (space-safe)
     const R2_URL = "./R2d2 scream.mp3";
@@ -874,6 +875,9 @@
     // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
+    const vader = safeAudio(VADER_URL);
+vader.loop = false;
+vader.volume = 0.75;
 
     // ✅ NEW: R2 object
     const r2 = safeAudio(R2_URL);
@@ -1602,11 +1606,19 @@
     });
 
     // Pills = Konami inputs (Dark=B, Light=A)
-    pillDark.addEventListener("click", () => {
-      vibe(12);
-      pushKonami("B");
-      burstAtElement(pillDark, PAL_RED, 0.75);
-    });
+    pillDark.addEventListener("click", async () => {
+  vibe(12);
+  getAudioCtx(); // helps mobile audio
+  pushKonami("B");
+  burstAtElement(pillDark, PAL_RED, 0.75);
+
+  try{
+    vader.currentTime = 0;
+    await vader.play();
+  }catch(e){
+    window.open(VADER_URL, "_blank", "noopener");
+  }
+});
 
     // ✅ UPDATED: Light Side also plays R2 audio (keeps Konami "A")
     pillLight.addEventListener("click", async () => {
