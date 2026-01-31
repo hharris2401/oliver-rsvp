@@ -242,13 +242,13 @@
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
-      transform: rotateX(24deg) translateY(95%);
+      transform: rotateX(24deg) translateY(75%); /* UPDATED start position */
       color: #ffd36b;
       font-weight: 900;
       letter-spacing: 1.4px;
       text-align: justify;
       text-shadow: 0 0 16px rgba(255,211,107,.12);
-      line-height: 1.55;
+      line-height: 1.70; /* UPDATED: slightly more readable */
       font-size: clamp(14px, 3.2vw, 22px);
       opacity: 1;
       will-change: transform;
@@ -259,9 +259,11 @@
     #crawlScreen.running .crawl{
       animation: crawlMove var(--crawlms) linear forwards;
     }
+
+    /* UPDATED distance: shorter runway (feels slower + finishes sooner visually) */
     @keyframes crawlMove{
-      0%   { transform: rotateX(24deg) translateY(95%); opacity: 1; }
-      100% { transform: rotateX(24deg) translateY(-165%); opacity: 0; }
+      0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
+      100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
     }
 
     /* ===== Dueling overlay ===== */
@@ -503,8 +505,10 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // ✅ UPDATED: 180 seconds
-    const CRAWL_MS = 180000;
+    // UPDATED: Crawl scroll speed stays slow/readable
+    const CRAWL_MS = 150000;      // 2:30 crawl (recommended)
+    // NEW: Menu reveals sooner so you don't wait forever
+    const MENU_REVEAL_MS = 70000; // 1:10 menu pop
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
@@ -535,7 +539,7 @@
     const warpCountdown = document.getElementById("warpCountdown");
     document.getElementById("formLink").href = RSVP_FORM;
 
-    // sync CSS crawl duration with JS
+    // sync CSS crawl duration with JS (controls scroll speed)
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
     // ================== STARFIELD ==================
@@ -845,7 +849,7 @@
       }, 850);
     }
 
-    // ================== CRAWL FLOW (mission brief removed) ==================
+    // ================== CRAWL FLOW (Option B) ==================
     let started = false;
 
     async function beginCrawl(){
@@ -862,17 +866,16 @@
       // start crawl immediately
       crawlScreen.classList.add("running");
 
+      // ✅ Menu reveals sooner (Option B)
       setTimeout(() => {
-        // show menu when crawl ends
         mainCard.classList.add("show");
 
-        // Chewie accent on arrival
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
 
         crawlScreen.classList.add("hide");
         setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
-      }, CRAWL_MS);
+      }, MENU_REVEAL_MS);
     }
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
