@@ -358,14 +358,6 @@
       letter-spacing:1px;
       min-height: 1.4em;
     }
-    .subchewie{
-      margin-top:10px;
-      font-weight:900;
-      letter-spacing:.8px;
-      font-size:12px;
-      opacity:.88;
-      color: rgba(255,211,107,.95);
-    }
 
     .pillrow{ display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
     .pill{
@@ -501,7 +493,7 @@
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
     }
 
-    /* ✅ NEW: Skip Crawl button (hidden until crawl starts) */
+    /* ✅ Skip Crawl button (hidden until crawl starts) */
     #skipCrawlBtn{
       position:absolute;
       right:16px;
@@ -817,7 +809,6 @@
       </div>
     </div>
 
-    <!-- ✅ Skip button lives INSIDE crawl screen (correct place) -->
     <button id="skipCrawlBtn" type="button" aria-label="Skip intro">SKIP CRAWL ⏭️</button>
   </div>
 
@@ -859,9 +850,10 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
-    const HYPER_URL = "./Star Wars Hyper space.mp3";
 
-    // ✅ NEW: R2 audio (space-safe)
+    // ✅ NOTE: no renaming files. We just URL-encode the spaces so the browser can fetch it.
+    const HYPER_URL = "./Star%20Wars%20Hyper%20space.mp3";
+
     const R2_URL = "./R2d2 scream.mp3";
 
     const CRAWL_MS = 150000;      // 2:30 crawl
@@ -877,17 +869,18 @@
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
     const vader = safeAudio(VADER_URL);
-vader.loop = false;
-vader.volume = 0.75;
 
-    // ✅ NEW: R2 object
+    vader.loop = false;
+    vader.volume = 0.75;
+
     const r2 = safeAudio(R2_URL);
     r2.loop = false;
     r2.volume = 0.90;
-    // 🚀 NEW: Hyperspace object
-const hyper = safeAudio(HYPER_URL);
-hyper.loop = false;
-hyper.volume = 0.95;
+
+    const hyper = safeAudio(HYPER_URL);
+    hyper.loop = false;
+    hyper.volume = 0.95;
+    hyper.load(); // ✅ helps mobile start faster
 
     theme.loop = false;
     theme.volume = 0.70;
@@ -902,7 +895,6 @@ hyper.volume = 0.95;
       }
     }
 
-    // ✅ NEW: play R2 helper (mobile-safe fallback)
     async function playR2(){
       try{
         r2.currentTime = 0;
@@ -1354,34 +1346,41 @@ hyper.volume = 0.95;
 
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
-  vibe([20,40,20]);
+      vibe([20,40,20]);
 
-  try{
-    hyper.currentTime = 0;
-    hyper.play();
-  }catch(e){}
+      // ✅ make mobile browsers happier about playing audio
+      getAudioCtx();
 
-  warpOverlay.classList.add("show");
-  warpCountdown.classList.add("show");
+      // ✅ stronger play: reset + catch promise
+      try{
+        hyper.pause();
+        hyper.currentTime = 0;
+        const p = hyper.play();
+        if (p && typeof p.then === "function") p.catch(()=>{});
+      }catch(e){}
 
-  let n = 3;
-  warpCountdown.textContent = `JUMP IN ${n}…`;
+      warpOverlay.classList.add("show");
+      warpCountdown.classList.add("show");
 
-  const tick = setInterval(()=>{
-    n--;
-    if (n <= 0){
-      clearInterval(tick);
-      warpCountdown.textContent = "JUMP!";
-    } else {
+      let n = 3;
       warpCountdown.textContent = `JUMP IN ${n}…`;
-    }
-  }, 280);
 
-  hyperspaceBurst();
+      const tick = setInterval(()=>{
+        n--;
+        if (n <= 0){
+          clearInterval(tick);
+          warpCountdown.textContent = "JUMP!";
+        } else {
+          warpCountdown.textContent = `JUMP IN ${n}…`;
+        }
+      }, 280);
 
-  setTimeout(()=>{
-    window.location.href = RSVP_FORM;
-  }, 850);
+      hyperspaceBurst();
+
+      // ✅ give the sound time to start before we leave the page
+      setTimeout(()=>{
+        window.location.href = RSVP_FORM;
+      }, 1400);
     }
 
     // ================== KONAMI (Dark = B, Light = A) ==================
@@ -1540,12 +1539,10 @@ hyper.volume = 0.95;
 
       crawlScreen.classList.add("running");
 
-      // Menu reveal timer
       crawlMenuTimer = setTimeout(() => {
         showMainMenuNow();
       }, MENU_REVEAL_MS);
 
-      // Optional crawl cleanup (in case someone never skips)
       crawlEndTimer = setTimeout(() => {
         try{ crawlScreen.remove(); }catch(e){}
       }, CRAWL_MS + 300);
@@ -1553,7 +1550,6 @@ hyper.volume = 0.95;
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
 
-    // ✅ Skip button (appears only after running)
     skipBtn.addEventListener("click", (e) => {
       e.stopPropagation();
 
@@ -1616,25 +1612,23 @@ hyper.volume = 0.95;
       doRsvpWarp();
     });
 
-    // Pills = Konami inputs (Dark=B, Light=A)
     pillDark.addEventListener("click", async () => {
-  vibe(12);
-  getAudioCtx(); // helps mobile audio
-  pushKonami("B");
-  burstAtElement(pillDark, PAL_RED, 0.75);
+      vibe(12);
+      getAudioCtx();
+      pushKonami("B");
+      burstAtElement(pillDark, PAL_RED, 0.75);
 
-  try{
-    vader.currentTime = 0;
-    await vader.play();
-  }catch(e){
-    window.open(VADER_URL, "_blank", "noopener");
-  }
-});
+      try{
+        vader.currentTime = 0;
+        await vader.play();
+      }catch(e){
+        window.open(VADER_URL, "_blank", "noopener");
+      }
+    });
 
-    // ✅ UPDATED: Light Side also plays R2 audio (keeps Konami "A")
     pillLight.addEventListener("click", async () => {
       vibe(12);
-      getAudioCtx(); // helps mobile audio
+      getAudioCtx();
       pushKonami("A");
       burstAtElement(pillLight, PAL_BLUE, 0.75);
       await playR2();
