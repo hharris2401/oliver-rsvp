@@ -70,6 +70,55 @@
     }
     #warpCountdown.show{ opacity:1; }
 
+    /* =========================
+       HOLO-TRANSMISSION FX (#4)
+       ========================= */
+    #holoFX{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index: 9994; /* above most things, below HUD/toasts */
+      opacity:0;
+      transition: opacity .25s ease;
+      mix-blend-mode: screen;
+      background:
+        /* scanlines */
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 1px,
+          rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0) 6px
+        ),
+        /* subtle cyan glow */
+        radial-gradient(circle at 50% 20%,
+          rgba(0,170,255,.12),
+          rgba(0,0,0,0) 60%
+        );
+    }
+    body.holo-on #holoFX{ opacity:.55; }
+
+    /* flicker */
+    body.holo-on{
+      animation: holoFlicker 2.6s infinite;
+    }
+    @keyframes holoFlicker{
+      0%,100%{ filter: brightness(1) contrast(1); }
+      50%{ filter: brightness(1.05) contrast(1.03); }
+    }
+
+    /* micro-jitter */
+    body.holo-on .stage,
+    body.holo-on #crawlScreen{
+      animation: holoJitter 1.4s infinite;
+    }
+    @keyframes holoJitter{
+      0%, 96%, 100% { transform: translate(0,0); }
+      97% { transform: translate(1px,0); }
+      98% { transform: translate(-1px,0); }
+      99% { transform: translate(0,1px); }
+    }
+
     /* Chewie bubble */
     #chewieBubble{
       position:fixed;
@@ -476,7 +525,7 @@
     }
 
     /* =========================================================
-       RETRO MODE (Legend-only): “pixel mode” + scanlines + CRT
+       RETRO MODE (Legend-only): scanlines + CRT feel
        ========================================================= */
     #scanlines{
       position:fixed;
@@ -497,7 +546,6 @@
     }
     body.retro #scanlines{ opacity:.42; }
 
-    /* A subtle CRT “bend” feel */
     body.retro{
       image-rendering: pixelated;
       filter: saturate(1.08) contrast(1.04);
@@ -532,7 +580,6 @@
       filter: brightness(.92) contrast(1.02);
     }
 
-    /* Tiny pixel “sparkle” around buttons (static but looks arcade) */
     body.retro .btn.gold{
       box-shadow:
         0 0 0 1px rgba(255,211,107,.16),
@@ -561,6 +608,9 @@
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
+
+  <!-- HOLO-TRANSMISSION overlay -->
+  <div id="holoFX" aria-hidden="true"></div>
 
   <!-- Retro scanlines overlay (only visible when body.retro) -->
   <div id="scanlines" aria-hidden="true"></div>
@@ -680,7 +730,6 @@
         <div class="pillrow">
           <div class="pill blue" id="pillLight">LIGHT SIDE</div>
           <div class="pill red" id="pillDark">DARK SIDE</div>
-          <!-- Retro Mode toggle (Legend-only) -->
           <div class="pill" id="retroToggle">RETRO MODE</div>
         </div>
       </div>
@@ -706,28 +755,22 @@
   <script>
     // ================== SETTINGS ==================
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
-
-    // Must match repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl scroll speed
     const CRAWL_MS = 150000;      // 2:30 crawl
-    // Menu reveal time (menu pops while crawl continues)
     const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
-    // Konami timing
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
 
-    // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
-    // ================== AUDIO (theme + saber) ==================
+    // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;       // whole song, no loop
+    theme.loop = false;
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -754,6 +797,11 @@
 
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
+
+    // ================== HOLO FX CONTROLS ==================
+    // Crawl = holo ON, Menu = holo OFF (clean UI)
+    function holoOn(){ document.body.classList.add("holo-on"); }
+    function holoOff(){ document.body.classList.remove("holo-on"); }
 
     // ================== HUD TOAST ==================
     function showHud(message, ms=1400){
@@ -799,7 +847,6 @@
     }
 
     function applyRetroOnLoad(){
-      // Only allow Retro if Legend is unlocked
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
         document.body.classList.remove("retro");
@@ -820,7 +867,7 @@
       sfCanvas.width = Math.floor(window.innerWidth * dpr);
       sfCanvas.height = Math.floor(window.innerHeight * dpr);
       sfCanvas.style.width = window.innerWidth + "px";
-      sfCanvas.style.height = window.innerHeight + "px";
+      sfCanvas.style.height = window.innerWidth + "px";
       sfCtx.setTransform(dpr,0,0,dpr,0,0);
 
       const count = Math.min(220, Math.floor((window.innerWidth * window.innerHeight) / 6500));
@@ -862,7 +909,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    // ================== HYPERSPACE BURST (for RSVP) ==================
+    // ================== HYPERSPACE BURST (RSVP) ==================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
@@ -991,7 +1038,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== CHEWIE (procedural, synthetic) ==================
+    // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
     function getAudioCtx(){
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1187,11 +1234,10 @@
 
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
 
-      // Retro toggle becomes available now, but does not auto-enable.
       applyRetroOnLoad();
     }
 
-    // Apply persistent unlock on load (title + styles + glow)
+    // Apply persistent unlock on load
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         document.body.classList.add("legend-unlocked");
@@ -1257,6 +1303,9 @@
 
       getAudioCtx();
 
+      // HOLO ON during crawl
+      holoOn();
+
       vibe(15);
       await startThemeGuaranteed(true);
 
@@ -1267,6 +1316,9 @@
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
+
+        // HOLO OFF when menu appears (clean)
+        holoOff();
 
         crawlScreen.classList.add("hide");
         setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
@@ -1328,7 +1380,6 @@
 
     // Retro toggle (Legend-only)
     retroToggle.addEventListener("click", () => {
-      // only allow if Legend unlocked
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
         showHud(`<b>LOCKED</b> • Unlock Legend Mode first`, 1200);
