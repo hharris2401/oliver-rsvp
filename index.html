@@ -538,43 +538,116 @@ body.legend .navDots .dot.active{
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
 
-    #retroToggle{ display:none; }
-    body.legend-unlocked #retroToggle{ display:inline-flex; }
-    body.retro #retroToggle{
-      border-color: rgba(255,211,107,.45);
-      background: rgba(255,211,107,.12);
-      box-shadow: 0 0 18px rgba(255,211,107,.14);
+    #retroToggle{ displ
     }
+    .btn/* =========================
+   POLISHED STARSHIP BUTTONS
+   ========================= */
 
-    .mid{ padding:0 22px 18px; display:grid; gap:12px; }
-    .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
+.btn{
+  width:100%;
+  border:none;
+  cursor:pointer;
+  padding:14px 16px;
+  border-radius:16px;
+  font-weight:950;
+  font-size:16px;
+  letter-spacing:.6px;
+  user-select:none;
+  position:relative;
+  isolation:isolate;
 
-    .btn{
-      width:100%;
-      border:none;
-      cursor:pointer;
-      padding:14px 16px;
-      border-radius:14px;
-      font-weight:900;
-      font-size:16px;
-      letter-spacing:.5px;
-      user-select:none;
-      transform: translateY(0);
-      transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
-      position: relative;
-    }
-    .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
+  /* Base material */
+  background: rgba(255,255,255,.06);
+  color:#fff;
 
-    .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
-    .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
-    .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
+  /* Bezel + depth */
+  box-shadow:
+    0 18px 50px rgba(0,0,0,.40),
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    inset 0 12px 18px rgba(255,255,255,.06),
+    inset 0 -14px 18px rgba(0,0,0,.35);
 
-    body.legend .btn{
-      box-shadow:
-        0 0 10px rgba(255,211,107,.35),
-        0 0 22px rgba(0,170,255,.25),
-        inset 0 0 8px rgba(255,255,255,.15);
+  transform: translateY(0);
+  transition:
+    transform .10s ease,
+    filter .16s ease,
+    box-shadow .22s ease;
+}
+
+/* Top gloss highlight */
+.btn::before{
+  content:"";
+  position:absolute;
+  inset:1px 1px 50%;
+  border-radius:15px;
+  pointer-events:none;
+  opacity:.85;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,.18),
+    rgba(255,255,255,.06),
+    rgba(255,255,255,0)
+  );
+  mix-blend-mode: screen;
+}
+
+/* Slow premium sheen sweep */
+.btn::after{
+  content:"";
+  position:absolute;
+  top:-60%;
+  left:-45%;
+  width:45%;
+  height:220%;
+  pointer-events:none;
+  opacity:0;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg,
+    rgba(0,0,0,0),
+    rgba(255,255,255,.18),
+    rgba(0,0,0,0)
+  );
+  mix-blend-mode: screen;
+  animation: btnSheen 7.5s ease-in-out infinite;
+}
+@keyframes btnSheen{
+  0%   { left:-55%; opacity:0; }
+  12%  { opacity:.55; }
+  24%  { left:120%; opacity:0; }
+  100% { left:120%; opacity:0; }
+}
+
+/* Press */
+.btn:active{
+  transform: translateY(1px);
+  filter: brightness(.96) contrast(1.02);
+  box-shadow:
+    0 12px 36px rgba(0,0,0,.38),
+    inset 0 0 0 1px rgba(255,255,255,.10),
+    inset 0 10px 18px rgba(255,255,255,.05),
+    inset 0 -18px 26px rgba(0,0,0,.45);
+}
+
+/* Optional: tiny cockpit indicator LED */
+.btn .led{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  margin-right:10px;
+  vertical-align:middle;
+  box-shadow: 0 0 14px rgba(255,255,255,.15);
+  opacity:.9;
+}
+
+/* Variants: keep your old meaning, now with premium color logic */
+.btn.gold{
+  color:#1a1200;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.22), rgba(255,255,255,0) 45%),
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(0,0,0,.15)),
+    linear-gradient(180deg, #ffe9b6, #ffd36b);
+  box-shadow:
     }
     body.legend .btn.gold{
       box-shadow:
