@@ -877,9 +877,10 @@
     const r2 = safeAudio(R2_URL);
     r2.loop = false;
     r2.volume = 0.90;
+
     const cantina = safeAudio(CANTINA_URL);
-cantina.loop = false;
-cantina.volume = 0.85;
+    cantina.loop = false;
+    cantina.volume = 0.85;
 
     const hyper = safeAudio(HYPER_URL);
     hyper.loop = false;
@@ -1331,6 +1332,16 @@ cantina.volume = 0.85;
         fireConfetti(2600);
         burstAtElement(title, PAL_GOLD, 1.25);
         vibe([30,40,30]);
+
+        // ✅ NEW: wake audio + play Cantina 8-bit on the secret egg
+        getAudioCtx();
+        try{
+          cantina.pause();
+          cantina.currentTime = 0;
+          const p = cantina.play();
+          if (p && typeof p.then === "function") p.catch(()=>{});
+        }catch(e){}
+
         wookieeGrowl(620);
         showChewieBubble("RRRAWWR! Birthday protocol engaged.");
         showYoda("A birthday… <b>legendary</b>, it is.");
