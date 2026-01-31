@@ -125,64 +125,6 @@
       99% { transform: translate(0,1px); }
     }
 
-    /* =========================
-       NEW: COCKPIT FRAME (Starship interior vibe)
-       ========================= */
-    #cockpitFrame{
-      position:fixed;
-      inset:0;
-      z-index: 5; /* above starfield (1/2), below card (10) */
-      pointer-events:none;
-      opacity:0;
-      transition: opacity .22s ease;
-    }
-    body.menu-on #cockpitFrame{ opacity:1; }
-
-    #cockpitFrame::before{
-      content:"";
-      position:absolute;
-      inset:12px;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset 0 0 0 1px rgba(0,170,255,.06),
-        inset 0 0 40px rgba(0,0,0,.25),
-        0 18px 80px rgba(0,0,0,.45);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.06), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 20% 30%, rgba(0,170,255,.05), rgba(0,0,0,0) 52%),
-        radial-gradient(circle at 80% 60%, rgba(255,211,107,.04), rgba(0,0,0,0) 55%),
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,0));
-      backdrop-filter: blur(0px);
-    }
-
-    /* corner brackets */
-    .corner{
-      position:absolute;
-      width:34px; height:34px;
-      border: 2px solid rgba(255,255,255,.14);
-      filter: drop-shadow(0 10px 25px rgba(0,0,0,.35));
-      opacity:.9;
-    }
-    .tl{ left:18px; top:18px; border-right:none; border-bottom:none; border-radius: 16px 0 0 0; }
-    .tr{ right:18px; top:18px; border-left:none; border-bottom:none; border-radius: 0 16px 0 0; }
-    .bl{ left:18px; bottom:18px; border-right:none; border-top:none; border-radius: 0 0 0 16px; }
-    .br{ right:18px; bottom:18px; border-left:none; border-top:none; border-radius: 0 0 16px 0; }
-
-    /* subtle bolt dots */
-    .bolt{
-      position:absolute;
-      width:6px; height:6px;
-      border-radius:999px;
-      background: rgba(255,255,255,.14);
-      box-shadow: 0 0 18px rgba(0,170,255,.10);
-      opacity:.8;
-    }
-    .b1{ left:40px; top:66px; }
-    .b2{ right:40px; top:66px; }
-    .b3{ left:40px; bottom:66px; }
-    .b4{ right:40px; bottom:66px; }
-
     /* Chewie bubble */
     #chewieBubble{
       position:fixed;
@@ -447,6 +389,7 @@
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
 
+    /* Your buttons will be overridden by the POLISHED block at bottom */
     .btn{
       width:100%;
       border:none;
@@ -462,7 +405,6 @@
       position: relative;
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
-
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
@@ -547,6 +489,7 @@
     #crawlScreen.running .crawl{
       animation: crawlMove var(--crawlms) linear forwards;
     }
+
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
@@ -715,105 +658,152 @@
         inset 0 0 0 1px rgba(0,0,0,.22);
     }
 
-    /* =========================
-       FLOATING "MOON STATION"
-       ========================= */
-    #deathStar{
-      position: fixed;
-      right: -8vmin;
-      top: 8vmin;
-      width: min(42vmin, 320px);
-      aspect-ratio: 1 / 1;
-      border-radius: 999px;
-      z-index: 6;            /* below stage (10), above starfield (1) */
-      pointer-events: none;
-      opacity: .0;
-      filter: drop-shadow(0 18px 70px rgba(0,0,0,.55));
-      transform: translate3d(0,0,0);
-      transition: opacity .25s ease, filter .25s ease;
-    }
-    body.menu-on #deathStar{ opacity:.55; }
+    /* ===========================================================
+       ✅ NEW: POLISHED STARSHIP BUTTONS + STATUS LED (your #1 + #2)
+       Paste-at-end overrides
+       =========================================================== */
 
-    #deathStar::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:inherit;
-      background:
-        radial-gradient(circle at 34% 30%, rgba(255,255,255,.22), rgba(0,0,0,0) 46%),
-        radial-gradient(circle at 62% 66%, rgba(0,0,0,.55), rgba(0,0,0,0) 52%),
-        radial-gradient(circle at 35% 40%, rgba(255,255,255,.06), rgba(0,0,0,0) 58%),
-        radial-gradient(circle at 70% 30%, rgba(0,170,255,.06), rgba(0,0,0,0) 55%),
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,0)),
-        radial-gradient(circle at 40% 25%, rgba(255,255,255,.10), rgba(0,0,0,.0) 55%),
-        rgba(90,110,130,.10);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset -30px -40px 90px rgba(0,0,0,.55),
-        inset 18px 12px 40px rgba(255,255,255,.06);
+    :root{
+      --btnRadius: 16px;
+      --btnStroke: rgba(255,255,255,.16);
+      --btnText: rgba(255,255,255,.92);
     }
-    #deathStar::after{
+
+    .btn{
+      border-radius: var(--btnRadius) !important;
+      position: relative;
+      overflow: hidden;
+      transform: translateZ(0);
+      letter-spacing: .6px;
+      font-weight: 950;
+      text-transform: uppercase;
+
+      background: rgba(255,255,255,.06) !important;
+      color: var(--btnText) !important;
+
+      border: 1px solid var(--btnStroke) !important;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.42),
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        inset 0 -10px 22px rgba(0,0,0,.26),
+        inset 0 10px 18px rgba(255,255,255,.06);
+      backdrop-filter: blur(6px);
+
+      transition:
+        transform .10s ease,
+        filter .14s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
+    }
+
+    .btn::before{
       content:"";
       position:absolute;
       inset:0;
-      border-radius:inherit;
+      pointer-events:none;
       background:
-        linear-gradient(
-          to bottom,
-          rgba(0,0,0,0) 48%,
-          rgba(255,255,255,.10) 49%,
-          rgba(0,0,0,.35) 50%,
-          rgba(255,255,255,.06) 51%,
-          rgba(0,0,0,0) 52%
-        ),
-        repeating-linear-gradient(
-          to right,
-          rgba(255,255,255,.06) 0px,
-          rgba(255,255,255,.06) 1px,
-          rgba(0,0,0,0) 18px,
-          rgba(0,0,0,0) 28px
-        ),
-        repeating-linear-gradient(
-          to bottom,
-          rgba(255,255,255,.05) 0px,
-          rgba(255,255,255,.05) 1px,
-          rgba(0,0,0,0) 20px,
-          rgba(0,0,0,0) 32px
+        linear-gradient(180deg,
+          rgba(255,255,255,.18),
+          rgba(255,255,255,.06) 28%,
+          rgba(0,0,0,0) 55%
         );
-      opacity: .38;
-      mix-blend-mode: screen;
-    }
-    #deathDish{
-      position:absolute;
-      left: 18%;
-      top: 22%;
-      width: 34%;
-      height: 34%;
-      border-radius: 999px;
-      background:
-        radial-gradient(circle at 35% 35%, rgba(255,255,255,.20), rgba(0,0,0,0) 45%),
-        radial-gradient(circle at 55% 60%, rgba(0,0,0,.55), rgba(0,0,0,0) 58%),
-        radial-gradient(circle at 50% 50%, rgba(0,0,0,.45), rgba(0,0,0,0) 66%),
-        rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow:
-        inset 0 0 0 2px rgba(0,0,0,.16),
-        0 0 18px rgba(0,170,255,.10);
-      transform: rotate(-12deg);
-      opacity: .85;
+      opacity:.85;
     }
 
-    @keyframes deathDrift{
-      0%   { transform: translate3d(0,0,0) rotate(0deg); }
-      50%  { transform: translate3d(-10px, 12px,0) rotate(1.2deg); }
-      100% { transform: translate3d(0,0,0) rotate(0deg); }
+    .btn::after{
+      content:"";
+      position:absolute;
+      top:-40%;
+      left:-70%;
+      width:60%;
+      height:180%;
+      pointer-events:none;
+      transform: skewX(-18deg);
+      background: linear-gradient(90deg,
+        rgba(0,0,0,0),
+        rgba(255,255,255,.24),
+        rgba(0,0,0,0)
+      );
+      opacity:0;
+      animation: btnSheen 6.6s ease-in-out infinite;
     }
-    body.menu-on #deathStar{
-      animation: deathDrift 10.5s ease-in-out infinite;
+    @keyframes btnSheen{
+      0%   { left:-75%; opacity:0; }
+      10%  { opacity:.55; }
+      22%  { left:130%; opacity:0; }
+      100% { left:130%; opacity:0; }
     }
-    body.legend-unlocked #deathStar{
-      opacity: .70;
-      filter: drop-shadow(0 22px 90px rgba(0,0,0,.62));
+
+    .btn{
+      text-shadow:
+        0 1px 0 rgba(0,0,0,.35),
+        0 0 18px rgba(255,255,255,.08);
+    }
+
+    .btn:active{
+      transform: translateY(2px) scale(.99) !important;
+      filter: brightness(.98) contrast(1.02);
+      box-shadow:
+        0 10px 40px rgba(0,0,0,.45),
+        inset 0 0 0 1px rgba(255,255,255,.05),
+        inset 0 -14px 26px rgba(0,0,0,.34),
+        inset 0 10px 18px rgba(255,255,255,.04);
+    }
+
+    .btn:focus-visible{
+      outline: none;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.42),
+        0 0 0 3px rgba(255,255,255,.08),
+        0 0 0 6px rgba(0,170,255,.20),
+        inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    .btn.gold{
+      border-color: rgba(255,211,107,.32) !important;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.42),
+        0 0 28px rgba(255,211,107,.12),
+        inset 0 0 0 1px rgba(255,211,107,.14),
+        inset 0 -10px 22px rgba(0,0,0,.26),
+        inset 0 12px 18px rgba(255,255,255,.07);
+      color: rgba(255,244,216,.95) !important;
+    }
+    .btn.blue{
+      border-color: rgba(0,170,255,.34) !important;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.42),
+        0 0 28px rgba(0,170,255,.12),
+        inset 0 0 0 1px rgba(0,170,255,.14),
+        inset 0 -10px 22px rgba(0,0,0,.26),
+        inset 0 12px 18px rgba(255,255,255,.07);
+    }
+    .btn.red{
+      border-color: rgba(255,60,60,.34) !important;
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.42),
+        0 0 28px rgba(255,60,60,.12),
+        inset 0 0 0 1px rgba(255,60,60,.14),
+        inset 0 -10px 22px rgba(0,0,0,.26),
+        inset 0 12px 18px rgba(255,255,255,.07);
+    }
+
+    /* Status LED dot */
+    .btn .led{
+      display:inline-block;
+      width:10px; height:10px;
+      border-radius:999px;
+      margin-right:10px;
+      background: rgba(255,255,255,.35);
+      box-shadow: 0 0 18px rgba(255,255,255,.18);
+      vertical-align: middle;
+    }
+    .btn.blue .led{ background: rgba(0,170,255,.65); box-shadow: 0 0 18px rgba(0,170,255,.32); }
+    .btn.red  .led{ background: rgba(255,60,60,.65); box-shadow: 0 0 18px rgba(255,60,60,.32); }
+    .btn.gold .led{ background: rgba(255,211,107,.75); box-shadow: 0 0 18px rgba(255,211,107,.28); }
+
+    @media (max-width:420px){
+      .btn{ font-size: 15px !important; padding: 13px 14px !important; }
     }
   </style>
 </head>
@@ -829,23 +819,6 @@
 
   <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
-
-  <!-- Cockpit frame overlay -->
-  <div id="cockpitFrame" aria-hidden="true">
-    <div class="corner tl"></div>
-    <div class="corner tr"></div>
-    <div class="corner bl"></div>
-    <div class="corner br"></div>
-    <div class="bolt b1"></div>
-    <div class="bolt b2"></div>
-    <div class="bolt b3"></div>
-    <div class="bolt b4"></div>
-  </div>
-
-  <!-- Floating moon station -->
-  <div id="deathStar" aria-hidden="true">
-    <div id="deathDish"></div>
-  </div>
 
   <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
@@ -970,14 +943,14 @@
       </div>
 
       <div class="mid">
-        <button class="btn gold" id="igniteBtn">TAP TO IGNITE LIGHTSABER ⚔️</button>
+        <button class="btn gold" id="igniteBtn"><span class="led"></span> TAP TO IGNITE LIGHTSABER ⚔️</button>
 
         <div class="row">
-          <button class="btn blue" id="musicBtn">PLAY THEME MUSIC 🎵</button>
-          <button class="btn red" id="stopBtn">STOP MUSIC ⛔</button>
+          <button class="btn blue" id="musicBtn"><span class="led"></span> PLAY THEME MUSIC 🎵</button>
+          <button class="btn red" id="stopBtn"><span class="led"></span> STOP MUSIC ⛔</button>
         </div>
 
-        <button class="btn gold" id="rsvpBtn">CONTINUE TO RSVP 📋</button>
+        <button class="btn gold" id="rsvpBtn"><span class="led"></span> CONTINUE TO RSVP 📋</button>
       </div>
 
       <div class="fine">
@@ -1029,7 +1002,6 @@
     const warpCountdown = document.getElementById("warpCountdown");
     const subtitleEl    = document.getElementById("subtitleEl");
     const retroToggle   = document.getElementById("retroToggle");
-    const deathStar     = document.getElementById("deathStar");
 
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
@@ -1037,13 +1009,6 @@
     // ================== HOLO FX CONTROLS ==================
     function holoOn(){ document.body.classList.add("holo-on"); }
     function holoOff(){ document.body.classList.remove("holo-on"); }
-
-    // ================== MENU VISUAL ENABLE (Death Star + cockpit frame) ==================
-    function setMenuScene(on){
-      document.body.classList.toggle("menu-on", on);
-      if (deathStar) deathStar.style.display = on ? "block" : "block"; // keep block; opacity drives visibility
-    }
-    setMenuScene(false);
 
     // ================== HUD TOAST ==================
     function showHud(message, ms=1400){
@@ -1319,9 +1284,7 @@
     function burstAtElement(el, palette, power=1){
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const x = r.left + r.width/2;
-      const y = r.top + r.height/2;
-      burstAt(x, y, palette, power);
+      burstAt(r.left + r.width/2, r.top + r.height/2, palette, power);
     }
 
     let lastP = performance.now();
@@ -1334,6 +1297,7 @@
       for (let i=particles.length-1;i>=0;i--){
         const p = particles[i];
         p.age += dt;
+
         p.x += p.vx * (dt/16);
         p.y += p.vy * (dt/16);
         p.vy += p.g * (dt/16);
@@ -1362,7 +1326,7 @@
     const PAL_BLUE = ["rgba(0,170,255,.95)","rgba(200,245,255,.85)","rgba(255,255,255,.70)"];
     const PAL_RED  = ["rgba(255,60,60,.95)","rgba(255,170,170,.85)","rgba(255,255,255,.70)"];
 
-    // ================== WEB AUDIO (Chewie + Ambient Hum) ==================
+    // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
     function getAudioCtx(){
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1370,90 +1334,6 @@
       return audioCtx;
     }
 
-    // Procedural “ambient ship hum” (no files). Fades in when menu appears.
-    let hum = null;
-    function startHum(){
-      try{
-        const ctx = getAudioCtx();
-        if (hum && hum.on) return;
-
-        const now = ctx.currentTime;
-
-        const humGain = ctx.createGain();
-        humGain.gain.setValueAtTime(0.0001, now);
-
-        // low fundamental + slight detune for “engine” feel
-        const o1 = ctx.createOscillator();
-        o1.type = "sine";
-        o1.frequency.setValueAtTime(52, now);
-
-        const o2 = ctx.createOscillator();
-        o2.type = "sine";
-        o2.frequency.setValueAtTime(58, now);
-
-        // very soft noise “air” layer
-        const noiseLen = ctx.sampleRate * 2;
-        const nb = ctx.createBuffer(1, noiseLen, ctx.sampleRate);
-        const data = nb.getChannelData(0);
-        for (let i=0;i<noiseLen;i++) data[i] = (Math.random()*2 - 1) * 0.25;
-        const noise = ctx.createBufferSource();
-        noise.buffer = nb;
-        noise.loop = true;
-
-        const lp = ctx.createBiquadFilter();
-        lp.type = "lowpass";
-        lp.frequency.setValueAtTime(220, now);
-        lp.Q.setValueAtTime(0.7, now);
-
-        const hp = ctx.createBiquadFilter();
-        hp.type = "highpass";
-        hp.frequency.setValueAtTime(18, now);
-
-        // gentle LFO wobble
-        const lfo = ctx.createOscillator();
-        lfo.type = "sine";
-        lfo.frequency.setValueAtTime(0.10, now);
-        const lfoGain = ctx.createGain();
-        lfoGain.gain.setValueAtTime(6, now);
-        lfo.connect(lfoGain);
-        lfoGain.connect(o1.frequency);
-
-        // mix
-        o1.connect(hp);
-        o2.connect(hp);
-        noise.connect(hp);
-        hp.connect(lp);
-        lp.connect(humGain);
-        humGain.connect(ctx.destination);
-
-        o1.start(now);
-        o2.start(now);
-        noise.start(now);
-        lfo.start(now);
-
-        // fade in (subtle!)
-        humGain.gain.exponentialRampToValueAtTime(0.06, now + 1.0);
-
-        hum = { on:true, ctx, humGain, o1, o2, noise, lfo };
-      }catch(e){}
-    }
-
-    function stopHum(){
-      try{
-        if (!hum || !hum.on) return;
-        const ctx = hum.ctx;
-        const now = ctx.currentTime;
-        hum.humGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-        setTimeout(()=>{
-          try{
-            hum.o1.stop(); hum.o2.stop(); hum.noise.stop(); hum.lfo.stop();
-          }catch(e){}
-          hum.on = false;
-        }, 320);
-      }catch(e){}
-    }
-
-    // Chewie synth
     function wookieeGrowl(ms = 520){
       try{
         const ctx = getAudioCtx();
@@ -1570,25 +1450,18 @@
 
       hyperspaceBurst();
 
-      setTimeout(()=>{
-        window.location.href = RSVP_FORM;
-      }, 850);
+      setTimeout(()=>{ window.location.href = RSVP_FORM; }, 850);
     }
 
     // ================== KONAMI (Dark = B, Light = A) ==================
     const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-
     let inputBuffer = [];
     let konamiStartAt = 0;
 
-    function resetKonami(){
-      inputBuffer = [];
-      konamiStartAt = 0;
-    }
+    function resetKonami(){ inputBuffer = []; konamiStartAt = 0; }
 
     function pushKonami(token){
       const now = Date.now();
-
       if (inputBuffer.length === 0) konamiStartAt = now;
       if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
         resetKonami();
@@ -1599,10 +1472,7 @@
       if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
 
       const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
-      if (ok){
-        resetKonami();
-        unlockLegendMode();
-      }
+      if (ok){ resetKonami(); unlockLegendMode(); }
     }
 
     function unlockLegendMode(){
@@ -1618,7 +1488,6 @@
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
-
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1628,7 +1497,6 @@
       wookieeGrowl(620);
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
-
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
@@ -1641,7 +1509,6 @@
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
-
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
       applyRetroOnLoad();
     }
@@ -1697,32 +1564,6 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // ================== Death Star Parallax ==================
-    let dsTargetX = 0, dsTargetY = 0, dsX = 0, dsY = 0;
-
-    function deathStarLoop(){
-      dsX += (dsTargetX - dsX) * 0.08;
-      dsY += (dsTargetY - dsY) * 0.08;
-      if (deathStar){
-        deathStar.style.transform = `translate3d(${dsX}px, ${dsY}px, 0)`;
-      }
-      requestAnimationFrame(deathStarLoop);
-    }
-    requestAnimationFrame(deathStarLoop);
-
-    window.addEventListener("mousemove", (e) => {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      dsTargetX = (e.clientX - cx) * 0.01;
-      dsTargetY = (e.clientY - cy) * 0.01;
-    }, { passive:true });
-
-    window.addEventListener("deviceorientation", (e) => {
-      if (e.beta == null || e.gamma == null) return;
-      dsTargetX = (e.gamma) * 0.18;
-      dsTargetY = (e.beta - 20) * 0.12;
-    }, { passive:true });
-
     // ================== CRAWL FLOW (Menu pops at 95s) ==================
     let started = false;
 
@@ -1731,8 +1572,6 @@
       started = true;
 
       getAudioCtx();
-
-      // HOLO ON during crawl
       holoOn();
 
       vibe(15);
@@ -1742,15 +1581,11 @@
 
       setTimeout(() => {
         mainCard.classList.add("show");
-        setMenuScene(true);      // ✅ enables cockpit frame + death star
-        startHum();              // ✅ ambient ship hum fades in
-
         burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // HOLO OFF when menu appears (clean)
         holoOff();
 
         crawlScreen.classList.add("hide");
@@ -1803,7 +1638,6 @@
       theme.pause();
       theme.currentTime = 0;
 
-      // (optional) keep hum running; it’s the ship ambience.
       showChewieBubble("Grrr… (music paused)");
       showYoda("Silence? Hmm. Music… you need.");
       yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
@@ -1814,7 +1648,6 @@
       doRsvpWarp();
     });
 
-    // Konami: Dark = B, Light = A (as you set it up)
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
