@@ -644,7 +644,7 @@
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
     // Crawl duration
-    const CRAWL_MS = 67200;
+    const CRAWL_MS = 120000;
 
     // Mission brief timing (auto-dismiss)
     const MISSION_SHOW_MS = 1200;
@@ -863,76 +863,6 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== CHEWIE (procedural) ==================
-    let audioCtx = null;
-
-    function getAudioCtx(){
-      if (!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      if (audioCtx.state === "suspended"){
-        audioCtx.resume().catch(()=>{});
-      }
-      return audioCtx;
-    }
-
-    function wookieeGrowl(ms = 520){
-      try{
-        const ctx = getAudioCtx();
-        const now = ctx.currentTime;
-        const end = now + ms/1000;
-
-        const bufferSize = Math.floor(ctx.sampleRate * (ms/1000));
-        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = noiseBuffer.getChannelData(0);
-        for (let i=0;i<bufferSize;i++){
-          data[i] = (Math.random()*2 - 1) * 0.55;
-        }
-        const noise = ctx.createBufferSource();
-        noise.buffer = noiseBuffer;
-
-        const osc = ctx.createOscillator();
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(115, now);
-        osc.frequency.exponentialRampToValueAtTime(70, end);
-
-        const filter = ctx.createBiquadFilter();
-        filter.type = "bandpass";
-        filter.frequency.setValueAtTime(260, now);
-        filter.Q.setValueAtTime(1.1, now);
-
-        const lowpass = ctx.createBiquadFilter();
-        lowpass.type = "lowpass";
-        lowpass.frequency.setValueAtTime(900, now);
-        lowpass.frequency.exponentialRampToValueAtTime(520, end);
-
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.55, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, end);
-
-        const mix = ctx.createGain();
-        mix.gain.setValueAtTime(0.9, now);
-
-        osc.connect(filter);
-        noise.connect(filter);
-        filter.connect(lowpass);
-        lowpass.connect(mix);
-        mix.connect(gain);
-        gain.connect(ctx.destination);
-
-        noise.start(now);
-        osc.start(now);
-        noise.stop(end);
-        osc.stop(end);
-      }catch(e){}
-    }
-
-    function showChewieBubble(text){
-      chewieBubble.textContent = text;
-      chewieBubble.classList.add("show");
-      setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
-    }
 
     // ================== DUEL VISUAL ==================
     function showDuel(){
