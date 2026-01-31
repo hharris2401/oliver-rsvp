@@ -37,7 +37,7 @@
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* NEW: button particle layer (above UI, below toasts/overlays) */
+    /* Button particle layer (above UI, below toasts/overlays) */
     #particles{
       position:fixed;
       inset:0;
@@ -81,7 +81,7 @@
     #warpCountdown.show{ opacity:1; }
 
     /* =========================
-       HOLO-TRANSMISSION FX (#4)
+       HOLO-TRANSMISSION FX
        ========================= */
     #holoFX{
       position:fixed;
@@ -281,9 +281,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* ==========================================================
-       NEW #1: HOLOGRAM TITLE (main menu) - subtle but premium
-       ========================================================== */
+    /* Hologram title (main menu) */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -298,6 +296,7 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
+      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -345,9 +344,6 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
-    .title{
-      animation: titleFlicker 3.8s infinite;
-    }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
       48%     { filter: brightness(1.03) contrast(1.02); }
@@ -355,7 +351,13 @@
       52%     { filter: brightness(1.04) contrast(1.03); }
     }
 
-    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
+    .subtitle{
+      opacity:.85;
+      margin-top:6px;
+      font-size:clamp(12px,2.6vw,16px);
+      letter-spacing:1px;
+      min-height: 1.4em;
+    }
     .subchewie{
       margin-top:10px;
       font-weight:900;
@@ -707,77 +709,67 @@
     </div>
   </div>
 
-  <!-- Opening Crawl (UPDATED: PROPHECY TEXT) -->
-  <div id="crawlScreen">
+  <!-- Opening Crawl -->
+  <div id="crawlScreen" aria-label="Tap to start">
     <div class="crawlWrap">
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
         <div class="center" style="margin-top:8px; font-size:1.55em;">THE PROPHECY OF LEVEL EIGHT</div>
 
+        <!-- ACROSTIC: O L I V E R -->
         <p class="small">
-          Long ago, in a glowing arcade sector of the galaxy, ancient Jedi scrolls foretold the rise of a young champion.
+          <b>O</b>n a neon-lit edge of the galaxy, where arcade cabinets glow like tiny starships, the scoreboard whispers a new name: OLIVER, now LEVEL 8.
         </p>
 
         <p class="small">
-          They spoke of flashing cabinets, humming joysticks, and a hero who would master both pixels and the Force.
+          <b>L</b>egends of SIDE QUEST ARCADE speak of a “Chosen Player”, one who can stack tickets at lightspeed and still share snacks like a true hero.
         </p>
 
         <p class="small">
-          That hero… is OLIVER.
+          <b>I</b>n the old training manuals, Master Yoda wrote: “When the eighth level arrives, the buttons will shine… and the party will awaken.”
         </p>
 
         <p class="small">
-          Now, on his eighth rotation around the birthday sun, the prophecy awakens.
+          <b>V</b>ictory chimes echo across hyperspeed racers, pixel brawlers, and galactic pinball lanes, as champions from every system receive the birthday summons.
         </p>
 
         <p class="small">
-          Game reactors power up across distant systems. High-score beacons ignite. Prize tickets tremble at lightspeed.
+          <b>E</b>very cabinet must be powered, every joystick tested, and every high score defended, before the celebration may begin.
         </p>
 
         <p class="small">
-          From hyperspeed racers to pixel-powered battles, champions from every quadrant are summoned to SIDE QUEST ARCADE.
+          <b>R</b>umors swirl of a hidden transmission, visible only to quick-tapping Jedi reflexes… and those who know the ancient cheat code ways.
+        </p>
+
+        <!-- Continue naturally -->
+        <p class="small">
+          Three heroic challenges await all who enter the arcade sector.
         </p>
 
         <p class="small">
-          But before celebration may begin, three trials must be completed.
+          CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
         </p>
 
         <p class="small">
-          TRIAL ONE: Activate the Celebration Soundtrack by pressing PLAY THEME.
+          CHALLENGE TWO: Press IGNITE to unleash lightsaber skills in a spectacular duel moment.
         </p>
 
         <p class="small">
-          TRIAL TWO: Ignite your lightsaber and prove your skills in the ceremonial duel.
+          CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
         </p>
 
         <p class="small">
-          TRIAL THREE: Lock in your RSVP coordinates so the party fleet knows who is landing.
-        </p>
-
-        <p class="small">
-          Meanwhile, snack droids prepare galactic treats, ticket counters overflow, and the birthday cake waits inside a hidden bonus level.
-        </p>
-
-        <p class="small">
-          Master Yoda watches quietly from the shadows.
-        </p>
-
-        <p class="small">
-          “Strong with the joystick, this one is,” he whispers.
-        </p>
-
-        <p class="small">
-          Rumors echo through hyperspace of secret transmissions, unlocked only by those with Jedi reflexes and legendary courage.
+          Meanwhile, prize tickets stack higher than asteroids, snack-bots prepare galactic treats, and the birthday cake is secured in a secret bonus level.
         </p>
 
         <p class="small center">
+          The joysticks are ready.<br>
           The buttons are glowing.<br>
-          The Force is charged.<br>
-          The arcade awaits.
+          The Force is fully charged.
         </p>
 
         <p class="small center" style="margin-top:10px;">
-          And the prophecy of LEVEL EIGHT…
+          And the prophecy of LEVEL 8…
         </p>
 
         <p class="small center">
@@ -826,11 +818,16 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    const CRAWL_MS = 150000;      // 2:30 crawl
-    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
+    const CRAWL_MS = 150000;       // crawl animation length (kept for pacing)
+    const MENU_REVEAL_MS = 95000;  // menu pops at 1:35 (does NOT wait for full crawl)
 
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
+
+    // ================== KONAMI / PERSIST KEYS (declare early to avoid ref issues) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY  = "oliverLegendUnlocked_v1";
+    const RETRO_KEY   = "oliverRetroMode_v1";
 
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
@@ -838,7 +835,7 @@
     // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;
+    theme.loop = false;      // full track, no loop
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -895,7 +892,6 @@
     }
 
     // ================== RETRO MODE (Legend-only) ==================
-    const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -1104,7 +1100,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== NEW #3: BUTTON PARTICLE BURSTS ==================
+    // ================== BUTTON PARTICLE BURSTS ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1142,9 +1138,7 @@
     function burstAtElement(el, palette, power=1){
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const x = r.left + r.width/2;
-      const y = r.top + r.height/2;
-      burstAt(x, y, palette, power);
+      burstAt(r.left + r.width/2, r.top + r.height/2, palette, power);
     }
 
     let lastP = performance.now();
@@ -1316,9 +1310,6 @@
     }
 
     // ================== KONAMI (Dark = B, Light = A) ==================
-    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-
     let inputBuffer = [];
     let konamiStartAt = 0;
 
@@ -1382,8 +1373,8 @@
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
-
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+
       applyRetroOnLoad();
     }
 
@@ -1445,16 +1436,16 @@
       if (started) return;
       started = true;
 
-      getAudioCtx();
-
-      // HOLO ON during crawl
-      holoOn();
+      getAudioCtx();   // unlock WebAudio early
+      holoOn();        // holo during crawl
 
       vibe(15);
       await startThemeGuaranteed(true);
 
+      // start crawl immediately on tap
       crawlScreen.classList.add("running");
 
+      // menu reveal timer (separate from full crawl length)
       setTimeout(() => {
         mainCard.classList.add("show");
         burstAtElement(mainCard, PAL_BLUE, 1.4);
@@ -1462,7 +1453,6 @@
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // HOLO OFF when menu appears (clean)
         holoOff();
 
         crawlScreen.classList.add("hide");
@@ -1525,9 +1515,11 @@
       doRsvpWarp();
     });
 
+    // Pills: A/B for Konami
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
+    // Retro toggle (Legend-only)
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
