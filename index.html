@@ -32,9 +32,12 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity:.78; }
+    #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
+
+    /* Legend pulse brightens starfield briefly */
+    body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
       position:fixed;
@@ -91,6 +94,33 @@
       opacity:1;
       transform:translateX(-50%) translateY(-2px);
     }
+
+    /* HUD toast (Konami feedback) */
+    #hudToast{
+      position:fixed;
+      left:50%;
+      top:14%;
+      transform:translateX(-50%) translateY(-6px);
+      z-index: 99999;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.64);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      text-align:center;
+      font-weight: 950;
+      letter-spacing: .9px;
+      color: rgba(255,255,255,.95);
+    }
+    #hudToast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+    #hudToast b{ color: var(--gold); }
 
     /* Secret birthday overlay */
     .secretMsg{
@@ -155,6 +185,19 @@
       transform: translateY(0) scale(1);
       opacity: 1;
       pointer-events:auto;
+    }
+
+    /* Persistent Legend Mode styling (subtle glow) */
+    body.legend-unlocked .card{
+      box-shadow: 0 22px 80px rgba(0,0,0,.50);
+      border-color: rgba(255,211,107,.22);
+    }
+    body.legend-unlocked .title{
+      text-shadow: 0 0 18px rgba(255,211,107,.14);
+    }
+    body.legend-unlocked .pill.blue,
+    body.legend-unlocked .pill.red{
+      border-color: rgba(255,211,107,.22);
     }
 
     .top{ padding:26px 22px 18px; text-align:center; }
@@ -226,6 +269,7 @@
       opacity:1;
       transition: opacity .06s linear;
       cursor:pointer;
+      touch-action: none; /* helps swipe detection */
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
 
@@ -370,6 +414,9 @@
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
+  <!-- HUD Toast -->
+  <div id="hudToast" aria-hidden="true"></div>
+
   <!-- Dueling overlay -->
   <div id="duelOverlay" aria-hidden="true">
     <div class="duelStage">
@@ -504,10 +551,14 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl scroll speed (keeps your readable pace)
+    // Crawl scroll speed
     const CRAWL_MS = 150000;      // 2:30 crawl
-    // ✅ UPDATED per your request: menu pops at 95 seconds
+    // Menu reveal time
     const MENU_REVEAL_MS = 95000; // 1:35 menu pop
+
+    // Konami timing
+    const KONAMI_WINDOW_MS = 8000;  // must complete within 8s
+    const SWIPE_THRESHOLD_PX = 45;  // min swipe distance
 
     // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
@@ -516,7 +567,7 @@
     // ================== AUDIO (theme + saber) ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = false;
+    theme.loop = false;       // whole song, no loop
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -530,16 +581,24 @@
     }
 
     // ================== DOM ==================
-    const crawlScreen = document.getElementById("crawlScreen");
-    const mainCard = document.getElementById("mainCard");
-    const duelOverlay = document.getElementById("duelOverlay");
-    const chewieBubble = document.getElementById("chewieBubble");
-    const warpOverlay = document.getElementById("warpOverlay");
+    const crawlScreen   = document.getElementById("crawlScreen");
+    const mainCard      = document.getElementById("mainCard");
+    const duelOverlay   = document.getElementById("duelOverlay");
+    const chewieBubble  = document.getElementById("chewieBubble");
+    const hudToast      = document.getElementById("hudToast");
+    const warpOverlay   = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
-    document.getElementById("formLink").href = RSVP_FORM;
 
-    // sync crawl duration
+    document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
+
+    // ================== HUD TOAST ==================
+    function showHud(message, ms=1400){
+      hudToast.innerHTML = message;
+      hudToast.classList.add("show");
+      clearTimeout(showHud._t);
+      showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
+    }
 
     // ================== STARFIELD ==================
     const sfCanvas = document.getElementById("starfield");
@@ -848,6 +907,134 @@
       }, 850);
     }
 
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){
+      inputBuffer = [];
+      konamiStartAt = 0;
+    }
+
+    function pushKonami(token){
+      const now = Date.now();
+
+      // start timing window on first input
+      if (inputBuffer.length === 0) konamiStartAt = now;
+
+      // if too slow, reset
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length){
+        inputBuffer.shift();
+      }
+
+      // check match
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
+    function unlockLegendMode(){
+      if (localStorage.getItem(LEGEND_KEY) === "1"){
+        // already unlocked: still give a tiny reward moment
+        vibe([20,30,20]);
+        fireConfetti(900);
+        showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
+        return;
+      }
+
+      localStorage.setItem(LEGEND_KEY, "1");
+      document.body.classList.add("legend-unlocked");
+
+      // big moment
+      vibe([30,40,30,60,30]);
+      fireConfetti(2400);
+      showDuel();
+      wookieeGrowl(620);
+      showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
+      showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
+
+      // quick starfield brighten pulse
+      document.body.classList.add("legend-pulse");
+      setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
+
+      // optional tiny title tweak (persistent)
+      const title = document.getElementById("secretTitle");
+      if (title && !title.dataset.legendApplied){
+        title.dataset.legendApplied = "1";
+        title.textContent = "THE BALANCE OF EIGHT ✨";
+      }
+    }
+
+    // Apply persistent unlock on load
+    (function applyLegendOnLoad(){
+      if (localStorage.getItem(LEGEND_KEY) === "1"){
+        document.body.classList.add("legend-unlocked");
+        const title = document.getElementById("secretTitle");
+        if (title){
+          title.dataset.legendApplied = "1";
+          title.textContent = "THE BALANCE OF EIGHT ✨";
+        }
+      }
+    })();
+
+    // Desktop keyboard support (classic)
+    window.addEventListener("keydown", (e) => {
+      const k = e.key;
+      if (k === "ArrowUp") pushKonami("U");
+      else if (k === "ArrowDown") pushKonami("D");
+      else if (k === "ArrowLeft") pushKonami("L");
+      else if (k === "ArrowRight") pushKonami("R");
+      else if (k === "b" || k === "B") pushKonami("B"); // Dark
+      else if (k === "a" || k === "A") pushKonami("A"); // Light
+    });
+
+    // Mobile swipe detection (works on crawl + menu)
+    let tStartX = 0, tStartY = 0, tStartTime = 0;
+
+    function onTouchStart(ev){
+      if (!ev.touches || ev.touches.length !== 1) return;
+      const t = ev.touches[0];
+      tStartX = t.clientX;
+      tStartY = t.clientY;
+      tStartTime = Date.now();
+    }
+
+    function onTouchEnd(ev){
+      const dt = Date.now() - tStartTime;
+      if (dt > 900) return; // too slow = likely scroll
+      const t = (ev.changedTouches && ev.changedTouches[0]) ? ev.changedTouches[0] : null;
+      if (!t) return;
+
+      const dx = t.clientX - tStartX;
+      const dy = t.clientY - tStartY;
+
+      const adx = Math.abs(dx);
+      const ady = Math.abs(dy);
+      if (Math.max(adx, ady) < SWIPE_THRESHOLD_PX) return;
+
+      if (ady > adx){
+        // vertical
+        pushKonami(dy < 0 ? "U" : "D");
+      } else {
+        // horizontal
+        pushKonami(dx < 0 ? "L" : "R");
+      }
+    }
+
+    // attach to whole document so it works anywhere
+    document.addEventListener("touchstart", onTouchStart, { passive:true });
+    document.addEventListener("touchend", onTouchEnd, { passive:true });
+
     // ================== CRAWL FLOW (Option B) ==================
     let started = false;
 
@@ -855,16 +1042,19 @@
       if (started) return;
       started = true;
 
+      // unlock WebAudio inside gesture
       getAudioCtx();
       vibe(15);
 
+      // start theme on tap
       await startThemeGuaranteed(true);
 
+      // start crawl immediately
       crawlScreen.classList.add("running");
 
+      // menu reveals at your set time
       setTimeout(() => {
         mainCard.classList.add("show");
-
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
 
@@ -919,8 +1109,9 @@
       doRsvpWarp();
     });
 
-    pillLight.addEventListener("click", () => { vibe(12); });
-    pillDark.addEventListener("click", () => { vibe(12); });
+    // Pills: now also feed Konami (Dark=B, Light=A)
+    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); });
+    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); });
   </script>
 </body>
 </html>
