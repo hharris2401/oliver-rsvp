@@ -244,9 +244,9 @@
       overflow:hidden;
       position:relative;
 
-      transform: translateY(12px) scale(.988);
+      transform: translateY(8px) scale(.992);
       opacity: 0;
-      transition: transform .10s ease, opacity .10s ease; /* EXTRA snappy */
+      transition: transform .05s ease, opacity .05s ease; /* IMMEDIATE-ish */
       pointer-events:none;
     }
     .card.show{
@@ -326,27 +326,6 @@
       cursor:pointer;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
-
-    .crawlHint{
-      position:absolute;
-      bottom:18px;
-      left:50%;
-      transform:translateX(-50%);
-      font-weight:900;
-      letter-spacing:.9px;
-      font-size:12px;
-      opacity:.88;
-      text-align:center;
-      padding: 0 14px;
-      max-width: 92vw;
-    }
-    .crawlHint span{
-      display:inline-block;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-    }
 
     .crawlWrap{
       position:absolute;
@@ -544,10 +523,10 @@
           Your mission: tap to ignite, hit the theme, and lock in your RSVP.
           Rumor has it there’s a hidden birthday message if you know where to tap…
         </p>
-        <p class="small center" style="margin-top:18px;">(Tap anywhere to begin)</p>
+        <!-- removed “Tap anywhere to begin” line per request -->
       </div>
     </div>
-    <div class="crawlHint"><span>Tap anywhere to start crawl + music 🎵</span></div>
+    <!-- removed bottom hint pill per request -->
   </div>
 
   <!-- Main UI -->
@@ -603,7 +582,9 @@
     // ================== AUDIO (theme + saber) ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = true;
+
+    // Per request: whole song, NO loop
+    theme.loop = false;
     theme.volume = 0.70;
 
     async function startThemeGuaranteed(restart=true){
@@ -808,9 +789,8 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== CHEWIE SOUND (FIXED: louder + resume context) ==================
+    // ================== CHEWIE (procedural) ==================
     let audioCtx = null;
-
     function getAudioCtx(){
       if (!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -821,30 +801,26 @@
       return audioCtx;
     }
 
-    // A louder, more “growly” procedural sound (still synthetic, no copyrighted audio).
     function wookieeGrowl(ms = 520){
       try{
         const ctx = getAudioCtx();
         const now = ctx.currentTime;
         const end = now + ms/1000;
 
-        // Noise buffer (adds throat texture)
         const bufferSize = Math.floor(ctx.sampleRate * (ms/1000));
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = noiseBuffer.getChannelData(0);
         for (let i=0;i<bufferSize;i++){
-          data[i] = (Math.random()*2 - 1) * 0.55; // stronger noise
+          data[i] = (Math.random()*2 - 1) * 0.55;
         }
         const noise = ctx.createBufferSource();
         noise.buffer = noiseBuffer;
 
-        // Oscillator (low fundamental)
         const osc = ctx.createOscillator();
         osc.type = "sawtooth";
         osc.frequency.setValueAtTime(115, now);
         osc.frequency.exponentialRampToValueAtTime(70, end);
 
-        // Filter to shape the growl
         const filter = ctx.createBiquadFilter();
         filter.type = "bandpass";
         filter.frequency.setValueAtTime(260, now);
@@ -855,13 +831,11 @@
         lowpass.frequency.setValueAtTime(900, now);
         lowpass.frequency.exponentialRampToValueAtTime(520, end);
 
-        // Gain envelope (LOUDER)
         const gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.55, now + 0.02);  // louder peak
+        gain.gain.exponentialRampToValueAtTime(0.55, now + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
-        // Mix
         const mix = ctx.createGain();
         mix.gain.setValueAtTime(0.9, now);
 
@@ -952,14 +926,14 @@
       }, 850);
     }
 
-    // ================== CRAWL FLOW (SNAPPY + MENU INSTANT) ==================
+    // ================== CRAWL FLOW (menu snaps on instantly after crawl) ==================
     let started = false;
 
     async function beginCrawl(){
       if (started) return;
       started = true;
 
-      // IMPORTANT: resume WebAudio inside the gesture so Chewie can play later
+      // Resume WebAudio inside gesture for Chewie later
       getAudioCtx();
 
       vibe(15);
@@ -971,17 +945,17 @@
       crawlScreen.classList.add("running");
 
       setTimeout(() => {
-        // ✅ Show menu immediately
+        // Show menu immediately after crawl ends
         mainCard.classList.add("show");
 
-        // ✅ Show mission briefing
+        // Mission briefing
         showMissionBrief();
 
         // Chewie accent on arrival
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
 
-        // Fade out crawl (does not block menu)
+        // Fade out crawl
         crawlScreen.classList.add("hide");
         setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
       }, CRAWL_MS);
@@ -997,18 +971,12 @@
     const pillLight = document.getElementById("pillLight");
     const pillDark  = document.getElementById("pillDark");
 
-    // NOTE: per your request, NO Light/Dark quotes are shown on button press.
-
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
-
-      // ensure WebAudio is available
       getAudioCtx();
 
-      // duel graphic replaces warp
       showDuel();
 
-      // Chewie accent (every time, so you definitely hear it)
       showChewieBubble("RRRAWWR! (Wookiee hype)");
       wookieeGrowl(620);
 
@@ -1023,11 +991,7 @@
     musicBtn.addEventListener("click", async () => {
       vibe(25);
       getAudioCtx();
-
-      // restart theme on tap
       await startThemeGuaranteed(true);
-
-      // subtle Chewie “DJ” tag
       showChewieBubble("Wookiee DJ says: TURN IT UP.");
       wookieeGrowl(420);
     });
@@ -1043,7 +1007,7 @@
       doRsvpWarp();
     });
 
-    // Pills: keep subtle haptic only (no quotes)
+    // Pills: haptic only
     pillLight.addEventListener("click", () => { vibe(12); });
     pillDark.addEventListener("click", () => { vibe(12); });
   </script>
