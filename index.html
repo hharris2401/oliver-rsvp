@@ -16,31 +16,6 @@
     }
     *{ box-sizing:border-box; }
 
-    /* =========================
-       THEME SYSTEM (RESTORED)
-       ========================= */
-    body{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --panelEdge: rgba(255,255,255,.18);
-      --panelBg: rgba(0,0,0,.55);
-      --vignette: rgba(0,0,0,.10);
-      --starOpacity: .78;
-      --holoOpacity: .22; /* subtle baseline */
-    }
-    body[data-theme="light"]{
-      --accent: var(--blue);
-      --accentGlow: rgba(0,170,255,.45);
-      --vignette: rgba(0,0,0,.08);
-      --starOpacity: .78;
-    }
-    body[data-theme="dark"]{
-      --accent: var(--red);
-      --accentGlow: rgba(255,60,60,.45);
-      --vignette: rgba(0,0,0,.22);
-      --starOpacity: .62;
-    }
-
     body{
       margin:0;
       font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -48,16 +23,6 @@
       background: radial-gradient(circle at 30% 10%, var(--bg1), var(--bg2) 60%, #000);
       min-height:100vh;
       overflow:hidden;
-    }
-
-    /* Theme-aware cinematic vignette */
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      background: radial-gradient(circle at 50% 30%, rgba(0,0,0,0), var(--vignette) 70%);
     }
 
     /* FX layers */
@@ -68,11 +33,11 @@
       height:100vh;
       pointer-events:none;
     }
-    #starfield{ z-index: 1; opacity: var(--starOpacity); transition: opacity .25s ease; }
+    #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* NEW: button particle layer (above UI, below toasts/overlays) */
+    /* button particle layer */
     #particles{
       position:fixed;
       inset:0;
@@ -82,7 +47,6 @@
       z-index: 9993;
     }
 
-    /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
@@ -115,9 +79,7 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* =========================
-       HOLO-TRANSMISSION FX (#4)
-       ========================= */
+    /* HOLO-TRANSMISSION FX */
     #holoFX{
       position:fixed;
       inset:0;
@@ -139,10 +101,7 @@
           rgba(0,0,0,0) 60%
         );
     }
-    /* baseline holo ON (subtle) */
-    body.holo-on #holoFX{ opacity: var(--holoOpacity); }
-    /* stronger holo during crawl */
-    body.holo-strong #holoFX{ opacity: .55; }
+    body.holo-on #holoFX{ opacity:.55; }
 
     body.holo-on{
       animation: holoFlicker 2.6s infinite;
@@ -152,8 +111,8 @@
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
 
-    body.holo-strong .stage,
-    body.holo-strong #crawlScreen{
+    body.holo-on .stage,
+    body.holo-on #crawlScreen{
       animation: holoJitter 1.4s infinite;
     }
     @keyframes holoJitter{
@@ -294,8 +253,8 @@
 
     .card{
       width:min(720px,100%);
-      border:1px solid var(--panelEdge);
-      background:var(--panelBg);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(0,0,0,.55);
       box-shadow:0 20px 60px rgba(0,0,0,.45);
       border-radius:18px;
       overflow:hidden;
@@ -319,7 +278,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* NEW #1: HOLOGRAM TITLE (main menu) */
+    /* hologram title */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -334,6 +293,7 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
+      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -381,9 +341,6 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
-    .title{
-      animation: titleFlicker 3.8s infinite;
-    }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
       48%     { filter: brightness(1.03) contrast(1.02); }
@@ -411,18 +368,11 @@
       background:rgba(255,255,255,.06);
       user-select:none;
       cursor:pointer;
-      transition: filter .12s ease, transform .08s ease, box-shadow .18s ease;
+      transition: filter .12s ease, transform .08s ease;
     }
     .pill:active{ transform: translateY(1px); filter: brightness(.96); }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
-
-    /* theme active styling */
-    .pill.active{
-      border-color: var(--accentGlow);
-      box-shadow: 0 0 18px var(--accentGlow);
-      background: rgba(255,255,255,.09);
-    }
 
     #retroToggle{ display:none; }
     body.legend-unlocked #retroToggle{ display:inline-flex; }
@@ -436,49 +386,173 @@
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
 
+    /* ==========================================================
+       ✅ NEW: POLISHED STARSHIP BUTTON SYSTEM
+       - glass + bevel + edge glow
+       - tap ripple from click point
+       - professional focus ring
+       ========================================================== */
     .btn{
       width:100%;
       border:none;
       cursor:pointer;
       padding:14px 16px;
-      border-radius:14px;
-      font-weight:900;
+      border-radius:16px;
+      font-weight:950;
       font-size:16px;
-      letter-spacing:.5px;
+      letter-spacing:.6px;
       user-select:none;
-      transform: translateY(0);
-      transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
       position: relative;
-    }
-    .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
-    .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
-    .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
-    .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
+      overflow:hidden;
 
+      /* base panel feel */
+      background: rgba(255,255,255,.08);
+      color: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+      -webkit-tap-highlight-color: transparent;
+
+      transform: translateY(0);
+      transition:
+        transform .10s ease,
+        filter .14s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+      box-shadow:
+        0 16px 48px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(0,0,0,.30);
+    }
+
+    /* crisp edge ring */
+    .btn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:16px;
+      pointer-events:none;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow:
+        inset 0 0 0 1px rgba(0,0,0,.22);
+      opacity: .95;
+    }
+
+    /* animated “energy edge” */
+    .btn::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:18px;
+      pointer-events:none;
+      opacity:0;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.18), rgba(0,0,0,0) 45%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.14), rgba(0,0,0,0) 55%),
+        linear-gradient(90deg,
+          rgba(0,0,0,0),
+          rgba(255,255,255,.14),
+          rgba(0,0,0,0)
+        );
+      mix-blend-mode: screen;
+      transform: translateX(-18%);
+      transition: opacity .18s ease, transform .36s ease;
+    }
+
+    .btn:active{ transform: translateY(1px); filter: brightness(0.98) contrast(1.02); }
+    .btn:focus-visible{
+      outline: none;
+      box-shadow:
+        0 16px 56px rgba(0,0,0,.40),
+        0 0 0 3px rgba(255,255,255,.10),
+        0 0 0 6px rgba(0,170,255,.18),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(0,0,0,.30);
+    }
+
+    /* hover (desktop only, harmless on mobile) */
+    @media (hover:hover){
+      .btn:hover{
+        filter: brightness(1.04);
+        box-shadow:
+          0 18px 60px rgba(0,0,0,.42),
+          inset 0 1px 0 rgba(255,255,255,.22),
+          inset 0 -1px 0 rgba(0,0,0,.28);
+      }
+      .btn:hover::after{
+        opacity:.55;
+        transform: translateX(10%);
+      }
+    }
+
+    /* color variants become premium “command buttons” */
+    .btn.gold{
+      color:#1a1200;
+      background:
+        radial-gradient(circle at 30% 10%, rgba(255,255,255,.35), rgba(0,0,0,0) 45%),
+        linear-gradient(180deg, rgba(255,231,166,.95), rgba(255,211,107,.95));
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.38),
+        0 0 28px rgba(255,211,107,.16),
+        inset 0 1px 0 rgba(255,255,255,.35),
+        inset 0 -1px 0 rgba(0,0,0,.18);
+    }
+    .btn.blue{
+      color:#00131a;
+      background:
+        radial-gradient(circle at 30% 10%, rgba(255,255,255,.32), rgba(0,0,0,0) 48%),
+        linear-gradient(180deg, rgba(58,208,255,.95), rgba(0,170,255,.95));
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.38),
+        0 0 30px rgba(0,170,255,.14),
+        inset 0 1px 0 rgba(255,255,255,.32),
+        inset 0 -1px 0 rgba(0,0,0,.18);
+    }
+    .btn.red{
+      color:#1a0000;
+      background:
+        radial-gradient(circle at 30% 10%, rgba(255,255,255,.28), rgba(0,0,0,0) 50%),
+        linear-gradient(180deg, rgba(255,123,123,.95), rgba(255,60,60,.95));
+      box-shadow:
+        0 18px 60px rgba(0,0,0,.38),
+        0 0 30px rgba(255,60,60,.12),
+        inset 0 1px 0 rgba(255,255,255,.30),
+        inset 0 -1px 0 rgba(0,0,0,.18);
+    }
+
+    /* tap ripple (JS sets --rx/--ry + adds .rippling) */
+    .btn .ripple{
+      position:absolute;
+      left:var(--rx,50%);
+      top:var(--ry,50%);
+      width: 14px;
+      height: 14px;
+      transform: translate(-50%,-50%) scale(0.3);
+      border-radius: 999px;
+      pointer-events:none;
+      opacity:0;
+      background: rgba(255,255,255,.55);
+      filter: blur(.2px);
+    }
+    .btn.rippling .ripple{
+      opacity:1;
+      animation: ripplePop .58s ease-out forwards;
+    }
+    @keyframes ripplePop{
+      0%   { transform: translate(-50%,-50%) scale(.25); opacity:.0; }
+      20%  { opacity:.55; }
+      100% { transform: translate(-50%,-50%) scale(18); opacity:0; }
+    }
+
+    /* Legend glow stays, just tighter and classier */
     body.legend .btn{
       box-shadow:
-        0 0 10px rgba(255,211,107,.35),
-        0 0 22px rgba(0,170,255,.25),
-        inset 0 0 8px rgba(255,255,255,.15);
+        0 18px 60px rgba(0,0,0,.42),
+        0 0 18px rgba(255,211,107,.18),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -1px 0 rgba(0,0,0,.22);
     }
-    body.legend .btn.gold{
-      box-shadow:
-        0 0 14px rgba(255,211,107,.55),
-        0 0 34px rgba(255,211,107,.35),
-        inset 0 0 10px rgba(255,255,255,.25);
-    }
-    body.legend .btn.blue{
-      box-shadow:
-        0 0 14px rgba(0,170,255,.55),
-        0 0 34px rgba(0,170,255,.35),
-        inset 0 0 10px rgba(255,255,255,.25);
-    }
-    body.legend .btn.red{
-      box-shadow:
-        0 0 14px rgba(255,60,60,.55),
-        0 0 34px rgba(255,60,60,.35),
-        inset 0 0 10px rgba(255,255,255,.25);
-    }
+    body.legend .btn.gold{ box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(255,211,107,.28), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,0,.18); }
+    body.legend .btn.blue{ box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(0,170,255,.24), inset 0 1px 0 rgba(255,255,255,.26), inset 0 -1px 0 rgba(0,0,0,.18); }
+    body.legend .btn.red { box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(255,60,60,.22), inset 0 1px 0 rgba(255,255,255,.24), inset 0 -1px 0 rgba(0,0,0,.18); }
 
     .fine{
       opacity:.75;
@@ -535,7 +609,6 @@
     #crawlScreen.running .crawl{
       animation: crawlMove var(--crawlms) linear forwards;
     }
-
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
@@ -636,7 +709,7 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* Retro mode overlay */
+    /* Retro overlay */
     #scanlines{
       position:fixed;
       inset:0;
@@ -677,32 +750,7 @@
         -1px 0 rgba(255,60,60,.12);
       letter-spacing: 1.2px;
     }
-    body.retro .btn{
-      border-radius: 10px;
-      outline: 1px solid rgba(255,255,255,.12);
-      outline-offset: -1px;
-    }
-    body.retro .btn:active{
-      filter: brightness(.92) contrast(1.02);
-    }
-    body.retro .btn.gold{
-      box-shadow:
-        0 0 0 1px rgba(255,211,107,.16),
-        0 0 18px rgba(255,211,107,.22),
-        inset 0 0 0 1px rgba(0,0,0,.22);
-    }
-    body.retro .btn.blue{
-      box-shadow:
-        0 0 0 1px rgba(0,170,255,.16),
-        0 0 18px rgba(0,170,255,.20),
-        inset 0 0 0 1px rgba(0,0,0,.22);
-    }
-    body.retro .btn.red{
-      box-shadow:
-        0 0 0 1px rgba(255,60,60,.16),
-        0 0 18px rgba(255,60,60,.20),
-        inset 0 0 0 1px rgba(0,0,0,.22);
-    }
+    body.retro .btn{ border-radius: 14px; }
   </style>
 </head>
 
@@ -715,16 +763,10 @@
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
-  <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
-
-  <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
 
-  <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
-
-  <!-- Yoda bubble -->
   <div id="yodaBubble" aria-hidden="true"></div>
 
   <!-- Dueling overlay -->
@@ -738,7 +780,6 @@
     </div>
   </div>
 
-  <!-- Chewie bubble -->
   <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
   <!-- Secret Easter Egg -->
@@ -759,65 +800,50 @@
         <p class="small">
           In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
         </p>
-
         <p class="small">
           The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
         </p>
-
         <p class="small">
           From the quiet shadows, Master Yoda watches… proud, he is.
         </p>
-
         <p class="small">
           Today, birthday mode has been activated.
         </p>
-
         <p class="small">
           From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
         </p>
-
         <p class="small">
           But before the party can begin, the arcade network must be fully powered.
         </p>
-
         <p class="small">
           Training droids have prepared three heroic challenges.
         </p>
-
         <p class="small">
           CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
         </p>
-
         <p class="small">
           CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
         </p>
-
         <p class="small">
           CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
         </p>
-
         <p class="small">
           Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
         </p>
-
         <p class="small">
           Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
         </p>
-
         <p class="small">
           Choose your path wisely, young player.
         </p>
-
         <p class="small center">
           The joysticks are ready.<br>
           The buttons are glowing.<br>
           The Force is fully charged.
         </p>
-
         <p class="small center" style="margin-top:10px;">
           And the quest for LEVEL 8…
         </p>
-
         <p class="small center">
           is about to begin.
         </p>
@@ -841,14 +867,14 @@
       </div>
 
       <div class="mid">
-        <button class="btn gold" id="igniteBtn">TAP TO IGNITE LIGHTSABER ⚔️</button>
+        <button class="btn gold" id="igniteBtn"><span class="ripple"></span>TAP TO IGNITE LIGHTSABER ⚔️</button>
 
         <div class="row">
-          <button class="btn blue" id="musicBtn">PLAY THEME MUSIC 🎵</button>
-          <button class="btn red" id="stopBtn">STOP MUSIC ⛔</button>
+          <button class="btn blue" id="musicBtn"><span class="ripple"></span>PLAY THEME MUSIC 🎵</button>
+          <button class="btn red" id="stopBtn"><span class="ripple"></span>STOP MUSIC ⛔</button>
         </div>
 
-        <button class="btn gold" id="rsvpBtn">CONTINUE TO RSVP 📋</button>
+        <button class="btn gold" id="rsvpBtn"><span class="ripple"></span>CONTINUE TO RSVP 📋</button>
       </div>
 
       <div class="fine">
@@ -864,18 +890,11 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    const CRAWL_MS = 150000;      // crawl animation length (2:30)
-    const MENU_REVEAL_MS = 95000; // menu appears at 1:35 (without killing crawl)
+    const CRAWL_MS = 150000;      // 2:30 crawl
+    const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
-
-    // Theme persistence
-    const THEME_KEY = "oliverTheme_v2";
-
-    // Legend & retro persistence
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-    const RETRO_KEY  = "oliverRetroMode_v1";
 
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
@@ -908,42 +927,12 @@
     const subtitleEl    = document.getElementById("subtitleEl");
     const retroToggle   = document.getElementById("retroToggle");
 
-    const pillLight     = document.getElementById("pillLight");
-    const pillDark      = document.getElementById("pillDark");
-
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
-    // ================== THEME SWITCHER (RESTORED) ==================
-    function applyTheme(t){
-      document.body.dataset.theme = t; // "light" or "dark"
-      localStorage.setItem(THEME_KEY, t);
-
-      pillLight.classList.toggle("active", t === "light");
-      pillDark.classList.toggle("active", t === "dark");
-    }
-
-    function initTheme(){
-      const saved = localStorage.getItem(THEME_KEY) || "light";
-      applyTheme(saved);
-    }
-    initTheme();
-
     // ================== HOLO FX CONTROLS ==================
-    function holoOnStrong(){
-      document.body.classList.add("holo-on");
-      document.body.classList.add("holo-strong");
-    }
-    function holoOnSubtle(){
-      document.body.classList.add("holo-on");
-      document.body.classList.remove("holo-strong");
-    }
-    function holoOff(){
-      document.body.classList.remove("holo-on");
-      document.body.classList.remove("holo-strong");
-    }
-    // keep subtle holo always (designer vibe)
-    holoOnSubtle();
+    function holoOn(){ document.body.classList.add("holo-on"); }
+    function holoOff(){ document.body.classList.remove("holo-on"); }
 
     // ================== HUD TOAST ==================
     function showHud(message, ms=1400){
@@ -970,6 +959,9 @@
     }
 
     // ================== RETRO MODE (Legend-only) ==================
+    const RETRO_KEY = "oliverRetroMode_v1";
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -1178,7 +1170,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== BUTTON PARTICLE BURSTS ==================
+    // ================== BUTTON PARTICLES + PALETTES ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1212,13 +1204,10 @@
         });
       }
     }
-
     function burstAtElement(el, palette, power=1){
       if (!el) return;
       const r = el.getBoundingClientRect();
-      const x = r.left + r.width/2;
-      const y = r.top + r.height/2;
-      burstAt(x, y, palette, power);
+      burstAt(r.left + r.width/2, r.top + r.height/2, palette, power);
     }
 
     let lastP = performance.now();
@@ -1231,7 +1220,6 @@
       for (let i=particles.length-1;i>=0;i--){
         const p = particles[i];
         p.age += dt;
-
         p.x += p.vx * (dt/16);
         p.y += p.vy * (dt/16);
         p.vy += p.g * (dt/16);
@@ -1259,6 +1247,28 @@
     const PAL_GOLD = ["rgba(255,211,107,.95)","rgba(255,245,210,.85)","rgba(255,255,255,.75)"];
     const PAL_BLUE = ["rgba(0,170,255,.95)","rgba(200,245,255,.85)","rgba(255,255,255,.70)"];
     const PAL_RED  = ["rgba(255,60,60,.95)","rgba(255,170,170,.85)","rgba(255,255,255,.70)"];
+
+    // ================== NEW: BUTTON RIPPLE SYSTEM ==================
+    function addRippleFX(el){
+      if (!el) return;
+      // make sure ripple span exists (we already added in HTML)
+      el.addEventListener("pointerdown", (ev) => {
+        const r = el.getBoundingClientRect();
+        const x = (ev.clientX || (r.left + r.width/2)) - r.left;
+        const y = (ev.clientY || (r.top + r.height/2)) - r.top;
+        el.style.setProperty("--rx", `${x}px`);
+        el.style.setProperty("--ry", `${y}px`);
+        el.classList.remove("rippling");
+        // force reflow for restart
+        void el.offsetWidth;
+        el.classList.add("rippling");
+        clearTimeout(el._ripT);
+        el._ripT = setTimeout(()=> el.classList.remove("rippling"), 650);
+      }, { passive:true });
+    }
+
+    // Apply ripple fx to all main buttons
+    document.querySelectorAll(".btn").forEach(addRippleFX);
 
     // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
@@ -1366,7 +1376,6 @@
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
       vibe([20,40,20]);
-
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
 
@@ -1389,7 +1398,7 @@
       }, 850);
     }
 
-    // ================== KONAMI (Dark=B, Light=A via LONG PRESS) ==================
+    // ================== KONAMI (Dark = B, Light = A) ==================
     const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
     let inputBuffer = [];
     let konamiStartAt = 0;
@@ -1398,7 +1407,6 @@
       inputBuffer = [];
       konamiStartAt = 0;
     }
-
     function pushKonami(token){
       const now = Date.now();
 
@@ -1424,14 +1432,16 @@
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
-        document.body.classList.add("legend","legend-unlocked");
+        document.body.classList.add("legend");
+        document.body.classList.add("legend-unlocked");
         applyRetroOnLoad();
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
 
-      document.body.classList.add("legend-unlocked","legend");
+      document.body.classList.add("legend-unlocked");
+      document.body.classList.add("legend");
 
       vibe([30,40,30,60,30]);
       fireConfetti(2400);
@@ -1439,26 +1449,27 @@
       wookieeGrowl(620);
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
+
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
       setTimeout(()=> document.body.classList.remove("legend-pulse"), 1200);
 
       const title = document.getElementById("secretTitle");
-      if (title){
+      if (title && !title.dataset.legendApplied){
         title.dataset.legendApplied = "1";
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
-
       applyRetroOnLoad();
     }
 
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
-        document.body.classList.add("legend-unlocked","legend");
+        document.body.classList.add("legend-unlocked");
+        document.body.classList.add("legend");
         const title = document.getElementById("secretTitle");
         if (title){
           title.dataset.legendApplied = "1";
@@ -1468,7 +1479,6 @@
       applyRetroOnLoad();
     })();
 
-    // Keyboard Konami
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1479,7 +1489,6 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
-    // Swipe Konami (mobile)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
@@ -1508,35 +1517,8 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // LONG PRESS helper for A/B on pills
-    function addLongPress(el, ms, onLong){
-      let timer = null;
-      let longFired = false;
-
-      function start(){
-        longFired = false;
-        clearTimeout(timer);
-        timer = setTimeout(()=>{
-          longFired = true;
-          onLong();
-        }, ms);
-      }
-      function cancel(){
-        clearTimeout(timer);
-      }
-
-      el.addEventListener("pointerdown", start);
-      el.addEventListener("pointerup", cancel);
-      el.addEventListener("pointercancel", cancel);
-      el.addEventListener("pointerleave", cancel);
-
-      // return whether last press was long (used to suppress tap)
-      return () => longFired;
-    }
-
-    // ================== CRAWL FLOW (menu pops at 95s, crawl ends at 150s) ==================
+    // ================== CRAWL FLOW (Menu pops at 95s) ==================
     let started = false;
-    let menuShown = false;
 
     async function beginCrawl(){
       if (started) return;
@@ -1544,34 +1526,24 @@
 
       getAudioCtx();
 
-      // Strong holo during crawl
-      holoOnStrong();
-
+      holoOn();
       vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
 
-      // show menu at MENU_REVEAL_MS (without removing crawl)
       setTimeout(() => {
-        if (menuShown) return;
-        menuShown = true;
-
         mainCard.classList.add("show");
         burstAtElement(mainCard, PAL_BLUE, 1.4);
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // Subtle holo continues during menu
-        holoOnSubtle();
-      }, MENU_REVEAL_MS);
+        holoOff();
 
-      // finally remove crawl at the actual crawl end
-      setTimeout(() => {
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 160);
-      }, CRAWL_MS);
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
+      }, MENU_REVEAL_MS);
     }
 
     crawlScreen.addEventListener("click", beginCrawl, { passive:true });
@@ -1581,6 +1553,8 @@
     const musicBtn  = document.getElementById("musicBtn");
     const stopBtn   = document.getElementById("stopBtn");
     const rsvpBtn   = document.getElementById("rsvpBtn");
+    const pillLight = document.getElementById("pillLight");
+    const pillDark  = document.getElementById("pillDark");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
@@ -1627,40 +1601,9 @@
       doRsvpWarp();
     });
 
-    // LIGHT/DARK pills:
-    // - TAP = theme switch (RESTORED)
-    // - LONG PRESS = Konami A/B (PERSISTENT UNLOCK)
-    const wasLongLight = addLongPress(pillLight, 420, () => {
-      vibe([10,20,10]);
-      pushKonami("A");
-      burstAtElement(pillLight, PAL_BLUE, 0.9);
-      showHud(`INPUT: <b>A</b>`, 650);
-    });
-
-    const wasLongDark = addLongPress(pillDark, 420, () => {
-      vibe([10,20,10]);
-      pushKonami("B");
-      burstAtElement(pillDark, PAL_RED, 0.9);
-      showHud(`INPUT: <b>B</b>`, 650);
-    });
-
-    pillLight.addEventListener("click", () => {
-      if (wasLongLight()) return; // long-press already used
-      vibe(12);
-      applyTheme("light");
-      burstAtElement(pillLight, PAL_BLUE, 0.75);
-      showYoda("Light side… chosen, you have.");
-      yodaSubtitle("Light side… active, it is.", 1900);
-    });
-
-    pillDark.addEventListener("click", () => {
-      if (wasLongDark()) return;
-      vibe(12);
-      applyTheme("dark");
-      burstAtElement(pillDark, PAL_RED, 0.75);
-      showYoda("Dark side… tempting, it is.");
-      yodaSubtitle("Dark side… active, it is.", 1900);
-    });
+    // Pills: Konami A/B inputs
+    pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
+    pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
