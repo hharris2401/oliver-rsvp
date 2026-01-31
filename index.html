@@ -26,7 +26,7 @@
     }
 
     /* FX layers */
-    #starfield, #hyperspace, #confetti{
+    #starfield, #weather, #hyperspace, #confetti{
       position:fixed;
       inset:0;
       width:100vw;
@@ -34,10 +34,12 @@
       pointer-events:none;
     }
     #starfield{ z-index: 1; opacity:.78; transition: opacity .25s ease; }
+    /* ✅ GALACTIC WEATHER layer */
+    #weather{ z-index: 1; opacity: .75; mix-blend-mode: screen; }
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* Button particle layer (above UI, below toasts/overlays) */
+    /* Button particle layer (above UI, below overlays/toasts) */
     #particles{
       position:fixed;
       inset:0;
@@ -47,7 +49,6 @@
       z-index: 9993;
     }
 
-    /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
@@ -80,9 +81,7 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* =========================
-       HOLO-TRANSMISSION FX
-       ========================= */
+    /* HOLO overlay */
     #holoFX{
       position:fixed;
       inset:0;
@@ -105,17 +104,13 @@
         );
     }
     body.holo-on #holoFX{ opacity:.55; }
-
     body.holo-on{ animation: holoFlicker 2.6s infinite; }
     @keyframes holoFlicker{
       0%,100%{ filter: brightness(1) contrast(1); }
       50%{ filter: brightness(1.05) contrast(1.03); }
     }
-
     body.holo-on .stage,
-    body.holo-on #crawlScreen{
-      animation: holoJitter 1.4s infinite;
-    }
+    body.holo-on #crawlScreen{ animation: holoJitter 1.4s infinite; }
     @keyframes holoJitter{
       0%, 96%, 100% { transform: translate(0,0); }
       97% { transform: translate(1px,0); }
@@ -260,7 +255,6 @@
       border-radius:18px;
       overflow:hidden;
       position:relative;
-
       transform: translateY(12px) scale(.988);
       opacity: 0;
       transition: transform .10s ease, opacity .10s ease;
@@ -279,7 +273,6 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* Hologram title */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -294,6 +287,7 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
+      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -341,7 +335,6 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
-    .title{ animation: titleFlicker 3.8s infinite; }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
       48%     { filter: brightness(1.03) contrast(1.02); }
@@ -349,13 +342,7 @@
       52%     { filter: brightness(1.04) contrast(1.03); }
     }
 
-    .subtitle{
-      opacity:.85;
-      margin-top:6px;
-      font-size:clamp(12px,2.6vw,16px);
-      letter-spacing:1px;
-      min-height: 1.4em;
-    }
+    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
     .subchewie{
       margin-top:10px;
       font-weight:900;
@@ -393,97 +380,50 @@
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
 
-    /* ==========================================================
-       REPLACED BUTTONS: "Glass Panel" + Glow (polished)
-       ========================================================== */
+    /* Buttons (glass + glow) */
     .btn{
       width:100%;
       border:none;
       cursor:pointer;
       padding:14px 16px;
-      border-radius:16px;
-      font-weight:950;
+      border-radius:14px;
+      font-weight:900;
       font-size:16px;
-      letter-spacing:.6px;
+      letter-spacing:.5px;
       user-select:none;
-      position:relative;
-      overflow:hidden;
-      -webkit-tap-highlight-color: transparent;
-
-      /* glass base */
-      background: rgba(255,255,255,.085);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-
-      border: 1px solid rgba(255,255,255,.18);
-
-      /* depth */
-      box-shadow:
-        0 18px 55px rgba(0,0,0,.42),
-        inset 0 1px 0 rgba(255,255,255,.22),
-        inset 0 -10px 20px rgba(0,0,0,.22);
-
-      color: rgba(255,255,255,.96);
-
       transform: translateY(0);
-      transition: transform .10s ease, filter .14s ease, box-shadow .18s ease;
+      transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
+      position: relative;
     }
+    .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
 
-    /* highlight film */
-    .btn::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius:18px;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255,255,255,.24), rgba(0,0,0,0) 42%),
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(0,0,0,0) 36%);
-      opacity:.95;
-    }
+    .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
+    .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
+    .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
 
-    /* glow edge + neon aura */
-    .btn::after{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      border-radius:18px;
-      pointer-events:none;
+    body.legend .btn{
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.10),
-        0 0 22px var(--glow, rgba(255,211,107,.22));
-      opacity:.85;
+        0 0 10px rgba(255,211,107,.35),
+        0 0 22px rgba(0,170,255,.25),
+        inset 0 0 8px rgba(255,255,255,.15);
     }
-
-    .btn:active{
-      transform: translateY(1px);
-      filter: brightness(.98);
+    body.legend .btn.gold{
       box-shadow:
-        0 12px 40px rgba(0,0,0,.44),
-        inset 0 1px 0 rgba(255,255,255,.18),
-        inset 0 -12px 26px rgba(0,0,0,.26);
+        0 0 14px rgba(255,211,107,.55),
+        0 0 34px rgba(255,211,107,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
     }
-
-    @media (hover:hover){
-      .btn:hover{
-        filter: brightness(1.03);
-        box-shadow:
-          0 20px 65px rgba(0,0,0,.45),
-          inset 0 1px 0 rgba(255,255,255,.24),
-          inset 0 -10px 22px rgba(0,0,0,.22);
-      }
-    }
-
-    /* color identities (kept subtle, premium) */
-    .btn.gold{ --glow: rgba(255,211,107,.30); color: rgba(255,245,210,.98); }
-    .btn.blue{ --glow: rgba(0,170,255,.28);   color: rgba(210,248,255,.98); }
-    .btn.red { --glow: rgba(255,60,60,.22);   color: rgba(255,220,220,.98); }
-
-    /* in Legend mode, glow is a touch stronger */
-    body.legend .btn::after{
+    body.legend .btn.blue{
       box-shadow:
-        0 0 0 1px rgba(255,255,255,.12),
-        0 0 30px var(--glow, rgba(255,211,107,.30));
+        0 0 14px rgba(0,170,255,.55),
+        0 0 34px rgba(0,170,255,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+    body.legend .btn.red{
+      box-shadow:
+        0 0 14px rgba(255,60,60,.55),
+        0 0 34px rgba(255,60,60,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
     }
 
     .fine{
@@ -642,7 +582,7 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* Retro mode overlay */
+    /* Retro scanlines overlay */
     #scanlines{
       position:fixed;
       inset:0;
@@ -684,7 +624,7 @@
       letter-spacing: 1.2px;
     }
     body.retro .btn{
-      border-radius: 14px;
+      border-radius: 10px;
       outline: 1px solid rgba(255,255,255,.12);
       outline-offset: -1px;
     }
@@ -697,13 +637,14 @@
 <body>
   <!-- FX -->
   <canvas id="starfield"></canvas>
+  <canvas id="weather"></canvas><!-- ✅ NEW -->
   <canvas id="hyperspace"></canvas>
   <canvas id="particles"></canvas>
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
-  <!-- HOLO-TRANSMISSION overlay -->
+  <!-- HOLO overlay -->
   <div id="holoFX" aria-hidden="true"></div>
 
   <!-- Retro scanlines overlay -->
@@ -858,6 +799,10 @@
     const KONAMI_WINDOW_MS = 8000;
     const SWIPE_THRESHOLD_PX = 45;
 
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+    const RETRO_KEY  = "oliverRetroMode_v1";
+
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
@@ -892,7 +837,7 @@
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
-    // ================== HOLO FX CONTROLS ==================
+    // ================== HOLO FX ==================
     function holoOn(){ document.body.classList.add("holo-on"); }
     function holoOff(){ document.body.classList.remove("holo-on"); }
 
@@ -904,7 +849,7 @@
       showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
     }
 
-    // ================== YODA ELEMENTS ==================
+    // ================== YODA ==================
     function showYoda(text, ms=1600){
       yodaBubble.innerHTML = text;
       yodaBubble.classList.add("show");
@@ -920,33 +865,7 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
-    // ================== KONAMI (Dark = B, Light = A) ==================
-    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-    let inputBuffer = [];
-    let konamiStartAt = 0;
-
-    function resetKonami(){ inputBuffer = []; konamiStartAt = 0; }
-
-    function pushKonami(token){
-      const now = Date.now();
-      if (inputBuffer.length === 0) konamiStartAt = now;
-      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
-        resetKonami();
-        konamiStartAt = now;
-      }
-      inputBuffer.push(token);
-      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
-
-      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
-      if (ok){
-        resetKonami();
-        unlockLegendMode();
-      }
-    }
-
     // ================== RETRO MODE (Legend-only) ==================
-    const RETRO_KEY = "oliverRetroMode_v1";
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -1025,6 +944,152 @@
       requestAnimationFrame(starfieldLoop);
     }
     requestAnimationFrame(starfieldLoop);
+
+    // ================== ✅ GALACTIC WEATHER (NEW) ==================
+    const wCanvas = document.getElementById("weather");
+    const wCtx = wCanvas.getContext("2d", { alpha:true });
+
+    function wResize(){
+      const dpr = Math.max(1, window.devicePixelRatio || 1);
+      wCanvas.width = Math.floor(window.innerWidth * dpr);
+      wCanvas.height = Math.floor(window.innerHeight * dpr);
+      wCanvas.style.width = window.innerWidth + "px";
+      wCanvas.style.height = window.innerHeight + "px";
+      wCtx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    wResize();
+    window.addEventListener("resize", wResize);
+
+    function rand(a,b){ return a + Math.random()*(b-a); }
+
+    function startGalacticWeather(){
+      // Respect reduced motion
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      // One “forecast” per load
+      const roll = Math.random();
+      const mode = roll < 0.45 ? "meteors" : (roll < 0.78 ? "nebula" : "debris");
+      const start = performance.now();
+      const duration = mode === "nebula" ? rand(14000, 19000) : rand(9000, 15000);
+
+      const meteors = Array.from({length: Math.floor(rand(4,7))}, () => ({
+        x: rand(-200, window.innerWidth + 200),
+        y: rand(0, window.innerHeight * 0.55),
+        vx: rand(9, 14),
+        vy: rand(3.5, 6.5),
+        len: rand(120, 240),
+        w: rand(1.1, 2.2),
+        a: rand(0.35, 0.7)
+      }));
+
+      const puffs = Array.from({length: Math.floor(rand(3,5))}, () => ({
+        x: rand(window.innerWidth*0.15, window.innerWidth*0.85),
+        y: rand(window.innerHeight*0.12, window.innerHeight*0.55),
+        r: rand(160, 340),
+        hue: Math.random() < 0.5 ? "0,170,255" : "255,211,107",
+        driftX: rand(-0.08, 0.08),
+        driftY: rand(-0.04, 0.06),
+        phase: rand(0, Math.PI*2),
+        amp: rand(0.10, 0.18)
+      }));
+
+      const debris = Array.from({length: Math.floor(rand(18,28))}, () => ({
+        x: rand(0, window.innerWidth),
+        y: rand(0, window.innerHeight),
+        vx: rand(-0.22, 0.22),
+        vy: rand(0.08, 0.28),
+        r: rand(0.7, 1.9),
+        a: rand(0.10, 0.28),
+        tw: rand(0.002, 0.01)
+      }));
+
+      function frame(t){
+        const p = Math.min(1, (t - start) / duration);
+        const fade = p < 0.15 ? (p/0.15) : (p > 0.85 ? (1 - (p-0.85)/0.15) : 1);
+
+        wCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+
+        if (mode === "meteors"){
+          wCtx.globalAlpha = 1 * fade;
+          for (const m of meteors){
+            const local = Math.max(0, (t - start - rand(0,1200)));
+            const tt = local / 16;
+
+            const x = m.x + m.vx * tt;
+            const y = m.y + m.vy * tt;
+
+            if (x > window.innerWidth + 260 || y > window.innerHeight + 260){
+              m.x = rand(-300, -120);
+              m.y = rand(0, window.innerHeight*0.55);
+            }
+
+            const dx = -m.len;
+            const dy = -m.len * 0.38;
+
+            const grad = wCtx.createLinearGradient(x+dx, y+dy, x, y);
+            grad.addColorStop(0, `rgba(255,255,255,0)`);
+            grad.addColorStop(0.35, `rgba(255,255,255,${0.35*m.a})`);
+            grad.addColorStop(1, `rgba(255,255,255,${0.95*m.a})`);
+
+            wCtx.strokeStyle = grad;
+            wCtx.lineWidth = m.w;
+            wCtx.lineCap = "round";
+            wCtx.beginPath();
+            wCtx.moveTo(x+dx, y+dy);
+            wCtx.lineTo(x, y);
+            wCtx.stroke();
+          }
+          wCtx.globalAlpha = 1;
+        }
+
+        if (mode === "nebula"){
+          for (const n of puffs){
+            n.x += n.driftX;
+            n.y += n.driftY;
+
+            const pulse = 0.55 + 0.45*Math.sin((t*0.0008) + n.phase);
+            const a = (n.amp * pulse) * fade;
+
+            const g = wCtx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            g.addColorStop(0, `rgba(${n.hue},${0.55*a})`);
+            g.addColorStop(0.35, `rgba(${n.hue},${0.22*a})`);
+            g.addColorStop(1, `rgba(${n.hue},0)`);
+
+            wCtx.fillStyle = g;
+            wCtx.beginPath();
+            wCtx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+            wCtx.fill();
+          }
+        }
+
+        if (mode === "debris"){
+          wCtx.fillStyle = "#fff";
+          for (const d of debris){
+            d.x += d.vx;
+            d.y += d.vy;
+
+            if (d.y > window.innerHeight + 4){ d.y = -4; d.x = rand(0, window.innerWidth); }
+            if (d.x < -4) d.x = window.innerWidth + 4;
+            if (d.x > window.innerWidth + 4) d.x = -4;
+
+            const tw = Math.sin(t * d.tw) * 0.08;
+            wCtx.globalAlpha = Math.max(0, (d.a + tw) * fade);
+            wCtx.beginPath();
+            wCtx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+            wCtx.fill();
+          }
+          wCtx.globalAlpha = 1;
+        }
+
+        if (p < 1) requestAnimationFrame(frame);
+        else wCtx.clearRect(0,0,window.innerWidth, window.innerHeight);
+      }
+
+      requestAnimationFrame(frame);
+    }
+
+    // Run once per load (safe + independent)
+    startGalacticWeather();
 
     // ================== HYPERSPACE BURST (RSVP) ==================
     const fxCanvas = document.getElementById("hyperspace");
@@ -1359,10 +1424,39 @@
 
       hyperspaceBurst();
 
-      setTimeout(()=>{ window.location.href = RSVP_FORM; }, 850);
+      setTimeout(()=>{
+        window.location.href = RSVP_FORM;
+      }, 850);
     }
 
-    // ================== LEGEND UNLOCK ==================
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){
+      inputBuffer = [];
+      konamiStartAt = 0;
+    }
+
+    function pushKonami(token){
+      const now = Date.now();
+
+      if (inputBuffer.length === 0) konamiStartAt = now;
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
+
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
     function unlockLegendMode(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
@@ -1376,6 +1470,7 @@
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
+
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1398,6 +1493,7 @@
 
       burstAtElement(mainCard, PAL_GOLD, 1.7);
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+
       applyRetroOnLoad();
     }
 
@@ -1414,7 +1510,6 @@
       applyRetroOnLoad();
     })();
 
-    // Keyboard Konami
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1425,7 +1520,6 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
-    // Touch swipes (U/D/L/R)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
@@ -1475,6 +1569,7 @@
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
+
         holoOff();
 
         crawlScreen.classList.add("hide");
@@ -1537,10 +1632,11 @@
       doRsvpWarp();
     });
 
-    // Pills are A/B inputs for Konami
+    // Pills act as A/B for Konami (Dark=B, Light=A)
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
+    // Retro toggle (Legend-only)
     retroToggle.addEventListener("click", () => {
       const legend = localStorage.getItem(LEGEND_KEY) === "1";
       if (!legend){
@@ -1549,7 +1645,8 @@
         return;
       }
       burstAtElement(retroToggle, PAL_GOLD, 0.9);
-      setRetro(!document.body.classList.contains("retro"));
+      const on = !document.body.classList.contains("retro");
+      setRetro(on);
     });
   </script>
 </body>
