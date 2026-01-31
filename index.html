@@ -37,7 +37,7 @@
     #hyperspace{ z-index: 2; }
     #confetti{ z-index: 9998; }
 
-    /* button particle layer */
+    /* Button particle layer (above UI, below toasts/overlays) */
     #particles{
       position:fixed;
       inset:0;
@@ -47,6 +47,7 @@
       z-index: 9993;
     }
 
+    /* Legend pulse brightens starfield briefly */
     body.legend-pulse #starfield{ opacity: 1; }
 
     #warpOverlay{
@@ -79,7 +80,9 @@
     }
     #warpCountdown.show{ opacity:1; }
 
-    /* HOLO-TRANSMISSION FX */
+    /* =========================
+       HOLO-TRANSMISSION FX
+       ========================= */
     #holoFX{
       position:fixed;
       inset:0;
@@ -103,9 +106,7 @@
     }
     body.holo-on #holoFX{ opacity:.55; }
 
-    body.holo-on{
-      animation: holoFlicker 2.6s infinite;
-    }
+    body.holo-on{ animation: holoFlicker 2.6s infinite; }
     @keyframes holoFlicker{
       0%,100%{ filter: brightness(1) contrast(1); }
       50%{ filter: brightness(1.05) contrast(1.03); }
@@ -278,7 +279,7 @@
 
     .top{ padding:26px 22px 18px; text-align:center; }
 
-    /* hologram title */
+    /* Hologram title */
     .title{
       font-weight:900;
       letter-spacing:3px;
@@ -293,7 +294,6 @@
       box-shadow:
         inset 0 0 0 1px rgba(255,255,255,.06),
         0 18px 60px rgba(0,0,0,.12);
-      animation: titleFlicker 3.8s infinite;
     }
     .title::before{
       content:"";
@@ -341,6 +341,7 @@
       24%  { left:110%; opacity:0; }
       100% { left:110%; opacity:0; }
     }
+    .title{ animation: titleFlicker 3.8s infinite; }
     @keyframes titleFlicker{
       0%,100% { filter: brightness(1) contrast(1); }
       48%     { filter: brightness(1.03) contrast(1.02); }
@@ -348,7 +349,13 @@
       52%     { filter: brightness(1.04) contrast(1.03); }
     }
 
-    .subtitle{ opacity:.85; margin-top:6px; font-size:clamp(12px,2.6vw,16px); letter-spacing:1px; min-height: 1.4em; }
+    .subtitle{
+      opacity:.85;
+      margin-top:6px;
+      font-size:clamp(12px,2.6vw,16px);
+      letter-spacing:1px;
+      min-height: 1.4em;
+    }
     .subchewie{
       margin-top:10px;
       font-weight:900;
@@ -387,10 +394,7 @@
     @media (max-width:520px){ .row{ grid-template-columns:1fr; } }
 
     /* ==========================================================
-       ✅ NEW: POLISHED STARSHIP BUTTON SYSTEM
-       - glass + bevel + edge glow
-       - tap ripple from click point
-       - professional focus ring
+       REPLACED BUTTONS: "Glass Panel" + Glow (polished)
        ========================================================== */
     .btn{
       width:100%;
@@ -402,157 +406,85 @@
       font-size:16px;
       letter-spacing:.6px;
       user-select:none;
-      position: relative;
+      position:relative;
       overflow:hidden;
-
-      /* base panel feel */
-      background: rgba(255,255,255,.08);
-      color: rgba(255,255,255,.96);
-      backdrop-filter: blur(10px);
       -webkit-tap-highlight-color: transparent;
 
+      /* glass base */
+      background: rgba(255,255,255,.085);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      border: 1px solid rgba(255,255,255,.18);
+
+      /* depth */
+      box-shadow:
+        0 18px 55px rgba(0,0,0,.42),
+        inset 0 1px 0 rgba(255,255,255,.22),
+        inset 0 -10px 20px rgba(0,0,0,.22);
+
+      color: rgba(255,255,255,.96);
+
       transform: translateY(0);
-      transition:
-        transform .10s ease,
-        filter .14s ease,
-        box-shadow .18s ease,
-        background .18s ease;
-      box-shadow:
-        0 16px 48px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.18),
-        inset 0 -1px 0 rgba(0,0,0,.30);
+      transition: transform .10s ease, filter .14s ease, box-shadow .18s ease;
     }
 
-    /* crisp edge ring */
+    /* highlight film */
     .btn::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      border-radius:16px;
-      pointer-events:none;
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow:
-        inset 0 0 0 1px rgba(0,0,0,.22);
-      opacity: .95;
-    }
-
-    /* animated “energy edge” */
-    .btn::after{
       content:"";
       position:absolute;
       inset:-2px;
       border-radius:18px;
       pointer-events:none;
-      opacity:0;
       background:
-        radial-gradient(circle at 20% 10%, rgba(255,255,255,.18), rgba(0,0,0,0) 45%),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,.14), rgba(0,0,0,0) 55%),
-        linear-gradient(90deg,
-          rgba(0,0,0,0),
-          rgba(255,255,255,.14),
-          rgba(0,0,0,0)
-        );
-      mix-blend-mode: screen;
-      transform: translateX(-18%);
-      transition: opacity .18s ease, transform .36s ease;
+        radial-gradient(circle at 18% 18%, rgba(255,255,255,.24), rgba(0,0,0,0) 42%),
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(0,0,0,0) 36%);
+      opacity:.95;
     }
 
-    .btn:active{ transform: translateY(1px); filter: brightness(0.98) contrast(1.02); }
-    .btn:focus-visible{
-      outline: none;
+    /* glow edge + neon aura */
+    .btn::after{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:18px;
+      pointer-events:none;
       box-shadow:
-        0 16px 56px rgba(0,0,0,.40),
-        0 0 0 3px rgba(255,255,255,.10),
-        0 0 0 6px rgba(0,170,255,.18),
-        inset 0 1px 0 rgba(255,255,255,.18),
-        inset 0 -1px 0 rgba(0,0,0,.30);
+        0 0 0 1px rgba(255,255,255,.10),
+        0 0 22px var(--glow, rgba(255,211,107,.22));
+      opacity:.85;
     }
 
-    /* hover (desktop only, harmless on mobile) */
+    .btn:active{
+      transform: translateY(1px);
+      filter: brightness(.98);
+      box-shadow:
+        0 12px 40px rgba(0,0,0,.44),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -12px 26px rgba(0,0,0,.26);
+    }
+
     @media (hover:hover){
       .btn:hover{
-        filter: brightness(1.04);
+        filter: brightness(1.03);
         box-shadow:
-          0 18px 60px rgba(0,0,0,.42),
-          inset 0 1px 0 rgba(255,255,255,.22),
-          inset 0 -1px 0 rgba(0,0,0,.28);
-      }
-      .btn:hover::after{
-        opacity:.55;
-        transform: translateX(10%);
+          0 20px 65px rgba(0,0,0,.45),
+          inset 0 1px 0 rgba(255,255,255,.24),
+          inset 0 -10px 22px rgba(0,0,0,.22);
       }
     }
 
-    /* color variants become premium “command buttons” */
-    .btn.gold{
-      color:#1a1200;
-      background:
-        radial-gradient(circle at 30% 10%, rgba(255,255,255,.35), rgba(0,0,0,0) 45%),
-        linear-gradient(180deg, rgba(255,231,166,.95), rgba(255,211,107,.95));
-      box-shadow:
-        0 18px 60px rgba(0,0,0,.38),
-        0 0 28px rgba(255,211,107,.16),
-        inset 0 1px 0 rgba(255,255,255,.35),
-        inset 0 -1px 0 rgba(0,0,0,.18);
-    }
-    .btn.blue{
-      color:#00131a;
-      background:
-        radial-gradient(circle at 30% 10%, rgba(255,255,255,.32), rgba(0,0,0,0) 48%),
-        linear-gradient(180deg, rgba(58,208,255,.95), rgba(0,170,255,.95));
-      box-shadow:
-        0 18px 60px rgba(0,0,0,.38),
-        0 0 30px rgba(0,170,255,.14),
-        inset 0 1px 0 rgba(255,255,255,.32),
-        inset 0 -1px 0 rgba(0,0,0,.18);
-    }
-    .btn.red{
-      color:#1a0000;
-      background:
-        radial-gradient(circle at 30% 10%, rgba(255,255,255,.28), rgba(0,0,0,0) 50%),
-        linear-gradient(180deg, rgba(255,123,123,.95), rgba(255,60,60,.95));
-      box-shadow:
-        0 18px 60px rgba(0,0,0,.38),
-        0 0 30px rgba(255,60,60,.12),
-        inset 0 1px 0 rgba(255,255,255,.30),
-        inset 0 -1px 0 rgba(0,0,0,.18);
-    }
+    /* color identities (kept subtle, premium) */
+    .btn.gold{ --glow: rgba(255,211,107,.30); color: rgba(255,245,210,.98); }
+    .btn.blue{ --glow: rgba(0,170,255,.28);   color: rgba(210,248,255,.98); }
+    .btn.red { --glow: rgba(255,60,60,.22);   color: rgba(255,220,220,.98); }
 
-    /* tap ripple (JS sets --rx/--ry + adds .rippling) */
-    .btn .ripple{
-      position:absolute;
-      left:var(--rx,50%);
-      top:var(--ry,50%);
-      width: 14px;
-      height: 14px;
-      transform: translate(-50%,-50%) scale(0.3);
-      border-radius: 999px;
-      pointer-events:none;
-      opacity:0;
-      background: rgba(255,255,255,.55);
-      filter: blur(.2px);
-    }
-    .btn.rippling .ripple{
-      opacity:1;
-      animation: ripplePop .58s ease-out forwards;
-    }
-    @keyframes ripplePop{
-      0%   { transform: translate(-50%,-50%) scale(.25); opacity:.0; }
-      20%  { opacity:.55; }
-      100% { transform: translate(-50%,-50%) scale(18); opacity:0; }
-    }
-
-    /* Legend glow stays, just tighter and classier */
-    body.legend .btn{
+    /* in Legend mode, glow is a touch stronger */
+    body.legend .btn::after{
       box-shadow:
-        0 18px 60px rgba(0,0,0,.42),
-        0 0 18px rgba(255,211,107,.18),
-        inset 0 1px 0 rgba(255,255,255,.22),
-        inset 0 -1px 0 rgba(0,0,0,.22);
+        0 0 0 1px rgba(255,255,255,.12),
+        0 0 30px var(--glow, rgba(255,211,107,.30));
     }
-    body.legend .btn.gold{ box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(255,211,107,.28), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -1px 0 rgba(0,0,0,.18); }
-    body.legend .btn.blue{ box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(0,170,255,.24), inset 0 1px 0 rgba(255,255,255,.26), inset 0 -1px 0 rgba(0,0,0,.18); }
-    body.legend .btn.red { box-shadow: 0 18px 60px rgba(0,0,0,.42), 0 0 26px rgba(255,60,60,.22), inset 0 1px 0 rgba(255,255,255,.24), inset 0 -1px 0 rgba(0,0,0,.18); }
 
     .fine{
       opacity:.75;
@@ -609,6 +541,7 @@
     #crawlScreen.running .crawl{
       animation: crawlMove var(--crawlms) linear forwards;
     }
+
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(75%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-120%); opacity: 0; }
@@ -709,7 +642,7 @@
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
 
-    /* Retro overlay */
+    /* Retro mode overlay */
     #scanlines{
       position:fixed;
       inset:0;
@@ -750,7 +683,14 @@
         -1px 0 rgba(255,60,60,.12);
       letter-spacing: 1.2px;
     }
-    body.retro .btn{ border-radius: 14px; }
+    body.retro .btn{
+      border-radius: 14px;
+      outline: 1px solid rgba(255,255,255,.12);
+      outline-offset: -1px;
+    }
+    body.retro .btn:active{
+      filter: brightness(.92) contrast(1.02);
+    }
   </style>
 </head>
 
@@ -763,10 +703,16 @@
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
 
+  <!-- HOLO-TRANSMISSION overlay -->
   <div id="holoFX" aria-hidden="true"></div>
+
+  <!-- Retro scanlines overlay -->
   <div id="scanlines" aria-hidden="true"></div>
 
+  <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
+
+  <!-- Yoda bubble -->
   <div id="yodaBubble" aria-hidden="true"></div>
 
   <!-- Dueling overlay -->
@@ -780,6 +726,7 @@
     </div>
   </div>
 
+  <!-- Chewie bubble -->
   <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
   <!-- Secret Easter Egg -->
@@ -800,50 +747,65 @@
         <p class="small">
           In a glowing sector of the galaxy, where arcade lights sparkle like distant stars, a brave young hero named OLIVER has reached LEVEL 8.
         </p>
+
         <p class="small">
           The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
         </p>
+
         <p class="small">
           From the quiet shadows, Master Yoda watches… proud, he is.
         </p>
+
         <p class="small">
           Today, birthday mode has been activated.
         </p>
+
         <p class="small">
           From hyperspeed racers to pixel-powered battles, champions from every system are summoned to SIDE QUEST ARCADE for a legendary celebration.
         </p>
+
         <p class="small">
           But before the party can begin, the arcade network must be fully powered.
         </p>
+
         <p class="small">
           Training droids have prepared three heroic challenges.
         </p>
+
         <p class="small">
           CHALLENGE ONE: Press PLAY THEME to activate Celebration Soundtrack Mode.
         </p>
+
         <p class="small">
           CHALLENGE TWO: Press IGNITE to unleash your lightsaber skills in a spectacular duel moment.
         </p>
+
         <p class="small">
           CHALLENGE THREE: Lock in your RSVP coordinates so the party crew knows how many champions are landing.
         </p>
+
         <p class="small">
           Meanwhile, prize tickets are stacking at lightspeed, snack bots are preparing galactic treats, and the birthday cake has been secured inside a secret bonus level.
         </p>
+
         <p class="small">
           Rumors echo through the star lanes of a hidden birthday transmission, visible only to those who tap with Jedi reflexes.
         </p>
+
         <p class="small">
           Choose your path wisely, young player.
         </p>
+
         <p class="small center">
           The joysticks are ready.<br>
           The buttons are glowing.<br>
           The Force is fully charged.
         </p>
+
         <p class="small center" style="margin-top:10px;">
           And the quest for LEVEL 8…
         </p>
+
         <p class="small center">
           is about to begin.
         </p>
@@ -867,14 +829,14 @@
       </div>
 
       <div class="mid">
-        <button class="btn gold" id="igniteBtn"><span class="ripple"></span>TAP TO IGNITE LIGHTSABER ⚔️</button>
+        <button class="btn gold" id="igniteBtn">TAP TO IGNITE LIGHTSABER ⚔️</button>
 
         <div class="row">
-          <button class="btn blue" id="musicBtn"><span class="ripple"></span>PLAY THEME MUSIC 🎵</button>
-          <button class="btn red" id="stopBtn"><span class="ripple"></span>STOP MUSIC ⛔</button>
+          <button class="btn blue" id="musicBtn">PLAY THEME MUSIC 🎵</button>
+          <button class="btn red" id="stopBtn">STOP MUSIC ⛔</button>
         </div>
 
-        <button class="btn gold" id="rsvpBtn"><span class="ripple"></span>CONTINUE TO RSVP 📋</button>
+        <button class="btn gold" id="rsvpBtn">CONTINUE TO RSVP 📋</button>
       </div>
 
       <div class="fine">
@@ -958,10 +920,33 @@
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
     }
 
+    // ================== KONAMI (Dark = B, Light = A) ==================
+    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
+    const LEGEND_KEY = "oliverLegendUnlocked_v1";
+    let inputBuffer = [];
+    let konamiStartAt = 0;
+
+    function resetKonami(){ inputBuffer = []; konamiStartAt = 0; }
+
+    function pushKonami(token){
+      const now = Date.now();
+      if (inputBuffer.length === 0) konamiStartAt = now;
+      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
+        resetKonami();
+        konamiStartAt = now;
+      }
+      inputBuffer.push(token);
+      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
+
+      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
+      if (ok){
+        resetKonami();
+        unlockLegendMode();
+      }
+    }
+
     // ================== RETRO MODE (Legend-only) ==================
     const RETRO_KEY = "oliverRetroMode_v1";
-    const LEGEND_KEY = "oliverLegendUnlocked_v1";
-
     function setRetro(on){
       if (on){
         document.body.classList.add("retro");
@@ -1170,7 +1155,7 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== BUTTON PARTICLES + PALETTES ==================
+    // ================== BUTTON PARTICLE BURSTS ==================
     const pCanvas = document.getElementById("particles");
     const pCtx = pCanvas.getContext("2d", { alpha:true });
     let particles = [];
@@ -1204,6 +1189,7 @@
         });
       }
     }
+
     function burstAtElement(el, palette, power=1){
       if (!el) return;
       const r = el.getBoundingClientRect();
@@ -1220,6 +1206,7 @@
       for (let i=particles.length-1;i>=0;i--){
         const p = particles[i];
         p.age += dt;
+
         p.x += p.vx * (dt/16);
         p.y += p.vy * (dt/16);
         p.vy += p.g * (dt/16);
@@ -1247,28 +1234,6 @@
     const PAL_GOLD = ["rgba(255,211,107,.95)","rgba(255,245,210,.85)","rgba(255,255,255,.75)"];
     const PAL_BLUE = ["rgba(0,170,255,.95)","rgba(200,245,255,.85)","rgba(255,255,255,.70)"];
     const PAL_RED  = ["rgba(255,60,60,.95)","rgba(255,170,170,.85)","rgba(255,255,255,.70)"];
-
-    // ================== NEW: BUTTON RIPPLE SYSTEM ==================
-    function addRippleFX(el){
-      if (!el) return;
-      // make sure ripple span exists (we already added in HTML)
-      el.addEventListener("pointerdown", (ev) => {
-        const r = el.getBoundingClientRect();
-        const x = (ev.clientX || (r.left + r.width/2)) - r.left;
-        const y = (ev.clientY || (r.top + r.height/2)) - r.top;
-        el.style.setProperty("--rx", `${x}px`);
-        el.style.setProperty("--ry", `${y}px`);
-        el.classList.remove("rippling");
-        // force reflow for restart
-        void el.offsetWidth;
-        el.classList.add("rippling");
-        clearTimeout(el._ripT);
-        el._ripT = setTimeout(()=> el.classList.remove("rippling"), 650);
-      }, { passive:true });
-    }
-
-    // Apply ripple fx to all main buttons
-    document.querySelectorAll(".btn").forEach(addRippleFX);
 
     // ================== CHEWIE (synthetic) ==================
     let audioCtx = null;
@@ -1376,6 +1341,7 @@
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
       vibe([20,40,20]);
+
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
 
@@ -1393,39 +1359,10 @@
 
       hyperspaceBurst();
 
-      setTimeout(()=>{
-        window.location.href = RSVP_FORM;
-      }, 850);
+      setTimeout(()=>{ window.location.href = RSVP_FORM; }, 850);
     }
 
-    // ================== KONAMI (Dark = B, Light = A) ==================
-    const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
-    let inputBuffer = [];
-    let konamiStartAt = 0;
-
-    function resetKonami(){
-      inputBuffer = [];
-      konamiStartAt = 0;
-    }
-    function pushKonami(token){
-      const now = Date.now();
-
-      if (inputBuffer.length === 0) konamiStartAt = now;
-      if (konamiStartAt && (now - konamiStartAt > KONAMI_WINDOW_MS)){
-        resetKonami();
-        konamiStartAt = now;
-      }
-
-      inputBuffer.push(token);
-      if (inputBuffer.length > KONAMI_CODE.length) inputBuffer.shift();
-
-      const ok = KONAMI_CODE.every((v, i) => inputBuffer[i] === v);
-      if (ok){
-        resetKonami();
-        unlockLegendMode();
-      }
-    }
-
+    // ================== LEGEND UNLOCK ==================
     function unlockLegendMode(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
@@ -1439,7 +1376,6 @@
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
-
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1449,7 +1385,6 @@
       wookieeGrowl(620);
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
-
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
@@ -1479,6 +1414,7 @@
       applyRetroOnLoad();
     })();
 
+    // Keyboard Konami
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1489,6 +1425,7 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
+    // Touch swipes (U/D/L/R)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
     function onTouchStart(ev){
       if (!ev.touches || ev.touches.length !== 1) return;
@@ -1525,8 +1462,8 @@
       started = true;
 
       getAudioCtx();
-
       holoOn();
+
       vibe(15);
       await startThemeGuaranteed(true);
 
@@ -1538,7 +1475,6 @@
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
-
         holoOff();
 
         crawlScreen.classList.add("hide");
@@ -1601,7 +1537,7 @@
       doRsvpWarp();
     });
 
-    // Pills: Konami A/B inputs
+    // Pills are A/B inputs for Konami
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); burstAtElement(pillDark, PAL_RED, 0.75); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); burstAtElement(pillLight, PAL_BLUE, 0.75); });
 
@@ -1613,8 +1549,7 @@
         return;
       }
       burstAtElement(retroToggle, PAL_GOLD, 0.9);
-      const on = !document.body.classList.contains("retro");
-      setRetro(on);
+      setRetro(!document.body.classList.contains("retro"));
     });
   </script>
 </body>
