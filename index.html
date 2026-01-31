@@ -127,7 +127,7 @@
     }
     #yodaBubble b{ color: var(--gold); }
 
-    /* HUD toast (Konami feedback) */
+    /* HUD toast */
     #hudToast{
       position:fixed;
       left:50%;
@@ -219,7 +219,7 @@
       pointer-events:auto;
     }
 
-    /* Persistent Legend Mode styling (subtle glow) */
+    /* Persistent Legend Mode styling */
     body.legend-unlocked .card{
       box-shadow: 0 22px 80px rgba(0,0,0,.50);
       border-color: rgba(255,211,107,.22);
@@ -254,9 +254,22 @@
       background:rgba(255,255,255,.06);
       user-select:none;
       cursor:pointer;
+      transition: filter .12s ease, transform .08s ease;
     }
+    .pill:active{ transform: translateY(1px); filter: brightness(.96); }
     .pill.blue{ border-color:rgba(0,170,255,.45); }
     .pill.red{ border-color:rgba(255,60,60,.45); }
+
+    /* Retro toggle only appears after Legend unlock */
+    #retroToggle{ display:none; }
+    body.legend-unlocked #retroToggle{ display:inline-flex; }
+
+    /* When Retro is ON, highlight the toggle pill */
+    body.retro #retroToggle{
+      border-color: rgba(255,211,107,.45);
+      background: rgba(255,211,107,.12);
+      box-shadow: 0 0 18px rgba(255,211,107,.14);
+    }
 
     .mid{ padding:0 22px 18px; display:grid; gap:12px; }
     .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -273,14 +286,14 @@
       letter-spacing:.5px;
       user-select:none;
       transform: translateY(0);
-      transition: transform .08s ease, filter .12s ease;
+      transition: transform .08s ease, filter .12s ease, box-shadow .18s ease;
     }
     .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
 
-    /* ===== LEGEND MODE BUTTON GLOW (Konami unlock) ===== */
+    /* ===== LEGEND MODE BUTTON GLOW ===== */
     body.legend .btn{
       box-shadow:
         0 0 10px rgba(255,211,107,.35),
@@ -461,6 +474,83 @@
       20%  { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
+
+    /* =========================================================
+       RETRO MODE (Legend-only): “pixel mode” + scanlines + CRT
+       ========================================================= */
+    #scanlines{
+      position:fixed;
+      inset:0;
+      z-index: 9999;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity .18s ease;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.05) 0px,
+          rgba(255,255,255,.05) 1px,
+          rgba(0,0,0,0) 2px,
+          rgba(0,0,0,0) 4px
+        );
+      mix-blend-mode: overlay;
+    }
+    body.retro #scanlines{ opacity:.42; }
+
+    /* A subtle CRT “bend” feel */
+    body.retro{
+      image-rendering: pixelated;
+      filter: saturate(1.08) contrast(1.04);
+    }
+
+    body.retro .card{
+      border-radius: 14px;
+      box-shadow:
+        0 24px 90px rgba(0,0,0,.60),
+        0 0 0 1px rgba(255,211,107,.10),
+        0 0 30px rgba(0,170,255,.10);
+      background: rgba(0,0,0,.62);
+    }
+
+    body.retro .title,
+    body.retro .subtitle,
+    body.retro .pill,
+    body.retro .btn{
+      text-shadow:
+        1px 0 rgba(0,170,255,.18),
+        -1px 0 rgba(255,60,60,.12);
+      letter-spacing: 1.2px;
+    }
+
+    body.retro .btn{
+      border-radius: 10px;
+      outline: 1px solid rgba(255,255,255,.12);
+      outline-offset: -1px;
+    }
+
+    body.retro .btn:active{
+      filter: brightness(.92) contrast(1.02);
+    }
+
+    /* Tiny pixel “sparkle” around buttons (static but looks arcade) */
+    body.retro .btn.gold{
+      box-shadow:
+        0 0 0 1px rgba(255,211,107,.16),
+        0 0 18px rgba(255,211,107,.22),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+    body.retro .btn.blue{
+      box-shadow:
+        0 0 0 1px rgba(0,170,255,.16),
+        0 0 18px rgba(0,170,255,.20),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
+    body.retro .btn.red{
+      box-shadow:
+        0 0 0 1px rgba(255,60,60,.16),
+        0 0 18px rgba(255,60,60,.20),
+        inset 0 0 0 1px rgba(0,0,0,.22);
+    }
   </style>
 </head>
 
@@ -471,6 +561,9 @@
   <div id="warpOverlay"></div>
   <div id="warpCountdown"></div>
   <canvas id="confetti"></canvas>
+
+  <!-- Retro scanlines overlay (only visible when body.retro) -->
+  <div id="scanlines" aria-hidden="true"></div>
 
   <!-- HUD Toast -->
   <div id="hudToast" aria-hidden="true"></div>
@@ -587,6 +680,8 @@
         <div class="pillrow">
           <div class="pill blue" id="pillLight">LIGHT SIDE</div>
           <div class="pill red" id="pillDark">DARK SIDE</div>
+          <!-- Retro Mode toggle (Legend-only) -->
+          <div class="pill" id="retroToggle">RETRO MODE</div>
         </div>
       </div>
 
@@ -655,6 +750,7 @@
     const warpOverlay   = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
     const subtitleEl    = document.getElementById("subtitleEl");
+    const retroToggle   = document.getElementById("retroToggle");
 
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
@@ -667,7 +763,7 @@
       showHud._t = setTimeout(()=> hudToast.classList.remove("show"), ms);
     }
 
-    // ================== YODA ELEMENTS (#2, #3, #5) ==================
+    // ================== YODA ELEMENTS ==================
     function showYoda(text, ms=1600){
       yodaBubble.innerHTML = text;
       yodaBubble.classList.add("show");
@@ -681,6 +777,37 @@
       subtitleEl.textContent = tempText;
       clearTimeout(yodaSubtitle._t);
       yodaSubtitle._t = setTimeout(()=>{ subtitleEl.textContent = baseSubtitle; }, ms);
+    }
+
+    // ================== RETRO MODE (Legend-only) ==================
+    const RETRO_KEY = "oliverRetroMode_v1";
+
+    function setRetro(on){
+      if (on){
+        document.body.classList.add("retro");
+        localStorage.setItem(RETRO_KEY, "1");
+        showYoda("Retro mode… <b>strong</b>, it is.");
+        yodaSubtitle("Retro mode… activated, it is.", 2200);
+        vibe([15,20,15]);
+      }else{
+        document.body.classList.remove("retro");
+        localStorage.setItem(RETRO_KEY, "0");
+        showYoda("Modern mode… returned.");
+        yodaSubtitle("Modern mode… restored, it is.", 2200);
+        vibe(15);
+      }
+    }
+
+    function applyRetroOnLoad(){
+      // Only allow Retro if Legend is unlocked
+      const legend = localStorage.getItem(LEGEND_KEY) === "1";
+      if (!legend){
+        document.body.classList.remove("retro");
+        return;
+      }
+      const on = localStorage.getItem(RETRO_KEY) === "1";
+      if (on) document.body.classList.add("retro");
+      else document.body.classList.remove("retro");
     }
 
     // ================== STARFIELD ==================
@@ -1024,21 +1151,19 @@
     }
 
     function unlockLegendMode(){
-      // already unlocked
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
         showYoda("Already unlocked… <b>legend</b>, you are.");
-        // ensure glow class is present
         document.body.classList.add("legend");
         document.body.classList.add("legend-unlocked");
+        applyRetroOnLoad();
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
 
-      // ✅ Turn on persistent styles + BUTTON GLOW
       document.body.classList.add("legend-unlocked");
       document.body.classList.add("legend");
 
@@ -1049,7 +1174,6 @@
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
 
-      // Yoda celebrates Konami unlock (#2)
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
@@ -1061,21 +1185,24 @@
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
-      // Subtitle Yoda-flip (#5)
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
+
+      // Retro toggle becomes available now, but does not auto-enable.
+      applyRetroOnLoad();
     }
 
     // Apply persistent unlock on load (title + styles + glow)
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         document.body.classList.add("legend-unlocked");
-        document.body.classList.add("legend"); // ✅ button glow persists
+        document.body.classList.add("legend");
         const title = document.getElementById("secretTitle");
         if (title){
           title.dataset.legendApplied = "1";
           title.textContent = "THE BALANCE OF EIGHT ✨";
         }
       }
+      applyRetroOnLoad();
     })();
 
     // Keyboard support (desktop)
@@ -1128,7 +1255,6 @@
       if (started) return;
       started = true;
 
-      // resume audio context in gesture (for Chewie synth later)
       getAudioCtx();
 
       vibe(15);
@@ -1142,7 +1268,6 @@
         wookieeGrowl(520);
         showYoda("A great quest… begins now.");
 
-        // keep crawl running in background, but remove overlay
         crawlScreen.classList.add("hide");
         setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
       }, MENU_REVEAL_MS);
@@ -1189,11 +1314,7 @@
       theme.currentTime = 0;
 
       showChewieBubble("Grrr… (music paused)");
-
-      // Yoda corrects you (#3)
       showYoda("Silence? Hmm. Music… you need.");
-
-      // Subtitle Yoda-flip (#5)
       yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
     });
 
@@ -1204,6 +1325,19 @@
     // Pills: Konami B/A (Dark=B, Light=A)
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); });
+
+    // Retro toggle (Legend-only)
+    retroToggle.addEventListener("click", () => {
+      // only allow if Legend unlocked
+      const legend = localStorage.getItem(LEGEND_KEY) === "1";
+      if (!legend){
+        showHud(`<b>LOCKED</b> • Unlock Legend Mode first`, 1200);
+        showYoda("Patience… you must have.");
+        return;
+      }
+      const on = !document.body.classList.contains("retro");
+      setRetro(on);
+    });
   </script>
 </body>
 </html>
