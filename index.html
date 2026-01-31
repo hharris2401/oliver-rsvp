@@ -12,6 +12,7 @@
       --red:#ff3c3c;
       --bg1:#173a66;
       --bg2:#04060a;
+      --crawlms: 85000ms; /* will be overwritten on tap */
     }
     *{ box-sizing:border-box; }
 
@@ -338,11 +339,14 @@
       padding-bottom: 10vh;
     }
 
-    /* UPDATED: opacity 1 for immediate visibility */
+    /* IMPORTANT:
+       - Start NOT animating until tap (no "late start" feeling)
+       - Keep it visible immediately
+    */
     .crawl{
       width:min(720px, 92vw);
       transform-origin: 50% 100%;
-      transform: rotateX(24deg) translateY(110%);
+      transform: rotateX(24deg) translateY(95%); /* matches keyframe start */
       color: #ffd36b;
       font-weight: 900;
       letter-spacing: 1.4px;
@@ -359,7 +363,7 @@
       animation: crawlMove var(--crawlms) linear forwards;
     }
 
-    /* UPDATED: shorter travel distance (feels slower and easier to read) */
+    /* Slightly shorter travel distance so it stays readable longer */
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(95%); opacity: 1; }
       100% { transform: rotateX(24deg) translateY(-165%); opacity: 0; }
@@ -582,7 +586,6 @@
         </p>
       </div>
     </div>
-    <!-- no hint, no extra tap text -->
   </div>
 
   <!-- Main UI -->
@@ -625,8 +628,11 @@
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // UPDATED: crawl duration (recommended with new keyframes)
-    const CRAWL_MS = 85000;
+    // Base duration (before slow-down multiplier)
+    const CRAWL_BASE_MS = 85000;
+
+    // UPDATED: Slow scroll down by 80% => 5x longer
+    const CRAWL_MS = Math.round(CRAWL_BASE_MS * 5);
 
     // Mission brief timing (auto-dismiss)
     const MISSION_SHOW_MS = 1200;
@@ -662,6 +668,8 @@
     const warpOverlay = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
     document.getElementById("formLink").href = RSVP_FORM;
+
+    // Set crawl timing variable (will be finalized on tap)
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
     // ================== STARFIELD ==================
@@ -983,20 +991,29 @@
       }, 850);
     }
 
-    // ================== CRAWL FLOW ==================
+    // ================== CRAWL FLOW (FIXED: start IMMEDIATELY + 80% slower) ==================
     let started = false;
 
     async function beginCrawl(){
       if (started) return;
       started = true;
 
+      // lock duration (and sync menu reveal) immediately on tap
+      document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
+
+      // resume WebAudio inside gesture
       getAudioCtx();
+
+      // tactile feedback
       vibe(15);
 
+      // optional: start theme on tap (kept)
       await startThemeGuaranteed(true);
 
+      // START CRAWL IMMEDIATELY
       crawlScreen.classList.add("running");
 
+      // When crawl completes -> show menu
       setTimeout(() => {
         mainCard.classList.add("show");
         showMissionBrief();
