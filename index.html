@@ -41,12 +41,11 @@
       inset:0;
       pointer-events:none;
       opacity:0;
-      transition:opacity .14s ease;
+      transition:opacity .10s linear;
       z-index: 9997;
       background:
         radial-gradient(circle at 50% 50%, rgba(255,255,255,.16), rgba(0,0,0,0) 55%),
-        radial-gradient(circle at 50% 50%, rgba(0,170,255,.18), rgba(0,0,0,0) 65%),
-        rgba(0,0,0,.0);
+        radial-gradient(circle at 50% 50%, rgba(0,170,255,.18), rgba(0,0,0,0) 65%);
     }
     #warpOverlay.show{ opacity:1; }
 
@@ -60,7 +59,7 @@
       font-size:clamp(18px,5vw,32px);
       text-shadow:0 0 18px rgba(255,255,255,.3);
       opacity:0;
-      transition:opacity .16s ease;
+      transition:opacity .12s linear;
       z-index:9999;
       pointer-events:none;
     }
@@ -75,7 +74,7 @@
       z-index: 30;
       opacity:0;
       pointer-events:none;
-      transition: opacity .25s ease, transform .25s ease;
+      transition: opacity .18s linear, transform .18s linear;
       background: rgba(0,0,0,.62);
       border:1px solid rgba(255,255,255,.18);
       border-radius: 999px;
@@ -92,7 +91,7 @@
       transform:translateX(-50%) translateY(-2px);
     }
 
-    /* Mission briefing overlay (after crawl) */
+    /* Mission briefing overlay */
     #missionBrief{
       position:fixed;
       inset:0;
@@ -102,13 +101,11 @@
       z-index: 99995;
       pointer-events:none;
       opacity:0;
-      transition: opacity .18s ease, transform .18s ease;
-      transform: translateY(8px);
+      transition: opacity .14s linear, transform .14s linear;
+      transform: translateY(6px);
     }
-    #missionBrief.show{
-      opacity:1;
-      transform: translateY(0);
-    }
+    #missionBrief.show{ opacity:1; transform: translateY(0); }
+
     .missionCard{
       width:min(680px, 92vw);
       border-radius: 20px;
@@ -159,15 +156,11 @@
       box-shadow: 0 0 16px rgba(191,239,255,.55);
       animation: blink 1.1s infinite;
     }
-    @keyframes blink{
-      0%,60%{ opacity:.25; }
-      70%,100%{ opacity:1; }
-    }
+    @keyframes blink{ 0%,60%{opacity:.25} 70%,100%{opacity:1} }
     .missionTitle{
       font-weight: 950;
       letter-spacing: 1.6px;
       font-size: clamp(18px, 4.6vw, 28px);
-      color: rgba(255,255,255,.95);
       text-shadow: 0 0 18px rgba(0,170,255,.14);
       margin: 2px 0 8px;
       text-align:center;
@@ -199,7 +192,7 @@
       justify-content: center;
       pointer-events: none;
       opacity: 0;
-      transition: opacity .22s ease;
+      transition: opacity .14s linear;
       z-index: 99999;
     }
     .secretMsg.show{ opacity:1; }
@@ -235,6 +228,7 @@
       z-index: 10;
     }
 
+    /* ✅ IMMEDIATE menu: no animation at all */
     .card{
       width:min(720px,100%);
       border:1px solid rgba(255,255,255,.18);
@@ -244,13 +238,11 @@
       overflow:hidden;
       position:relative;
 
-      transform: translateY(12px) scale(.988);
       opacity: 0;
-      transition: transform .10s ease, opacity .10s ease; /* EXTRA snappy */
       pointer-events:none;
+      transition: none;
     }
     .card.show{
-      transform: translateY(0) scale(1);
       opacity: 1;
       pointer-events:auto;
     }
@@ -295,10 +287,9 @@
       font-size:16px;
       letter-spacing:.5px;
       user-select:none;
-      transform: translateY(0);
-      transition: transform .08s ease, filter .12s ease;
+      transition: filter .12s ease;
     }
-    .btn:active{ transform: translateY(1px); filter: brightness(0.96); }
+    .btn:active{ filter: brightness(0.96); }
     .btn.gold{ background:linear-gradient(180deg,#ffe7a6,var(--gold)); color:#1a1200; }
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
@@ -322,7 +313,7 @@
       justify-content:center;
       background: radial-gradient(circle at 50% 20%, rgba(25,60,110,.65), rgba(0,0,0,.85) 65%, #000);
       opacity:1;
-      transition: opacity .06s linear; /* fast fade */
+      transition: opacity .04s linear; /* super quick */
       cursor:pointer;
     }
     #crawlScreen.hide{ opacity:0; pointer-events:none; }
@@ -380,7 +371,7 @@
     }
     @keyframes crawlMove{
       0%   { transform: rotateX(24deg) translateY(120%); opacity: 1; }
-      100% { transform: rotateX(24deg) translateY(-230%); opacity: .0; }
+      100% { transform: rotateX(24deg) translateY(-230%); opacity: 0; }
     }
 
     /* ===== Dueling overlay (CSS graphic) ===== */
@@ -390,7 +381,7 @@
       z-index: 9996;
       pointer-events:none;
       opacity:0;
-      transition: opacity .12s ease;
+      transition: opacity .10s linear;
       background: radial-gradient(circle at 50% 40%, rgba(255,255,255,.08), rgba(0,0,0,.0) 55%), rgba(0,0,0,.18);
     }
     #duelOverlay.show{ opacity:1; }
@@ -477,6 +468,36 @@
       20%  { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
       100% { transform: translate(-50%,-50%) scale(2.1); opacity: 0; }
     }
+
+    /* Chewie button (floating) */
+    #chewieBtn{
+      position:fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 99996;
+      border:none;
+      cursor:pointer;
+      border-radius: 999px;
+      padding: 12px 14px;
+      font-weight: 950;
+      letter-spacing: .6px;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,211,107,.32);
+      color: var(--gold);
+      box-shadow: 0 16px 50px rgba(0,0,0,.45);
+      backdrop-filter: blur(6px);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
+    #chewieBtn:active{ transform: translateY(1px); filter: brightness(.96); }
+    .chewieDot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: var(--gold);
+      box-shadow: 0 0 18px rgba(255,211,107,.45);
+    }
   </style>
 </head>
 
@@ -511,9 +532,9 @@
         </div>
         <div class="missionTitle">MISSION BRIEFING</div>
         <div class="missionGrid">
-          <div class="missionLine">1) Tap <b>PLAY THEME</b> to start the soundtrack.</div>
-          <div class="missionLine">2) Tap <b>IGNITE</b> for a lightsaber duel moment.</div>
-          <div class="missionLine">3) Tap <b>CONTINUE TO RSVP</b> to jump to the form.</div>
+          <div class="missionLine">Tap <b>PLAY THEME</b> to unleash the soundtrack.</div>
+          <div class="missionLine">Tap <b>IGNITE</b> for a lightsaber clash moment.</div>
+          <div class="missionLine">Tap <b>RSVP</b> to jump to the Hololink form.</div>
         </div>
       </div>
     </div>
@@ -535,15 +556,30 @@
     <div class="crawlWrap">
       <div class="crawl" id="crawlText">
         <div class="center" style="font-size:1.15em;">EPISODE VIII</div>
-        <div class="center" style="margin-top:8px; font-size:1.55em;">THE BALANCE OF EIGHT</div>
+        <div class="center" style="margin-top:8px; font-size:1.55em;">THE ARCADE SECTOR UPRISING</div>
+
         <p class="small">
-          A young legend named OLIVER has reached LEVEL 8. The galaxy is buzzing, the snacks are stocked,
-          and the Force is absolutely vibing.
+          Chaos gives way to celebration. OLIVER has reached LEVEL 8, and a party beacon has been detected in the ARCADE SECTOR.
         </p>
+
         <p class="small">
-          Your mission: tap to ignite, hit the theme, and lock in your RSVP.
-          Rumor has it there’s a hidden birthday message if you know where to tap…
+          Deep within FIREWHEEL STATION, cabinets glow like star consoles. Tokens clink like credits. High scores rise like legends.
         </p>
+
+        <p class="small">
+          But balance is fragile. A shadowy faction has hacked the scoreboard, threatening to pull the party toward the DARK SIDE of “NO FUN.”
+        </p>
+
+        <p class="small">
+          Only the bravest recruits can restore joy to the system. Your mission: arrive ready, choose your path, and bring your best costume energy:
+          Jedi, Sith, droids, bounty hunters, smugglers, or royalty of the stars.
+        </p>
+
+        <p class="small">
+          Ignite. Play the theme. RSVP through the Hololink.
+          The Force will be restored… thru cake.
+        </p>
+
         <p class="small center" style="margin-top:18px;">(Tap anywhere to begin)</p>
       </div>
     </div>
@@ -582,33 +618,37 @@
     </div>
   </div>
 
+  <!-- Chewie button -->
+  <button id="chewieBtn" type="button" aria-label="Chewie Button">
+    <span class="chewieDot"></span> CHEWIE
+  </button>
+
   <script>
     // ================== SETTINGS ==================
     const RSVP_FORM = "https://docs.google.com/forms/d/1OLrE8YDSc8s2vui9SLxuMw_eFsDtCxU6Dw6OUFzqhu0/viewform";
-
-    // Must match repo filenames EXACTLY:
     const SABER_URL = "./Lightsaber Fight.mp3";
     const MUSIC_URL = "./Star Wars Theme.mp3";
 
-    // Crawl duration
-    const CRAWL_MS = 67200;
+    // 1 minute crawl (sync vibe with your 1-min music moment)
+    const CRAWL_MS = 60000;
 
-    // Mission brief timing (auto-dismiss)
+    // mission flash
     const MISSION_SHOW_MS = 1200;
 
-    // ================== HELPERS ==================
     function vibe(pattern){ if (navigator.vibrate) navigator.vibrate(pattern); }
     function safeAudio(url){ const a = new Audio(url); a.preload = "auto"; return a; }
 
-    // ================== AUDIO (theme + saber) ==================
+    // ================== AUDIO ==================
     const theme = safeAudio(MUSIC_URL);
     const saber = safeAudio(SABER_URL);
-    theme.loop = true;
-    theme.volume = 0.70;
 
-    async function startThemeGuaranteed(restart=true){
+    // Whole song, no loop
+    theme.loop = false;
+    theme.volume = 0.9;
+
+    async function startThemeFromTap(){
       try{
-        if (restart) theme.currentTime = 0;
+        theme.currentTime = 0;   // start from beginning for the crawl experience
         await theme.play();
         return true;
       }catch(e){
@@ -624,6 +664,7 @@
     const missionBrief = document.getElementById("missionBrief");
     const warpOverlay = document.getElementById("warpOverlay");
     const warpCountdown = document.getElementById("warpCountdown");
+
     document.getElementById("formLink").href = RSVP_FORM;
     document.documentElement.style.setProperty("--crawlms", `${CRAWL_MS}ms`);
 
@@ -679,7 +720,7 @@
     }
     requestAnimationFrame(starfieldLoop);
 
-    // ================== HYPERSPACE BURST (for RSVP only) ==================
+    // ================== HYPERSPACE (RSVP only) ==================
     const fxCanvas = document.getElementById("hyperspace");
     const fxCtx = fxCanvas.getContext("2d", { alpha:true });
 
@@ -710,7 +751,6 @@
       }));
 
       const start = performance.now();
-
       function frame(t){
         const p = Math.min(1,(t-start)/850);
         const fade = p < 0.75 ? 1 : (1 - (p-0.75)/0.25);
@@ -746,71 +786,8 @@
       requestAnimationFrame(frame);
     }
 
-    // ================== CONFETTI ==================
-    const confettiCanvas = document.getElementById("confetti");
-    const confettiCtx = confettiCanvas.getContext("2d", { alpha:true });
-
-    function confettiResize(){
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      confettiCanvas.width = Math.floor(window.innerWidth * dpr);
-      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-      confettiCanvas.style.width = window.innerWidth + "px";
-      confettiCanvas.style.height = window.innerHeight + "px";
-      confettiCtx.setTransform(dpr,0,0,dpr,0,0);
-    }
-    confettiResize();
-    window.addEventListener("resize", confettiResize);
-
-    function fireConfetti(durationMs = 2200){
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const start = performance.now();
-
-      const pieces = Array.from({ length: 150 }, () => ({
-        x: Math.random() * w,
-        y: -20 - Math.random() * h * 0.2,
-        vx: -1.2 + Math.random() * 2.4,
-        vy: 3.2 + Math.random() * 5.6,
-        r: 4 + Math.random() * 6,
-        rot: Math.random() * Math.PI,
-        vr: (-0.2 + Math.random() * 0.4),
-        c: (["#ffd36b", "#00aaff", "#ff3c3c", "#ffffff"][(Math.random()*4)|0]),
-        life: 0.85 + Math.random() * 0.6
-      }));
-
-      function frame(t){
-        const p = Math.min(1, (t - start) / durationMs);
-        confettiCtx.clearRect(0,0,w,h);
-
-        for (const q of pieces){
-          q.x += q.vx;
-          q.y += q.vy;
-          q.vy += 0.03;
-          q.rot += q.vr;
-
-          if (q.x < -30) q.x = w + 30;
-          if (q.x > w + 30) q.x = -30;
-
-          const fade = p < 0.75 ? 1 : (1 - (p - 0.75) / 0.25);
-          confettiCtx.globalAlpha = fade * q.life;
-
-          confettiCtx.save();
-          confettiCtx.translate(q.x, q.y);
-          confettiCtx.rotate(q.rot);
-          confettiCtx.fillStyle = q.c;
-          confettiCtx.fillRect(-q.r, -q.r*0.6, q.r*2, q.r*1.2);
-          confettiCtx.restore();
-        }
-
-        if (p < 1) requestAnimationFrame(frame);
-        else confettiCtx.clearRect(0,0,w,h);
-      }
-      requestAnimationFrame(frame);
-    }
-
-    // ================== CHEWIE SOUND (FIXED: louder + resume context) ==================
+    // ================== CHEWIE SOUND (LOUD) ==================
     let audioCtx = null;
-
     function getAudioCtx(){
       if (!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -821,55 +798,45 @@
       return audioCtx;
     }
 
-    // A louder, more “growly” procedural sound (still synthetic, no copyrighted audio).
-    function wookieeGrowl(ms = 520){
+    function wookieeGrowl(ms = 900){
       try{
         const ctx = getAudioCtx();
         const now = ctx.currentTime;
         const end = now + ms/1000;
 
-        // Noise buffer (adds throat texture)
         const bufferSize = Math.floor(ctx.sampleRate * (ms/1000));
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = noiseBuffer.getChannelData(0);
         for (let i=0;i<bufferSize;i++){
-          data[i] = (Math.random()*2 - 1) * 0.55; // stronger noise
+          data[i] = (Math.random()*2 - 1) * 0.75;
         }
         const noise = ctx.createBufferSource();
         noise.buffer = noiseBuffer;
 
-        // Oscillator (low fundamental)
         const osc = ctx.createOscillator();
         osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(115, now);
-        osc.frequency.exponentialRampToValueAtTime(70, end);
+        osc.frequency.setValueAtTime(130, now);
+        osc.frequency.exponentialRampToValueAtTime(68, end);
 
-        // Filter to shape the growl
-        const filter = ctx.createBiquadFilter();
-        filter.type = "bandpass";
-        filter.frequency.setValueAtTime(260, now);
-        filter.Q.setValueAtTime(1.1, now);
+        const band = ctx.createBiquadFilter();
+        band.type = "bandpass";
+        band.frequency.setValueAtTime(280, now);
+        band.Q.setValueAtTime(1.0, now);
 
         const lowpass = ctx.createBiquadFilter();
         lowpass.type = "lowpass";
-        lowpass.frequency.setValueAtTime(900, now);
+        lowpass.frequency.setValueAtTime(1100, now);
         lowpass.frequency.exponentialRampToValueAtTime(520, end);
 
-        // Gain envelope (LOUDER)
         const gain = ctx.createGain();
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.55, now + 0.02);  // louder peak
+        gain.gain.exponentialRampToValueAtTime(0.90, now + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, end);
 
-        // Mix
-        const mix = ctx.createGain();
-        mix.gain.setValueAtTime(0.9, now);
-
-        osc.connect(filter);
-        noise.connect(filter);
-        filter.connect(lowpass);
-        lowpass.connect(mix);
-        mix.connect(gain);
+        osc.connect(band);
+        noise.connect(band);
+        band.connect(lowpass);
+        lowpass.connect(gain);
         gain.connect(ctx.destination);
 
         noise.start(now);
@@ -882,7 +849,7 @@
     function showChewieBubble(text){
       chewieBubble.textContent = text;
       chewieBubble.classList.add("show");
-      setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
+      setTimeout(()=>chewieBubble.classList.remove("show"), 1000);
     }
 
     // ================== DUEL VISUAL ==================
@@ -897,39 +864,9 @@
       setTimeout(()=> missionBrief.classList.remove("show"), MISSION_SHOW_MS);
     }
 
-    // ================== SECRET EGG (5 taps title) ==================
-    (function birthdayEgg(){
-      const title = document.getElementById("secretTitle");
-      const msg = document.getElementById("secretMsg");
-      if (!title || !msg) return;
-
-      let taps = 0;
-      let timer = null;
-
-      function showBirthday(){
-        msg.classList.add("show");
-        fireConfetti(2600);
-        vibe([30,40,30]);
-        wookieeGrowl(620);
-        showChewieBubble("RRRAWWR! Birthday protocol engaged.");
-        setTimeout(() => msg.classList.remove("show"), 2500);
-      }
-
-      title.addEventListener("click", () => {
-        taps++;
-        clearTimeout(timer);
-        timer = setTimeout(() => (taps = 0), 900);
-        if (taps >= 5){
-          taps = 0;
-          showBirthday();
-        }
-      });
-    })();
-
     // ================== RSVP WARP + COUNTDOWN ==================
     function doRsvpWarp(){
       vibe([20,40,20]);
-
       warpOverlay.classList.add("show");
       warpCountdown.classList.add("show");
 
@@ -943,47 +880,40 @@
         } else {
           warpCountdown.textContent = `JUMP IN ${n}…`;
         }
-      }, 280);
+      }, 260);
 
       hyperspaceBurst();
 
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
-      }, 850);
+      }, 820);
     }
 
-    // ================== CRAWL FLOW (SNAPPY + MENU INSTANT) ==================
+    // ================== CRAWL FLOW (IMMEDIATE MENU) ==================
     let started = false;
 
     async function beginCrawl(){
       if (started) return;
       started = true;
 
-      // IMPORTANT: resume WebAudio inside the gesture so Chewie can play later
-      getAudioCtx();
-
+      getAudioCtx();         // unlock Chewie for mobile
       vibe(15);
 
-      // Start theme from this gesture (mobile requirement)
-      await startThemeGuaranteed(true);
+      await startThemeFromTap(); // full song, no loop
 
-      // Start crawl anim
       crawlScreen.classList.add("running");
 
       setTimeout(() => {
-        // ✅ Show menu immediately
+        // ✅ Menu is IMMEDIATE: no animation, no waiting
         mainCard.classList.add("show");
 
-        // ✅ Show mission briefing
+        // quick legendary “arrival hit”
         showMissionBrief();
+        showChewieBubble("RRRAWWR! Mission unlocked.");
+        wookieeGrowl(800);
 
-        // Chewie accent on arrival
-        showChewieBubble("Rrrrwwgh! New mission unlocked.");
-        wookieeGrowl(520);
-
-        // Fade out crawl (does not block menu)
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 60);
       }, CRAWL_MS);
     }
 
@@ -996,21 +926,16 @@
     const rsvpBtn   = document.getElementById("rsvpBtn");
     const pillLight = document.getElementById("pillLight");
     const pillDark  = document.getElementById("pillDark");
-
-    // NOTE: per your request, NO Light/Dark quotes are shown on button press.
+    const chewieBtn = document.getElementById("chewieBtn");
 
     igniteBtn.addEventListener("click", async () => {
       vibe([40,20,40]);
-
-      // ensure WebAudio is available
       getAudioCtx();
-
-      // duel graphic replaces warp
       showDuel();
 
-      // Chewie accent (every time, so you definitely hear it)
-      showChewieBubble("RRRAWWR! (Wookiee hype)");
-      wookieeGrowl(620);
+      // optional Chewie stinger on ignite
+      showChewieBubble("RRRAWWR!");
+      wookieeGrowl(900);
 
       try{
         saber.currentTime = 0;
@@ -1020,22 +945,19 @@
       }
     });
 
+    // Play Theme button: starts the song if paused
     musicBtn.addEventListener("click", async () => {
       vibe(25);
-      getAudioCtx();
-
-      // restart theme on tap
-      await startThemeGuaranteed(true);
-
-      // subtle Chewie “DJ” tag
-      showChewieBubble("Wookiee DJ says: TURN IT UP.");
-      wookieeGrowl(420);
+      try{
+        if (theme.paused) await theme.play();
+      }catch(e){
+        window.open(MUSIC_URL, "_blank", "noopener");
+      }
     });
 
     stopBtn.addEventListener("click", () => {
       vibe(15);
       theme.pause();
-      theme.currentTime = 0;
       showChewieBubble("Grrr… (music paused)");
     });
 
@@ -1043,9 +965,17 @@
       doRsvpWarp();
     });
 
-    // Pills: keep subtle haptic only (no quotes)
+    // Pills: haptic only (no quotes)
     pillLight.addEventListener("click", () => { vibe(12); });
     pillDark.addEventListener("click", () => { vibe(12); });
+
+    // CHEWIE BUTTON: LOUD
+    chewieBtn.addEventListener("click", () => {
+      getAudioCtx();
+      vibe([20,30,20,30,40]);
+      showChewieBubble("RRRRAAAWWWRRHHH!!");
+      wookieeGrowl(1100);
+    });
   </script>
 </body>
 </html>
