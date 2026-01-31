@@ -584,7 +584,6 @@
       );
     }
     .crawl::after{
-      /* subtle glow near bottom, subtle shadow near top */
       content:"";
       position:absolute;
       inset:0;
@@ -980,6 +979,9 @@
     const MUSIC_URL = "./Star Wars Theme.mp3";
     const VADER_URL = "./Darth Vader.mp3";
 
+    // ✅ C-3PO menu greeting
+    const C3PO_URL  = "./c3po.mp3";
+
     // ✅ #4: UI hover/tap sound (add this file next to your HTML)
     // If you want, name it exactly like this: "ui-hover.mp3"
     const UI_CHIRP_URL = "./ui-hover.mp3";
@@ -1003,6 +1005,11 @@
     const saber = safeAudio(SABER_URL);
     const vader = safeAudio(VADER_URL);
     const r2 = safeAudio(R2_URL);
+
+    // ✅ C-3PO audio
+    const c3po = safeAudio(C3PO_URL);
+    c3po.loop = false;
+    c3po.volume = 0.72;
 
     const cantina = safeAudio(CANTINA_URL);
     cantina.loop = false;
@@ -1044,6 +1051,17 @@
       }catch(e){
         window.open(R2_URL, "_blank", "noopener");
       }
+    }
+
+    // ✅ C-3PO helper (menu pop)
+    async function playC3PO(){
+      try{
+        getAudioCtx(); // mobile-friendly
+        c3po.pause();
+        c3po.currentTime = 0;
+        const p = c3po.play();
+        if (p && typeof p.then === "function") p.catch(()=>{});
+      }catch(e){}
     }
 
     // ✅ Cantina Easter Egg helper (5-tap title)
@@ -1523,10 +1541,8 @@
     function doRsvpWarp(){
       vibe([20,40,20]);
 
-      // make mobile browsers happier about playing audio
       getAudioCtx();
 
-      // stronger play: reset + catch promise
       try{
         hyper.pause();
         hyper.currentTime = 0;
@@ -1553,7 +1569,6 @@
       hyperspaceBurst();
       droidSay("Coordinates locked. Initiating <b>hyperspace</b>…", 1600);
 
-      // give the sound time to start before we leave the page
       setTimeout(()=>{
         window.location.href = RSVP_FORM;
       }, 1400);
@@ -1693,6 +1708,10 @@
       if (mainCard.classList.contains("show")) return;
 
       mainCard.classList.add("show");
+
+      // ✅ C-3PO fires when the menu appears (timer reveal or skip)
+      playC3PO();
+
       burstAtElement(mainCard, PAL_BLUE, 1.4);
       showChewieBubble("Rrrrwwgh! New mission unlocked.");
       wookieeGrowl(520);
@@ -1740,8 +1759,6 @@
     }, { passive:false });
 
     // ================== ✅ #4: UI CHIRP HOOKS (safe + non-destructive) ==================
-    // Plays a tiny "premium UI" chirp on hover/tap for buttons + pills.
-    // Graceful failure: if autoplay is blocked, nothing breaks.
     let lastChirpAt = 0;
     function playUiChirp(){
       const now = Date.now();
@@ -1749,7 +1766,6 @@
       lastChirpAt = now;
 
       try{
-        // Don't force-unlock here; only attempt after the user has interacted somewhere.
         uiChirp.pause();
         uiChirp.currentTime = 0;
         const p = uiChirp.play();
@@ -1863,7 +1879,6 @@
       setRetro(on);
     });
 
-    // Small “hello” from the co-pilot shortly after load (won’t disrupt anything)
     setTimeout(()=> droidSay("Co-pilot online. Try the <b>5-tap</b> title secret…", 2600), 900);
   </script>
 </body>
