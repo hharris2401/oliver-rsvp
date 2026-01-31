@@ -90,6 +90,8 @@
       text-shadow: 0 0 18px rgba(255,211,107,.18);
       max-width: 92vw;
       text-align:center;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 16px 60px rgba(0,0,0,.35);
     }
     #chewieBubble.show{
       opacity:1;
@@ -278,6 +280,32 @@
     .btn.blue{ background:linear-gradient(180deg,#3ad0ff,var(--blue)); color:#00131a; }
     .btn.red{ background:linear-gradient(180deg,#ff7b7b,var(--red)); color:#1a0000; }
 
+    /* ===== LEGEND MODE BUTTON GLOW (Konami unlock) ===== */
+    body.legend .btn{
+      box-shadow:
+        0 0 10px rgba(255,211,107,.35),
+        0 0 22px rgba(0,170,255,.25),
+        inset 0 0 8px rgba(255,255,255,.15);
+    }
+    body.legend .btn.gold{
+      box-shadow:
+        0 0 14px rgba(255,211,107,.55),
+        0 0 34px rgba(255,211,107,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+    body.legend .btn.blue{
+      box-shadow:
+        0 0 14px rgba(0,170,255,.55),
+        0 0 34px rgba(0,170,255,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+    body.legend .btn.red{
+      box-shadow:
+        0 0 14px rgba(255,60,60,.55),
+        0 0 34px rgba(255,60,60,.35),
+        inset 0 0 10px rgba(255,255,255,.25);
+    }
+
     .fine{
       opacity:.75;
       font-size:12px;
@@ -462,7 +490,7 @@
   </div>
 
   <!-- Chewie bubble -->
-  <div id="chewieBubble">Rrrrwwgh! (Chewie approves.)</div>
+  <div id="chewieBubble" aria-hidden="true">Rrrrwwgh! (Chewie approves.)</div>
 
   <!-- Secret Easter Egg -->
   <div id="secretMsg" class="secretMsg" aria-hidden="true">
@@ -487,7 +515,6 @@
           The Force is buzzing. The game cabinets are warming up. High scores across the universe begin to shake.
         </p>
 
-        <!-- ✅ YODA CRAWL LINE (#6) -->
         <p class="small">
           From the quiet shadows, Master Yoda watches… proud, he is.
         </p>
@@ -591,7 +618,7 @@
 
     // Crawl scroll speed
     const CRAWL_MS = 150000;      // 2:30 crawl
-    // Menu reveal time
+    // Menu reveal time (menu pops while crawl continues)
     const MENU_REVEAL_MS = 95000; // 1:35 menu pop
 
     // Konami timing
@@ -899,7 +926,8 @@
     function showChewieBubble(text){
       chewieBubble.textContent = text;
       chewieBubble.classList.add("show");
-      setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
+      clearTimeout(showChewieBubble._t);
+      showChewieBubble._t = setTimeout(()=>chewieBubble.classList.remove("show"), 1100);
     }
 
     // ================== DUEL VISUAL ==================
@@ -967,6 +995,7 @@
     // ================== KONAMI (Dark = B, Light = A) ==================
     const KONAMI_CODE = ["U","U","D","D","L","R","L","R","B","A"];
     const LEGEND_KEY = "oliverLegendUnlocked_v1";
+
     let inputBuffer = [];
     let konamiStartAt = 0;
 
@@ -995,17 +1024,23 @@
     }
 
     function unlockLegendMode(){
+      // already unlocked
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         vibe([20,30,20]);
         fireConfetti(900);
         showHud(`<b>LEGEND MODE</b> already unlocked ✅`, 1100);
-        // ✅ Yoda on repeat unlock (#2)
         showYoda("Already unlocked… <b>legend</b>, you are.");
+        // ensure glow class is present
+        document.body.classList.add("legend");
+        document.body.classList.add("legend-unlocked");
         return;
       }
 
       localStorage.setItem(LEGEND_KEY, "1");
+
+      // ✅ Turn on persistent styles + BUTTON GLOW
       document.body.classList.add("legend-unlocked");
+      document.body.classList.add("legend");
 
       vibe([30,40,30,60,30]);
       fireConfetti(2400);
@@ -1014,7 +1049,7 @@
       showChewieBubble("RRRAWWR! ULTRA LEGEND UNLOCKED.");
       showHud(`CHEAT CODE ACCEPTED • <b>ULTRA LEGEND MODE</b>`, 1700);
 
-      // ✅ Yoda celebrates Konami unlock (#2)
+      // Yoda celebrates Konami unlock (#2)
       showYoda("Legend… you have become. Proud, I am.");
 
       document.body.classList.add("legend-pulse");
@@ -1026,13 +1061,15 @@
         title.textContent = "THE BALANCE OF EIGHT ✨";
       }
 
-      // ✅ Subtitle Yoda-flip moment (#5)
+      // Subtitle Yoda-flip (#5)
       yodaSubtitle("Legend mode… unlocked, it is. Continue, you must.", 2800);
     }
 
+    // Apply persistent unlock on load (title + styles + glow)
     (function applyLegendOnLoad(){
       if (localStorage.getItem(LEGEND_KEY) === "1"){
         document.body.classList.add("legend-unlocked");
+        document.body.classList.add("legend"); // ✅ button glow persists
         const title = document.getElementById("secretTitle");
         if (title){
           title.dataset.legendApplied = "1";
@@ -1041,6 +1078,7 @@
       }
     })();
 
+    // Keyboard support (desktop)
     window.addEventListener("keydown", (e) => {
       const k = e.key;
       if (k === "ArrowUp") pushKonami("U");
@@ -1051,6 +1089,7 @@
       else if (k === "a" || k === "A") pushKonami("A");
     });
 
+    // Swipe support (mobile)
     let tStartX = 0, tStartY = 0, tStartTime = 0;
 
     function onTouchStart(ev){
@@ -1064,6 +1103,7 @@
     function onTouchEnd(ev){
       const dt = Date.now() - tStartTime;
       if (dt > 900) return;
+
       const t = (ev.changedTouches && ev.changedTouches[0]) ? ev.changedTouches[0] : null;
       if (!t) return;
 
@@ -1081,16 +1121,17 @@
     document.addEventListener("touchstart", onTouchStart, { passive:true });
     document.addEventListener("touchend", onTouchEnd, { passive:true });
 
-    // ================== CRAWL FLOW (Option B) ==================
+    // ================== CRAWL FLOW (Menu pops at 95s) ==================
     let started = false;
 
     async function beginCrawl(){
       if (started) return;
       started = true;
 
+      // resume audio context in gesture (for Chewie synth later)
       getAudioCtx();
-      vibe(15);
 
+      vibe(15);
       await startThemeGuaranteed(true);
 
       crawlScreen.classList.add("running");
@@ -1099,12 +1140,11 @@
         mainCard.classList.add("show");
         showChewieBubble("Rrrrwwgh! New mission unlocked.");
         wookieeGrowl(520);
-
-        // ✅ optional tiny Yoda welcome (light touch, short)
         showYoda("A great quest… begins now.");
 
+        // keep crawl running in background, but remove overlay
         crawlScreen.classList.add("hide");
-        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 120);
+        setTimeout(()=>{ try{ crawlScreen.remove(); }catch(e){} }, 140);
       }, MENU_REVEAL_MS);
     }
 
@@ -1150,10 +1190,10 @@
 
       showChewieBubble("Grrr… (music paused)");
 
-      // ✅ Yoda corrects you (#3)
+      // Yoda corrects you (#3)
       showYoda("Silence? Hmm. Music… you need.");
 
-      // ✅ Subtitle Yoda-flip (#5)
+      // Subtitle Yoda-flip (#5)
       yodaSubtitle("Silence choose, you did. Music, soon… return it must.", 2800);
     });
 
@@ -1161,7 +1201,7 @@
       doRsvpWarp();
     });
 
-    // Pills: Konami B/A
+    // Pills: Konami B/A (Dark=B, Light=A)
     pillDark.addEventListener("click", () => { vibe(12); pushKonami("B"); });
     pillLight.addEventListener("click", () => { vibe(12); pushKonami("A"); });
   </script>
